@@ -1,4 +1,4 @@
-require 'rainbows'
+# -*- encoding: binary -*-
 require 'revactor'
 
 module Rainbows

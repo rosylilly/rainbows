@@ -1,4 +1,4 @@
-require 'rainbows'
+# -*- encoding: binary -*-
 module Rainbows
 
   class Configurator < ::Unicorn::Configurator

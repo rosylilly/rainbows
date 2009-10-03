@@ -1,3 +1,5 @@
+# -*- encoding: binary -*-
+
 module Rainbows
 
   module ThreadPool
