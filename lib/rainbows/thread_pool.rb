@@ -42,7 +42,7 @@ module Rainbows
     def maintain_thread_count(threads)
       threads.list.each do |thr|
         next if (Time.now - (thr[:t] || next)) < timeout
-        thr.kill! # take no prisoners for timeout violations
+        thr.kill
         logger.error "killed #{thr.inspect} for being too old"
       end
 
