@@ -2,13 +2,15 @@
 
 module Rainbows
 
-  module ThreadBase
+  # base class for Rainbows concurrency models
+  module Base
 
     include Unicorn
     include Rainbows::Const
 
-    # write a response without caring if it went out or not
-    # This is in the case of untrappable errors
+    # write a response without caring if it went out or not for error
+    # messages.
+    # TODO: merge into Unicorn::HttpServer
     def emergency_response(client, response_str)
       client.write_nonblock(response_str) rescue nil
       client.close rescue nil
@@ -56,6 +58,12 @@ module Rainbows
       logger.error "Read error: #{e.inspect}"
       logger.error e.backtrace.join("\n")
     end
+
+    def self.included(klass)
+      HttpServer.constants.each do |x|
+        klass.const_set(x, HttpServer.const_get(x))
+      end
+    end
+
   end
 end
-

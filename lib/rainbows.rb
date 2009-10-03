@@ -11,9 +11,9 @@ module Rainbows
   require 'rainbows/const'
   require 'rainbows/http_server'
   require 'rainbows/http_response'
+  require 'rainbows/base'
 
   autoload :Revactor, 'rainbows/revactor'
-  autoload :ThreadBase, 'rainbows/thread_base'
   autoload :ThreadPool, 'rainbows/thread_pool'
 
   class << self

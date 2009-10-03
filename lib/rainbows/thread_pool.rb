@@ -4,9 +4,7 @@ module Rainbows
 
   module ThreadPool
 
-    include ThreadBase
-
-    HttpServer.constants.each  { |x| const_set(x, HttpServer.const_get(x)) }
+    include Base
 
     def worker_loop(worker)
       init_worker_process(worker)

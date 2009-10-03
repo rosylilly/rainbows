@@ -10,9 +10,7 @@ module Rainbows
   module Revactor
     require 'rainbows/revactor/tee_input'
 
-    include Unicorn
-    include Rainbows::Const
-    HttpServer.constants.each  { |x| const_set(x, HttpServer.const_get(x)) }
+    include Base
 
     # once a client is accepted, it is processed in its entirety here
     # in 3 easy steps: read request, call app, write app response
