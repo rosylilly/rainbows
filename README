@@ -1,0 +1,69 @@
+= Rainbows: Unicorn for Comet and slow clients
+
+Rainbows is a HTTP server for {Rack}[http://rack.rubyforge.org/]
+applications.  It is based on {Unicorn}[http://unicorn.bogomips.org/],
+but designed to handle applications that expect long request/response
+times and/or slow clients.  It is designed for Comet applications and
+reverse proxy implementations.  For Rack applications not heavily
+bound by external dependencies, consider Unicorn instead as it simpler
+and easier to debug.
+
+== Features
+
+* Designed for Rack, the standard for modern Ruby HTTP applications.
+
+* Built on Unicorn, inheriting its process/socket management features
+  such as transparent upgrades and Ruby configuration DSL.
+
+* Like Unicorn, it is able to stream large request bodies off the
+  socket to the application while the client is still uploading.
+
+* Combines heavyweight concurrency (worker processes) with lightweight
+  concurrency (Actors/Threads), allowing CPU/memory/disk to be scaled
+  independently of client connections.
+
+== License
+
+Rainbows is copyright 2009 Eric Wong and contributors.  It is based on
+Mongrel and Unicorn and carries the same license.
+
+Mongrel is copyright 2007 Zed A. Shaw and contributors. It is licensed
+under the Ruby license and the GPL2. See the included LICENSE file for
+details.
+
+Rainbows is 100% Free Software.
+
+== Usage
+
+=== for Rack applications
+
+In APP_ROOT (where config.ru is located), run:
+
+  rainbows
+
+Rainbows will bind to all interfaces on TCP port 8080 by default.
+
+=== Configuration File(s)
+
+Rainbows will look for the config.ru file used by rackup in APP_ROOT.
+
+For deployments, it can use a config file for Rainbows-specific options
+specified by the +--config-file/-c+ command-line switch.  See
+Rainbows::Configurator for the syntax of the Rainbows-specific options.
+
+== Disclaimer
+
+There is NO WARRANTY whatsoever if anything goes wrong, but let us know
+and we'll try our best to fix it.
+
+== Contact
+
+All feedback (bug reports, user/development dicussion, patches, pull
+requests) go to the mailing list/newsgroup.  Patches must be sent inline
+(git format-patch -M + git send-email).  No subscription is necessary
+to post on the mailing list.  No top posting.  Address replies +To:+ (or
++Cc:+) the original sender and +Cc:+ the mailing list.
+
+* email: mailto:rainbows-talk@rubyforge.org
+* archives: http://rubyforge.org/pipermail/rainbows-talk
+* subscribe: http://rubyforge.org/mailman/listinfo/rainbows-talk
