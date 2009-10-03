@@ -1,6 +1,10 @@
 # -*- encoding: binary -*-
 require 'revactor'
 
+# workaround revactor 0.1.4 still using the old Rev::Buffer
+# ref: http://rubyforge.org/pipermail/revactor-talk/2009-October/000034.html
+defined?(Rev::Buffer) or Rev::Buffer = IO::Buffer
+
 module Rainbows
 
   module Revactor
