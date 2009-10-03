@@ -5,27 +5,41 @@ module Rainbows
   class HttpServer < ::Unicorn::HttpServer
     include Rainbows
 
-    attr_accessor :worker_connections
-    attr_reader :use
+    @@instance = nil
 
-    def initialize(app, options)
-      self.app = app
-      self.reexec_pid = 0
-      self.init_listeners = options[:listeners] ? options[:listeners].dup : []
-      self.config = Configurator.new(options.merge(:use_defaults => true))
-      self.listener_opts = {}
-      config.commit!(self, :skip => [:listeners, :pid])
-
-      defined?(@use) or
-        self.use = Rainbows.const_get(:ThreadPool)
-      defined?(@worker_connections) or
-        @worker_connections = 4
-
-      #self.orig_app = app
+    class << self
+      def setup(block)
+        @@instance.instance_eval(&block)
+      end
     end
 
-    def use=(model)
+    def initialize(app, options)
+      @@instance = self
+      rv = super(app, options)
+      defined?(@use) or use(:ThreadPool)
+      defined?(@worker_connections) or worker_connections(4)
+      rv
+    end
+
+    def use(*args)
+      return @use if args.empty?
+      model = begin
+        Rainbows.const_get(args.first)
+      rescue NameError
+        raise ArgumentError, "concurrency model #{model.inspect} not supported"
+      end
+
+      Module === model or
+        raise ArgumentError, "concurrency model #{model.inspect} not supported"
       extend(@use = model)
+    end
+
+    def worker_connections(*args)
+      return @worker_connections if args.empty?
+      nr = args.first
+      (Integer === nr && nr > 0) || nr.nil? or
+        raise ArgumentError, "worker_connections must be an Integer or nil"
+      @worker_connections = nr
     end
 
   end

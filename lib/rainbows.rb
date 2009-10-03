@@ -1,10 +1,14 @@
 # -*- encoding: binary -*-
 require 'unicorn'
 
+def Rainbows!(&block)
+  block_given? or raise ArgumentError, "Rainbows! requires a block"
+  Rainbows::HttpServer.setup(block)
+end
+
 module Rainbows
 
   require 'rainbows/const'
-  require 'rainbows/configurator'
   require 'rainbows/http_server'
   require 'rainbows/http_response'
 
