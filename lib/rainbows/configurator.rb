@@ -18,6 +18,7 @@ module Rainbows
     def worker_connections(nr)
       (Integer === nr && nr > 0) || nr.nil? or
         raise ArgumentError, "worker_connections must be an Integer or nil"
+      set[:worker_connections] = nr
     end
 
   end
