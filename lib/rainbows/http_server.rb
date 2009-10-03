@@ -25,8 +25,7 @@ module Rainbows
     end
 
     def use=(model)
-      (class << self; self; end).instance_eval { include model }
-      @use = model
+      extend(@use = model)
     end
 
   end
