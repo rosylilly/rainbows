@@ -1,6 +1,6 @@
-= Rainbows: Unicorn for Comet and slow clients
+= Rainbows! Unicorn for Comet and slow clients
 
-Rainbows is a HTTP server for {Rack}[http://rack.rubyforge.org/]
+Rainbows! is a HTTP server for {Rack}[http://rack.rubyforge.org/]
 applications.  It is based on {Unicorn}[http://unicorn.bogomips.org/],
 but designed to handle applications that expect long request/response
 times and/or slow clients.  It is designed for Comet applications and
@@ -24,14 +24,14 @@ and easier to debug.
 
 == License
 
-Rainbows is copyright 2009 Eric Wong and contributors.  It is based on
+Rainbows! is copyright 2009 Eric Wong and contributors.  It is based on
 Mongrel and Unicorn and carries the same license.
 
 Mongrel is copyright 2007 Zed A. Shaw and contributors. It is licensed
 under the Ruby license and the GPL2. See the included LICENSE file for
 details.
 
-Rainbows is 100% Free Software.
+Rainbows! is 100% Free Software.
 
 == Usage
 
@@ -41,20 +41,37 @@ In APP_ROOT (where config.ru is located), run:
 
   rainbows
 
-Rainbows will bind to all interfaces on TCP port 8080 by default.
+Rainbows! will bind to all interfaces on TCP port 8080 by default.
 
 === Configuration File(s)
 
-Rainbows will look for the config.ru file used by rackup in APP_ROOT.
+Rainbows! will look for the config.ru file used by rackup in APP_ROOT.
 
-For deployments, it can use a config file for Rainbows-specific options
-specified by the +--config-file/-c+ command-line switch.  See
-Rainbows::Configurator for the syntax of the Rainbows-specific options.
+For deployments, it can use a config file for Unicorn and
+Rainbows!-specific options specified by the +--config-file/-c+
+command-line switch.  Rainbows! accepts all options found in
+{Unicorn::Configurator}[http://unicorn.bogomips.org/Unicorn/Configurator.html]
+as well as the "Rainbows!" block, so you can have the following in your
+config file:
+
+    Rainbows! do
+      use :Revactor
+      worker_connections 128
+    end
 
 == Development
 
 * git: git://git.bogomips.org/rainbows.git
 * cgit: http://git.bogomips.org/cgit/rainbows.git
+
+Inline patches (from "git format-patch") to the mailing list are
+preferred because they allow code review and comments in the reply to
+the patch.
+
+We will adhere to mostly the same conventions for patch submissions as
+git itself.  See the Documentation/SubmittingPatches document
+distributed with git on on patch submission guidelines to follow.  Just
+don't email the git mailing list or maintainer with Rainbows! patches.
 
 == Disclaimer
 

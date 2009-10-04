@@ -13,7 +13,7 @@ module Rainbows
       # with Revactor or Rev, so we're considered multithread-ed even
       # when we're not technically...
       "rack.multithread" => true,
-      "SERVER_SOFTWARE" => "Rainbows #{RAINBOWS_VERSION}",
+      "SERVER_SOFTWARE" => "Rainbows! #{RAINBOWS_VERSION}",
     })
 
     CONN_CLOSE = "Connection: close\r\n"

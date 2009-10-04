@@ -1,8 +1,8 @@
 == Signal handling
 
-In general, signals need only be sent to the master process.  However, the
-signals Rainbows uses internally to communicate with the worker processes are
-documented here as well.
+In general, signals need only be sent to the master process.  However,
+the signals Rainbows! uses internally to communicate with the worker
+processes are documented here as well.
 
 === Master Process
 

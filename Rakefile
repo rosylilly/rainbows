@@ -32,7 +32,7 @@ task :news_atom do
   puts(Nokogiri::XML::Builder.new do
     feed :xmlns => "http://www.w3.org/2005/Atom" do
       id! "http://rainbows.rubyforge.org/NEWS.atom.xml"
-      title "Rainbows news"
+      title "Rainbows! news"
       subtitle "Unicorn for Comet and slow clients"
       link! :rel => 'alternate', :type => 'text/html',
             :href => 'http://rainbows.rubyforge.org/NEWS.html'
