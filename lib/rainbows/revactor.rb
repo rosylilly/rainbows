@@ -102,6 +102,7 @@ module Rainbows
           filter.after(1) do
             if alive
               alive.chmod(nr = 0 == nr ? 1 : 0)
+              listeners.each { |l| alive = false if l.dead? }
               ppid == Process.ppid or alive = false
             end
           end
