@@ -68,16 +68,24 @@ module Rainbows
       trap(:QUIT) { alive = false; LISTENERS.each { |s| s.close rescue nil } }
       [:TERM, :INT].each { |sig| trap(sig) { exit!(0) } } # instant shutdown
 
-      Actor.current.trap_exit = true
+      root = Actor.current
+      root.trap_exit = true
 
+      limit = worker_connections
       listeners = revactorize_listeners
       logger.info "worker=#{worker.nr} ready with Revactor"
-      clients = []
+      clients = 0
 
       listeners.map! do |s|
         Actor.spawn(s) do |l|
           begin
-            clients << Actor.spawn(l.accept) { |c| process_client(c) }
+            while clients >= limit
+              logger.info "busy: clients=#{clients} >= limit=#{limit}"
+              Actor.receive { |filter| filter.when(:resume) {} }
+            end
+            actor = Actor.spawn(l.accept) { |c| process_client(c) }
+            clients += 1
+            root.link(actor)
           rescue Errno::EAGAIN, Errno::ECONNABORTED
           rescue Object => e
             if alive
@@ -90,13 +98,20 @@ module Rainbows
 
       nr = 0
       begin
-        Actor.sleep 1
-        clients.delete_if { |c| c.dead? }
-        if alive
-          alive.chmod(nr = 0 == nr ? 1 : 0)
-          ppid == Process.ppid or alive = false
+        Actor.receive do |filter|
+          filter.after(1) do
+            if alive
+              alive.chmod(nr = 0 == nr ? 1 : 0)
+              ppid == Process.ppid or alive = false
+            end
+          end
+          filter.when(Case[:exit, Actor, Object]) do |_,actor,_|
+            orig = clients
+            clients -= 1
+            orig >= limit and listeners.each { |l| l << :resume }
+          end
         end
-      end while alive || ! clients.empty?
+      end while alive || clients > 0
     end
 
   private
