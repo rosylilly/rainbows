@@ -1,23 +1,23 @@
-% UNICORN-RAINBOWS(1) Unicorn User Manual
+% rainbows(1) Unicorn User Manual
 % The Unicorn Community <mongrel-unicorn@rubyforge.org>
 % September 15, 2009
 
 # NAME
 
-unicorn-rainbows - rackup-like command to launch Unicorn Rainbows
+rainbows - rackup-like command to launch Rainbows!
 
 # SYNOPSIS
 
-unicorn-rainbows [-c CONFIG_FILE] [-E RACK_ENV] [-D] [RACKUP_FILE]
+rainbows [-c CONFIG_FILE] [-E RACK_ENV] [-D] [RACKUP_FILE]
 
 # DESCRIPTION
 
-A rackup(1)-like command to launch Rack applications using Unicorn
-Rainbows.  It is expected to be started in your application root
+A rackup(1)-like command to launch Rack applications using
+Rainbows!.  It is expected to be started in your application root
 (APP_ROOT), but "Dir.chdir" may also be executed in the CONFIG_FILE or
 RACKUP_FILE.
 
-While Unicorn Rainbows takes a myriad of command-line options for
+While Rainbows! takes a myriad of command-line options for
 compatibility with ruby(1) and rackup(1), it is recommended to stick
 to the few command-line options specified in the SYNOPSIS and use
 the CONFIG_FILE as much as possible.
@@ -122,7 +122,7 @@ The following UNIX signals may be sent to the master process:
 * TTOU - decrement the number of worker processes by one
 
 See the [SIGNALS][4] document for full description of all signals
-used by Unicorn Rainbows.
+used by Rainbows!.
 
 #  RACK ENVIRONMENT
 
@@ -149,7 +149,7 @@ not require them.
 * unicorn(1)
 * *Rack::Builder* ri/RDoc
 * *Unicorn::Configurator* ri/RDoc
-* [Unicorn Rainbows RDoc][1]
+* [Rainbows! RDoc][1]
 * [Rack RDoc][2]
 * [Rackup HowTo][3]
 
