@@ -51,6 +51,11 @@ For deployments, it can use a config file for Rainbows-specific options
 specified by the +--config-file/-c+ command-line switch.  See
 Rainbows::Configurator for the syntax of the Rainbows-specific options.
 
+== Development
+
+* git: git://git.bogomips.org/rainbows.git
+* cgit: http://git.bogomips.org/cgit/rainbows.git
+
 == Disclaimer
 
 There is NO WARRANTY whatsoever if anything goes wrong, but let us know
