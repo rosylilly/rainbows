@@ -18,7 +18,8 @@ module Rainbows
       buf = client.read or return # this probably does not happen...
       hp = HttpParser.new
       env = {}
-      remote_addr = client.remote_addr
+      remote_addr = ::Revactor::TCP::Socket === client ?
+                    client.remote_addr : LOCALHOST
 
       begin
         while ! hp.headers(env, buf)
@@ -69,10 +70,7 @@ module Rainbows
 
       Actor.current.trap_exit = true
 
-      listeners = LISTENERS.map do |s|
-        TCPServer === s ? ::Revactor::TCP.listen(s, nil) : nil
-      end.compact
-
+      listeners = revactorize_listeners
       logger.info "worker=#{worker.nr} ready with Revactor"
       clients = []
 
@@ -111,6 +109,19 @@ module Rainbows
         @_io.write_nonblock(response_str) rescue nil
       end
       client.close rescue nil
+    end
+
+    def revactorize_listeners
+      LISTENERS.map do |s|
+        if TCPServer === s
+          ::Revactor::TCP.listen(s, nil)
+        elsif defined?(::Revactor::UNIX) && UNIXServer === s
+          ::Revactor::UNIX.listen(s)
+        else
+          logger.error "your version of Revactor can't handle #{s.inspect}"
+          nil
+        end
+      end.compact
     end
 
   end
