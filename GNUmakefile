@@ -8,7 +8,6 @@ GIT-VERSION-FILE: .FORCE-GIT-VERSION-FILE
 	@./GIT-VERSION-GEN
 -include GIT-VERSION-FILE
 -include local.mk
-ruby_bin := $(shell which $(ruby))
 ifeq ($(DLEXT),) # "so" for Linux
   DLEXT := $(shell $(ruby) -rrbconfig -e 'puts Config::CONFIG["DLEXT"]')
 endif
