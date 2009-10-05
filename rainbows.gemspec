@@ -33,7 +33,7 @@ Gem::Specification.new do |s|
 
   s.files = manifest
   s.homepage = %q{http://rainbows.rubyforge.org/}
-  s.summary = %q{Unicorn for slow apps and slow clients}
+  s.summary = %q{Unicorn for sleepy apps and slow clients}
   s.rdoc_options = [ "-Na", "-t", "Rainbows! #{s.summary}" ]
   s.require_paths = %w(lib)
   s.rubyforge_project = %q{rainbows}

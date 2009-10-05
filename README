@@ -1,10 +1,10 @@
-= Rainbows! Unicorn for slow apps and slow clients
+= Rainbows! Unicorn for sleepy apps and slow clients
 
-Rainbows! is a HTTP server for Rack applications.  It is based on
+Rainbows! is a HTTP server for sleepy Rack applications.  It is based on
 Unicorn, but designed to handle applications that expect long
 request/response times and/or slow clients.  For Rack applications not
-heavily bound by slow external dependencies, consider Unicorn instead as
-it simpler and easier to debug.
+heavily bound by slow external network dependencies, consider Unicorn
+instead as it simpler and easier to debug.
 
 == \Rainbows! is about Diversity
 
