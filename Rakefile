@@ -101,3 +101,19 @@ task :release_notes do
   print "\nChanges:\n\n"
   puts body
 end
+
+desc "read news article from STDIN and post to rubyforge"
+task :publish_news do
+  require 'rubyforge'
+  IO.select([STDIN], nil, nil, 1) or abort "E: news must be read from stdin"
+  msg = STDIN.readlines
+  subject = msg.shift
+  blank = msg.shift
+  blank == "\n" or abort "no newline after subject!"
+  subject.strip!
+  body = msg.join("").strip!
+
+  rf = RubyForge.new.configure
+  rf.login
+  rf.post_news('rainbows', subject, body)
+end
