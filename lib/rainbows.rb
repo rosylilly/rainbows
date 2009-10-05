@@ -15,6 +15,7 @@ module Rainbows
 
   autoload :Revactor, 'rainbows/revactor'
   autoload :ThreadPool, 'rainbows/thread_pool'
+  autoload :ThreadSpawn, 'rainbows/thread_spawn'
 
   class << self
     def run(app, options = {})
