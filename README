@@ -1,12 +1,26 @@
-= Rainbows! Unicorn for Comet and slow clients
+= Rainbows! Unicorn for slow apps and slow clients
 
-Rainbows! is a HTTP server for {Rack}[http://rack.rubyforge.org/]
+\Rainbows! is a HTTP server for {Rack}[http://rack.rubyforge.org/]
 applications.  It is based on {Unicorn}[http://unicorn.bogomips.org/],
 but designed to handle applications that expect long request/response
-times and/or slow clients.  It is designed for Comet applications and
-reverse proxy implementations.  For Rack applications not heavily
-bound by external dependencies, consider Unicorn instead as it simpler
-and easier to debug.
+times and/or slow clients.  For Rack applications not heavily bound by
+slow external dependencies, consider Unicorn instead as it simpler and
+easier to debug.
+
+== \Rainbows! is about Diversity
+
+We aim to support as many concurrency models as we can because they all
+suck; differently.
+
+For network concurrency, models we currently support are:
+
+* {:ThreadSpawn}[link:Rainbows/ThreadSpawn.html]
+* {:ThreadPool}[link:Rainbows/ThreadPool.html]
+* {:Revactor}[link:Rainbows/Revactor.html]
+
+We have {more on the way}[link:TODO.html] for handling network concurrency.
+Additionally, we also use multiple processes (managed by Unicorn) for
+CPU/memory/disk concurrency.
 
 == Features
 
@@ -15,23 +29,40 @@ and easier to debug.
 * Built on Unicorn, inheriting its process/socket management features
   such as transparent upgrades and Ruby configuration DSL.
 
-* Like Unicorn, it is able to stream large request bodies off the
-  socket to the application while the client is still uploading.
+* As with Unicorn, it is able to stream large request bodies off the
+  socket to the application while the client is still uploading.  Since
+  \Rainbows! can handle slow clients, this feature is more useful than
+  it is with Unicorn.
 
 * Combines heavyweight concurrency (worker processes) with lightweight
-  concurrency (Actors/Threads), allowing CPU/memory/disk to be scaled
-  independently of client connections.
+  concurrency (Actors or Threads), allowing CPU/memory/disk to be scaled
+  independently of client connections.  Alternative concurrency models
+  (listed in the TODO) will be supported as we find time for them.
+
+== Applications
+
+\Rainbows is for the odd things Unicorn sucks at:
+
+* 3rd-party APIs (to services outside your control/LAN)
+* OpenID consumers (to providers outside your control/LAN)
+* Reverse proxy implementations with editing/censoring
+  (to upstreams outside your control/LAN)
+* Comet
+* BOSH (with slow clients)
+* HTTP server push
+* Long polling
+* Reverse Ajax
 
 == License
 
-Rainbows! is copyright 2009 Eric Wong and contributors.  It is based on
+\Rainbows! is copyright 2009 Eric Wong and contributors.  It is based on
 Mongrel and Unicorn and carries the same license.
 
 Mongrel is copyright 2007 Zed A. Shaw and contributors. It is licensed
 under the Ruby license and the GPL2. See the included LICENSE file for
 details.
 
-Rainbows! is 100% Free Software.
+\Rainbows! is 100% Free Software.
 
 == Usage
 
@@ -41,17 +72,17 @@ In APP_ROOT (where config.ru is located), run:
 
   rainbows
 
-Rainbows! will bind to all interfaces on TCP port 8080 by default.
+\Rainbows! will bind to all interfaces on TCP port 8080 by default.
 
 === Configuration File(s)
 
-Rainbows! will look for the config.ru file used by rackup in APP_ROOT.
+\Rainbows! will look for the config.ru file used by rackup in APP_ROOT.
 
 For deployments, it can use a config file for Unicorn and
-Rainbows!-specific options specified by the +--config-file/-c+
-command-line switch.  Rainbows! accepts all options found in
+\Rainbows!-specific options specified by the +--config-file/-c+
+command-line switch.  \Rainbows! accepts all options found in
 {Unicorn::Configurator}[http://unicorn.bogomips.org/Unicorn/Configurator.html]
-as well as the "Rainbows!" block, so you can have the following in your
+as well as the "\Rainbows!" block, so you can have the following in your
 config file:
 
     Rainbows! do
@@ -71,7 +102,7 @@ the patch.
 We will adhere to mostly the same conventions for patch submissions as
 git itself.  See the Documentation/SubmittingPatches document
 distributed with git on on patch submission guidelines to follow.  Just
-don't email the git mailing list or maintainer with Rainbows! patches.
+don't email the git mailing list or maintainer with \Rainbows! patches.
 
 == Disclaimer
 

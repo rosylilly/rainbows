@@ -1,0 +1,50 @@
+= Frequently Asked Questions about \Rainbows!
+
+=== Why is \Rainbows! a separate project from Unicorn?
+
+\Rainbows is for the odd, corner-case requests that Unicorn is poorly
+suited for.  More scalable concurrency models introduce additional
+complexity that Unicorn users and developers are uncomfortable with for
+the common cases.
+
+
+=== What complexity?  Threads/events/actors are easy to work with!
+
+Good for you.  Some of us depend on libraries incompatible with those
+models, or are just too lazy to deal with them for the majority of
+requests we service.
+
+
+=== Isn't "rainbows" a branch of Unicorn?
+
+That functionality is now in the Revactor model of \Rainbows!
+
+
+=== What happened to the "gossamer" branch of Unicorn?
+
+It became the ThreadPool model of \Rainbows!
+
+
+=== Which concurrency model should I use?
+
+It depends on your application, libraries, Ruby stack and use cases.
+That's why we support as many concurrency model as we can.  Each model
+has their own strengths and weaknesses in terms of maturity,
+ease-of-debugging, compatibility, performance, and memory usage.
+
+
+=== Should I put \Rainbows! behind nginx to serve slow clients?
+
+It is optional.  You can still use nginx to route certain requests to
+Unicorn and others to \Rainbows!  nginx will always outperform
+\Rainbows! in both pure reverse proxy applications and for serving
+static files,  but \Rainbows! is for hosting applications that are more
+easily-implemented in Ruby than C.
+
+
+=== Should I use \Rainbows! to serve static files?
+
+It depends on the size and amount of static files you're serving.  If
+you're serving a lot of static files (especially large ones), then by
+all means use nginx.  If not, then \Rainbows! is likely a "good enough"
+solution even if nginx will always outperform it in raw throughput.

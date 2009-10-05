@@ -33,7 +33,7 @@ task :news_atom do
     feed :xmlns => "http://www.w3.org/2005/Atom" do
       id! "http://rainbows.rubyforge.org/NEWS.atom.xml"
       title "Rainbows! news"
-      subtitle "Unicorn for Comet and slow clients"
+      subtitle "Unicorn for slow apps and slow clients"
       link! :rel => 'alternate', :type => 'text/html',
             :href => 'http://rainbows.rubyforge.org/NEWS.html'
       updated(new_tags.empty? ? "1970-01-01T00:00:00Z" : new_tags.first[:time])

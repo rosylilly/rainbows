@@ -1,0 +1,48 @@
+= \Rainbows! is like Unicorn, but Different...
+
+While \Rainbows! depends on Unicorn for its process/socket management,
+HTTP parser and configuration language; \Rainbows! is more ambitious.
+
+== Differences from Unicorn
+
+* log rotation is handled immediately in \Rainbows! whereas Unicorn has
+  the luxury of delaying it until the current request is finished
+  processing to prevent log entries for one request to be split across
+  files.
+
+* load balancing between workers is imperfect, certain worker processes
+  may be servicing more requests than others so it is important to not
+  set +worker_connections+ too high.  Unicorn worker processes can never
+  be servicing more than one request at once.
+
+* speculative, non-blocking accept() is not used, this is to help
+  load balance between multiple worker processes.
+
+* HTTP pipelining and keepalive may be used for GET and HEAD requests.
+
+* Less heavily-tested and inherently more complex.
+
+
+== Similarities with Unicorn
+
+While some similarities are obvious (we depend on and subclass of
+Unicorn code), some things are not:
+
+* Does not attempt to accept() connections when pre-configured limits
+  are hit (+worker_connections+).  This will first help balance load
+  to different worker processes, and if your listen() +:backlog+ is
+  overflowing: to other machines in your cluster.
+
+* Accepts the same {signals}[http://unicorn.bogomips.org/SIGNALS.html]
+  for process management, so you can share scripts to manage them (and
+  nginx, too).
+
+* supports per-process listeners, allowing an external load balancer
+  like haproxy or nginx to be used to balance between multiple
+  worker processes.
+
+* Exposes a streaming "rack.input" to the Rack application that reads
+  data off the socket as the application reads it (while retaining
+  rewindable semantics as required by Rack).  This allows Rack-compliant
+  apps/middleware to implement things such as real-time upload progress
+  monitoring.

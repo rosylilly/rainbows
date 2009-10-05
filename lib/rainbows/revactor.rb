@@ -7,6 +7,20 @@ defined?(Rev::Buffer) or Rev::Buffer = IO::Buffer
 
 module Rainbows
 
+  # Enables use of the Actor model through
+  # {Revactor}[http://revactor.org] under Ruby 1.9.  It spawns one
+  # long-lived Actor for every listen socket in the process and spawns a
+  # new Actor for every client connection accept()-ed.
+  # +worker_connections+ will limit the number of client Actors we have
+  # running at any one time.
+  #
+  # Applications using this model are required to be reentrant, but
+  # generally do not have to worry about race conditions.  Multiple
+  # instances of the same app may run in the same address space
+  # sequentially (but at interleaved points).  Any network dependencies
+  # in the application using this model should be implemented using the
+  # \Revactor library as well.
+
   module Revactor
     require 'rainbows/revactor/tee_input'
 
