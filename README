@@ -65,6 +65,17 @@ details.
 
 \Rainbows! is 100% Free Software.
 
+== Install
+
+You may download the tarball from the Rainbows project page on Rubyforge
+and run setup.rb after unpacking it:
+
+http://rubyforge.org/frs/?group_id=8977
+
+You may also install it via Rubygems on Rubyforge:
+
+  gem install rainbows
+
 == Usage
 
 === for Rack applications
