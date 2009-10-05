@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.name = %q{rainbows}
   s.version = ENV["VERSION"]
 
-  s.authors = ["Eric Wong"]
+  s.authors = ["Rainbows! developers"]
   s.date = Time.now.utc.strftime('%Y-%m-%d')
   s.description = File.read("README").split(/\n\n/)[1]
   s.email = %q{rainbows-talk@rubyforge.org}

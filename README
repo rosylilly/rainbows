@@ -56,8 +56,8 @@ CPU/memory/disk concurrency.
 
 == License
 
-\Rainbows! is copyright 2009 Eric Wong and contributors.  It is based on
-Mongrel and Unicorn and carries the same license.
+\Rainbows! is copyright 2009 by all contributors (see logs in git).
+It is based on Mongrel and Unicorn and carries the same license.
 
 Mongrel is copyright 2007 Zed A. Shaw and contributors. It is licensed
 under the Ruby license and the GPL2. See the included LICENSE file for

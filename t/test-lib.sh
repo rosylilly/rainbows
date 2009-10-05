@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (c) 2009 Eric Wong
+# Copyright (c) 2009 Rainbows! developers
 set -e
 set -u
 T=$(basename $0)
