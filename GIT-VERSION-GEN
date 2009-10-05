@@ -1,8 +1,8 @@
 #!/bin/sh
 
 GVF=GIT-VERSION-FILE
-DEF_VER=v0.93.0
-# DEF_VER=v0.93.0.GIT
+DEF_VER=v0.1.0
+# DEF_VER=v0.1.0.GIT
 
 LF='
 '
