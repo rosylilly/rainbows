@@ -15,9 +15,9 @@ module Rainbows
 
     def initialize(app, options)
       @@instance = self
-      @worker_connections = 1
       rv = super(app, options)
       defined?(@use) or use(:Base)
+      @worker_connections ||= MODEL_WORKER_CONNECTIONS[@use]
     end
 
     def use(*args)

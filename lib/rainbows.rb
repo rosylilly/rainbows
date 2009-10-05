@@ -13,14 +13,23 @@ module Rainbows
   require 'rainbows/http_response'
   require 'rainbows/base'
 
-  autoload :Revactor, 'rainbows/revactor'
-  autoload :ThreadPool, 'rainbows/thread_pool'
-  autoload :ThreadSpawn, 'rainbows/thread_spawn'
-
   class << self
     def run(app, options = {})
       HttpServer.new(app, options).start.join
     end
+  end
+
+  # maps models to default worker counts, default worker count numbers are
+  # pretty arbitrary and tuning them to your application and hardware is
+  # highly recommended
+  MODEL_WORKER_CONNECTIONS = {
+    :Base => 1, # this one can't change
+    :Revactor => 50,
+    :ThreadSpawn => 30,
+    :ThreadPool => 10,
+  }.each do |model, _|
+    u = model.to_s.gsub(/([a-z0-9])([A-Z0-9])/) { "#{$1}_#{$2.downcase!}" }
+    autoload model, "rainbows/#{u.downcase!}"
   end
 
 end
