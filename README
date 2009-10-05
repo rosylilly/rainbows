@@ -1,11 +1,10 @@
 = Rainbows! Unicorn for slow apps and slow clients
 
-\Rainbows! is a HTTP server for {Rack}[http://rack.rubyforge.org/]
-applications.  It is based on {Unicorn}[http://unicorn.bogomips.org/],
-but designed to handle applications that expect long request/response
-times and/or slow clients.  For Rack applications not heavily bound by
-slow external dependencies, consider Unicorn instead as it simpler and
-easier to debug.
+Rainbows! is a HTTP server for Rack applications.  It is based on
+Unicorn, but designed to handle applications that expect long
+request/response times and/or slow clients.  For Rack applications not
+heavily bound by slow external dependencies, consider Unicorn instead as
+it simpler and easier to debug.
 
 == \Rainbows! is about Diversity
 
@@ -24,9 +23,11 @@ CPU/memory/disk concurrency.
 
 == Features
 
-* Designed for Rack, the standard for modern Ruby HTTP applications.
+* Designed for {Rack}[http://rack.rubyforge.org/], the standard for
+  modern Ruby HTTP applications.
 
-* Built on Unicorn, inheriting its process/socket management features
+* Built on {Unicorn}[http://unicorn.bogomips.org/], inheriting its
+  process/socket management features
   such as transparent upgrades and Ruby configuration DSL.
 
 * As with Unicorn, it is able to stream large request bodies off the
