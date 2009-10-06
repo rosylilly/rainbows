@@ -21,8 +21,8 @@ T = $(wildcard t[0-9][0-9][0-9][0-9]-*.sh)
 all:: $(T)
 
 # can't rely on "set -o pipefail" since we don't require bash or ksh93 :<
-t_code = $@-$(RUBY_VERSION).code
-t_log = $@-$(RUBY_VERSION).log
+t_code = trash/$@-$(RUBY_VERSION).code
+t_log = trash/$@-$(RUBY_VERSION).log
 t_run = $(TRACER) $(SHELL) $(TEST_OPTS) $@
 
 # prefix stdout messages with ':', and stderr messages with '!'
@@ -63,12 +63,17 @@ random_blob:
 
 $(addsuffix .sh,$(req_random_blob)): random_blob
 
+$(T): trash/.gitignore
 $(T): export ruby := $(ruby)
 $(T): export PATH := $(CURDIR)/test-bin-$(RUBY_VERSION):$(PATH)
 $(T): test-bin-$(RUBY_VERSION)/rainbows
 	$(run_test)
 
+trash/.gitignore:
+	mkdir -p $(@D)
+	echo '*' > $@
+
 clean:
-	$(RM) -r *.log *.code test-bin-$(RUBY_VERSION)
+	$(RM) -r trash/*.log trash/*.code test-bin-$(RUBY_VERSION)
 
 .PHONY: $(T) clean
