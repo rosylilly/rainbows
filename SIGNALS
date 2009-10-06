@@ -2,7 +2,10 @@
 
 In general, signals need only be sent to the master process.  However,
 the signals Rainbows! uses internally to communicate with the worker
-processes are documented here as well.
+processes are documented here as well.  With the exception of TTIN/TTOU,
+signal handling matches the behavior of and {nginx}[http://nginx.net/]
+so it should be possible to easily share process management scripts
+between \Rainbows!, Unicorn and nginx.
 
 === Master Process
 
@@ -43,16 +46,17 @@ automatically respawned.
 
 * USR1 - Reopen all logs owned by the worker process.
   See Unicorn::Util.reopen_logs for what is considered a log.
-  Log files are not reopened until it is done processing
-  the current request, so multiple log lines for one request
-  (as done by Rails) will not be split across multiple logs.
+  Unlike Unicorn, log files are reopened immediately in \Rainbows!
+  since worker processes are likely to be serving multiple clients
+  simutaneously, we can't wait for all of them to finish.
 
 === Procedure to replace a running rainbows executable
 
-You may replace a running instance of unicorn with a new one without
+You may replace a running instance of rainbows with a new one without
 losing any incoming connections.  Doing so will reload all of your
-application code, Unicorn config, Ruby executable, and all libraries.
-The only things that will not change (due to OS limitations) are:
+application code, Unicorn/Rainbows! config, Ruby executable, and all
+libraries.  The only things that will not change (due to OS limitations)
+are:
 
 1. The path to the rainbows executable script.  If you want to change to
    a different installation of Ruby, you can modify the shebang
