@@ -2,3 +2,4 @@
 /test-bin-*
 /*.code
 /*.log
+/random_blob

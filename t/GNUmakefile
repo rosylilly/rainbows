@@ -56,6 +56,13 @@ test-bin-$(RUBY_VERSION)/rainbows: ../bin/rainbows
 	cmp $@+ $@ 2>/dev/null || mv $@+ $@
 	$(RM) $@+
 
+req_random_blob := t3100-revactor-tee-input
+random_blob:
+	dd if=/dev/urandom bs=1M count=10 of=$@+
+	mv $@+ $@
+
+$(addsuffix .sh,$(req_random_blob)): random_blob
+
 $(T): export ruby := $(ruby)
 $(T): export PATH := $(CURDIR)/test-bin-$(RUBY_VERSION):$(PATH)
 $(T): test-bin-$(RUBY_VERSION)/rainbows
