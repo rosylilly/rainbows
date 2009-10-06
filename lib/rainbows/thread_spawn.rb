@@ -28,6 +28,7 @@ module Rainbows
 
       while alive && master_pid == Process.ppid
         ret = begin
+          alive.chmod(nr += 1)
           IO.select(LISTENERS, nil, nil, timeout/2.0) or next
         rescue Errno::EINTR
           retry
