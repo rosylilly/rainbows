@@ -153,4 +153,8 @@ gem install-gem: GIT-VERSION-FILE
 	$(MAKE) $@ VERSION=$(GIT_VERSION)
 endif
 
-.PHONY: .FORCE-GIT-VERSION-FILE doc manifest man
+all:: test
+test:
+	$(MAKE) -C t
+
+.PHONY: .FORCE-GIT-VERSION-FILE doc manifest man test
