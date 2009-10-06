@@ -79,7 +79,6 @@ module Rainbows
           ret.first.each do |sock|
             begin
               process_client(sock.accept_nonblock)
-              thr[:t] = Time.now
             rescue Errno::EAGAIN, Errno::ECONNABORTED
             end
           end

@@ -24,7 +24,8 @@ module Rainbows
       env = {}
       remote_addr = TCPSocket === client ? client.peeraddr.last : LOCALHOST
 
-      begin
+      begin # loop
+        Thread.current[:t] = Time.now
         while ! hp.headers(env, buf)
           buf << client.readpartial(CHUNK_SIZE)
         end

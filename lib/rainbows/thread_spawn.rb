@@ -44,10 +44,7 @@ module Rainbows
           rescue Errno::EINTR, Errno::ECONNABORTED
             next
           end
-          threads.add(Thread.new(c) { |c|
-            Thread.current[:t] = Time.now
-            process_client(c)
-          })
+          threads.add(Thread.new(c) { |c| process_client(c) })
         end
       end
       join_spawned_threads(threads)
