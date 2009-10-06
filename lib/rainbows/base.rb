@@ -60,9 +60,7 @@ module Rainbows
     end
 
     def self.included(klass)
-      HttpServer.constants.each do |x|
-        klass.const_set(x, HttpServer.const_get(x))
-      end
+      klass.const_set :LISTENERS, HttpServer::LISTENERS
     end
 
   end
