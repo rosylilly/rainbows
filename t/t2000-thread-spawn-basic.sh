@@ -2,22 +2,12 @@
 . ./test-lib.sh
 
 eval $(unused_listen)
-config_ru=$(mktemp -t rainbows.$$.XXXXXXXX.config.ru)
-unicorn_config=$(mktemp -t rainbows.$$.XXXXXXXX.unicorn.rb)
-curl_out=$(mktemp -t rainbows.$$.XXXXXXXX.curl.out)
-curl_err=$(mktemp -t rainbows.$$.XXXXXXXX.curl.err)
-pid=$(mktemp -t rainbows.$$.XXXXXXXX.pid)
-TEST_RM_LIST="$TEST_RM_LIST $config_ru $unicorn_config $lock_path"
+unicorn_config=$(mktemp -t rainbows.$$.unicorn.rb.XXXXXXXX)
+curl_out=$(mktemp -t rainbows.$$.curl.out.XXXXXXXX)
+curl_err=$(mktemp -t rainbows.$$.curl.err.XXXXXXXX)
+pid=$(mktemp -t rainbows.$$.pid.XXXXXXXX)
+TEST_RM_LIST="$TEST_RM_LIST $unicorn_config $lock_path $pid"
 TEST_RM_LIST="$TEST_RM_LIST $curl_out $curl_err"
-
-cat > $config_ru <<\EOF
-use Rack::ContentLength
-use Rack::ContentType
-run lambda { |env|
-  sleep 1
-  [ 200, {}, [ Thread.current.inspect << "\n" ] ]
-}
-EOF
 
 nr_client=30
 nr_thread=10
@@ -31,7 +21,7 @@ Rainbows! do
 end
 EOF
 
-rainbows -D $config_ru -c $unicorn_config
+rainbows -D t2000.ru -c $unicorn_config
 wait_for_pid $pid
 
 start=$(date +%s)

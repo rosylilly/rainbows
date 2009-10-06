@@ -14,7 +14,7 @@ r_out=$(mktemp -t rainbows.$$.r.out.XXXXXXXX)
 pid=$(mktemp -t rainbows.$$.pid.XXXXXXXX)
 blob=$(mktemp -t rainbows.$$.blob.XXXXXXXX)
 TEST_RM_LIST="$TEST_RM_LIST $unicorn_config $lock_path $r_err $r_out"
-TEST_RM_LIST="$TEST_RM_LIST $curl_out $curl_err $blob"
+TEST_RM_LIST="$TEST_RM_LIST $curl_out $curl_err $blob $pid"
 
 cat > $unicorn_config <<EOF
 listen "$listen"
