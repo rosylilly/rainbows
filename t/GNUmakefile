@@ -37,6 +37,9 @@ ifndef V
   quiet_post = > $(t_log) 2>&1; exit $$(cat $(t_code))
   pfx =
 else
+  ifeq ($(V),2)
+    TEST_OPTS += -x
+  endif
   quiet_pre = @echo '* $@';
   quiet_post = 2>&1 | tee $(t_log); exit $$(cat $(t_code))
   pfx = $@
