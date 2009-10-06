@@ -50,7 +50,7 @@ test-bin-$(RUBY_VERSION)/rainbows: ../bin/rainbows
 	mkdir -p $(@D)
 	install -m 755 $^ $@+
 	$(ruby) -i -p -e '$$_.gsub!(%r{^#!.*$$},"#!$(ruby_bin)")' $@+
-	cmp $@+ $@ || mv $@+ $@
+	cmp $@+ $@ 2>/dev/null || mv $@+ $@
 	$(RM) $@+
 
 $(T): export ruby := $(ruby)
