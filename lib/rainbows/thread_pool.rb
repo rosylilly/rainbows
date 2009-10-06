@@ -26,11 +26,11 @@ module Rainbows
 
       # closing anything we IO.select on will raise EBADF
       trap(:USR1) { reopen_worker_logs(worker.nr) rescue nil }
-      trap(:QUIT) { alive = false; LISTENERS.map! { |s| s.close rescue nil } }
+      trap(:QUIT) { LISTENERS.map! { |s| s.close rescue nil } }
       [:TERM, :INT].each { |sig| trap(sig) { exit(0) } } # instant shutdown
       logger.info "worker=#{worker.nr} ready with ThreadPool"
 
-      while alive && master_pid == Process.ppid
+      while LISTENERS.first && master_pid == Process.ppid
         maintain_thread_count(threads)
         threads.list.each do |thr|
           alive.chmod(nr += 1)
@@ -65,11 +65,9 @@ module Rainbows
 
     def new_worker_thread
       Thread.new {
-        alive = true
-        thr = Thread.current
         begin
           ret = begin
-            thr[:t] = Time.now
+            Thread.current[:t] = Time.now
             IO.select(LISTENERS, nil, nil, timeout/2.0) or next
           rescue Errno::EINTR
             retry
@@ -83,11 +81,11 @@ module Rainbows
             end
           end
         rescue Object => e
-          if alive
+          if LISTENERS.first
             logger.error "Unhandled listen loop exception #{e.inspect}."
             logger.error e.backtrace.join("\n")
           end
-        end while alive = LISTENERS.first
+        end while LISTENERS.first
       }
     end
 
