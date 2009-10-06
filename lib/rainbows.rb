@@ -17,18 +17,23 @@ module Rainbows
     end
   end
 
-  # configures Rainbows! with a given concurrency model to +use+ and
+  # configures \Rainbows! with a given concurrency model to +use+ and
   # a +worker_connections+ upper-bound.  This method may be called
   # inside a Unicorn/Rainbows configuration file:
   #
   #   Rainbows! do
   #     use :Revactor # this may also be :ThreadSpawn or :ThreadPool
-  #     worker_connections 128
+  #     worker_connections 400
   #   end
+  #
+  #   # the rest of the Unicorn configuration
+  #   worker_processes 8
   #
   # See the documentation for the respective Revactor, ThreadSpawn,
   # and ThreadPool classes for descriptions and recommendations for
-  # each of them.
+  # each of them.  The total number of clients we're able to serve is
+  # +worker_processes+ * +worker_connections+, so in the above example
+  # we can serve 8 * 400 = 3200 clients concurrently.
   def Rainbows!(&block)
     block_given? or raise ArgumentError, "Rainbows! requires a block"
     HttpServer.setup(block)

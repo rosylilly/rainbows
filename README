@@ -99,8 +99,11 @@ config file:
 
     Rainbows! do
       use :Revactor
-      worker_connections 128
+      worker_connections 400
     end
+
+See the {Rainbows! configuration documentation}[link:Rainbows.html#M000001]
+for more details.
 
 == Development
 
