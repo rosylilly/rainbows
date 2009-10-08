@@ -50,3 +50,9 @@ rtmpfiles () {
 		_TEST_RM_LIST="$_TEST_RM_LIST $_tmp"
 	done
 }
+
+dbgcat () {
+	id=$1
+	eval '_file=$'$id
+	sed -e "s/^/$id:/" < $_file
+}
