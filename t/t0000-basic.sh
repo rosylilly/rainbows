@@ -2,11 +2,7 @@
 . ./test-lib.sh
 
 eval $(unused_listen)
-pid=$(mktemp -t rainbows.$$.pid.XXXXXXXX)
-tmp=$(mktemp -t rainbows.$$.err.XXXXXXXX)
-ok=$(mktemp -t rainbows.$$.ok.XXXXXXXX)
-fifo=$(mktemp -t rainbows.$$.fifo.XXXXXXXX)
-TEST_RM_LIST="$TEST_RM_LIST $lock_path $pid $tmp $ok $fifo"
+rtmpfiles pid tmp ok fifo
 
 rm -f $fifo
 mkfifo $fifo

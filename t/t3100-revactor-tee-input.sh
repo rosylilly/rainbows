@@ -7,14 +7,7 @@ require_revactor
 test -r random_blob || die "random_blob required, run with 'make $0'"
 
 eval $(unused_listen)
-unicorn_config=$(mktemp -t rainbows.$$.unicorn.rb.XXXXXXXX)
-curl_out=$(mktemp -t rainbows.$$.curl.out.XXXXXXXX)
-curl_err=$(mktemp -t rainbows.$$.curl.err.XXXXXXXX)
-r_err=$(mktemp -t rainbows.$$.r.err.XXXXXXXX)
-r_out=$(mktemp -t rainbows.$$.r.out.XXXXXXXX)
-pid=$(mktemp -t rainbows.$$.pid.XXXXXXXX)
-TEST_RM_LIST="$TEST_RM_LIST $unicorn_config $lock_path $r_err $r_out"
-TEST_RM_LIST="$TEST_RM_LIST $curl_out $curl_err $pid"
+rtmpfiles unicorn_config curl_out curl_err r_err r_out pid
 
 cat > $unicorn_config <<EOF
 listen "$listen"

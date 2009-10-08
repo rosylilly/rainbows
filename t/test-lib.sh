@@ -15,8 +15,8 @@ die () {
 	exit 1
 }
 
-TEST_RM_LIST=""
-trap 'rm -f $TEST_RM_LIST' 0
+_TEST_RM_LIST=""
+trap 'rm -f $_TEST_RM_LIST' 0
 PATH=$PWD/bin:$PATH
 export PATH
 
@@ -38,4 +38,15 @@ require_revactor () {
 		echo >&2 "skipping $T since we don't have Revactor"
 		exit 0
 	fi
+}
+
+# given a list of variable names, create temporary files and assign
+# the pathnames to those variables
+rtmpfiles () {
+	for id in "$@"
+	do
+		_tmp=$(mktemp -t rainbows.$$.$id.XXXXXXXX)
+		eval "$id=$_tmp"
+		_TEST_RM_LIST="$_TEST_RM_LIST $_tmp"
+	done
 }

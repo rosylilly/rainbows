@@ -3,12 +3,7 @@
 require_revactor
 
 eval $(unused_listen)
-unicorn_config=$(mktemp -t rainbows.$$.unicorn.rb.XXXXXXXX)
-curl_out=$(mktemp -t rainbows.$$.curl.out.XXXXXXXX)
-curl_err=$(mktemp -t rainbows.$$.curl.err.XXXXXXXX)
-pid=$(mktemp -t rainbows.$$.pid.XXXXXXXX)
-TEST_RM_LIST="$TEST_RM_LIST $pid $unicorn_config $lock_path"
-TEST_RM_LIST="$TEST_RM_LIST $curl_out $curl_err"
+rtmpfiles unicorn_config curl_out curl_err pid
 
 nr_client=30
 nr_actor=10
