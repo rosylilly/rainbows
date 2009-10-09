@@ -17,7 +17,7 @@ module Rainbows
       init_worker_process(worker)
       threads = ThreadGroup.new
       alive = worker.tmp
-      nr = 0
+      m = 0
       limit = worker_connections
 
       # closing anything we IO.select on will raise EBADF
@@ -28,7 +28,7 @@ module Rainbows
 
       while alive && master_pid == Process.ppid
         ret = begin
-          alive.chmod(nr += 1)
+          alive.chmod(m = 0 == m ? 1 : 0)
           IO.select(LISTENERS, nil, nil, timeout/2.0) or next
         rescue Errno::EINTR
           retry

@@ -110,12 +110,12 @@ module Rainbows
         end
       end
 
-      nr = 0
+      m = 0
       begin
         Actor.receive do |filter|
           filter.after(1) do
             if alive
-              alive.chmod(nr = 0 == nr ? 1 : 0)
+              alive.chmod(m = 0 == m ? 1 : 0)
               listeners.each { |l| alive = false if l.dead? }
               ppid == Process.ppid or alive = false
             end

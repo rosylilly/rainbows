@@ -22,7 +22,7 @@ module Rainbows
       init_worker_process(worker)
       threads = ThreadGroup.new
       alive = worker.tmp
-      nr = 0
+      m = 0
 
       # closing anything we IO.select on will raise EBADF
       trap(:USR1) { reopen_worker_logs(worker.nr) rescue nil }
@@ -33,7 +33,7 @@ module Rainbows
       while LISTENERS.first && master_pid == Process.ppid
         maintain_thread_count(threads)
         threads.list.each do |thr|
-          alive.chmod(nr += 1)
+          alive.chmod(m = 0 == m ? 1 : 0)
           thr.join(timeout / 2.0) and break
         end
       end
