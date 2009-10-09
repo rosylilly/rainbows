@@ -42,7 +42,7 @@ module Rainbows
           end
           c = begin
             l.accept_nonblock
-          rescue Errno::EINTR, Errno::ECONNABORTED
+          rescue Errno::EAGAIN, Errno::EINTR, Errno::ECONNABORTED
             next
           end
           threads.add(Thread.new(c) { |c| process_client(c) })
