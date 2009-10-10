@@ -37,9 +37,7 @@ module Rainbows
         end
 
         ret.first.each do |l|
-          while threads.list.size >= limit
-            nuke_old_thread(threads)
-          end
+          nuke_old_thread(threads, limit)
           c = begin
             l.accept_nonblock
           rescue Errno::EAGAIN, Errno::ECONNABORTED
@@ -56,15 +54,18 @@ module Rainbows
       join_spawned_threads(threads)
     end
 
-    def nuke_old_thread(threads)
-      threads.list.each do |thr|
-        next if (Time.now - (thr[:t] || next)) < timeout
-        thr.kill
-        logger.error "killed #{thr.inspect} for being too old"
-        return
+    def nuke_old_thread(threads, limit)
+      while (list = threads.list).size > limit
+        list.each do |thr|
+          thr.alive? or return # it _just_ died, we don't need it
+          next if (age = (Time.now - (thr[:t] || next))) < timeout
+          thr.kill # no-op if already dead
+          logger.error "killed #{thr.inspect} for being too old: #{age}"
+          return
+        end
+        # nothing to kill, yield to another thread
+        Thread.pass
       end
-      # nothing to kill, yield to another thread
-      Thread.pass
     end
 
     def join_spawned_threads(threads)
