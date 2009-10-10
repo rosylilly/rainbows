@@ -1,5 +1,7 @@
 #!/bin/sh
 # Copyright (c) 2009 Rainbows! developers
+
+set -o pipefail >/dev/null 2>&1 || : # non-POSIX, but useful in ksh/bash
 set -e
 set -u
 T=$(basename $0)
