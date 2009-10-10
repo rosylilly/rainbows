@@ -23,7 +23,7 @@ all:: $(T)
 # can't rely on "set -o pipefail" since we don't require bash or ksh93 :<
 t_code = trash/$@-$(RUBY_VERSION).code
 t_log = trash/$@-$(RUBY_VERSION).log
-t_run = $(TRACER) $(SHELL) $(TEST_OPTS) $@
+t_run = $(TRACER) $(SHELL) $(SH_TEST_OPTS) $@
 
 # prefix stdout messages with ':', and stderr messages with '!'
 t_wrap = ( ( ( $(RM) $(t_code); \
@@ -38,7 +38,7 @@ ifndef V
   pfx =
 else
   ifeq ($(V),2)
-    TEST_OPTS += -x
+    SH_TEST_OPTS += -x
   endif
   quiet_pre = @echo '* $@';
   quiet_post = 2>&1 | tee $(t_log); exit $$(cat $(t_code))
