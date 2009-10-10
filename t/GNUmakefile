@@ -21,8 +21,11 @@ T = $(wildcard t[0-9][0-9][0-9][0-9]-*.sh)
 all:: $(T)
 
 # can't rely on "set -o pipefail" since we don't require bash or ksh93 :<
-t_code = trash/$@-$(RUBY_VERSION).code
-t_log = trash/$@-$(RUBY_VERSION).log
+t_pfx = trash/$@-$(RUBY_VERSION)
+t_code = $(t_pfx).code
+t_log = $(t_pfx).log
+# TRACER = strace -f -o $(t_pfx).strace -s 100000
+# TRACER = /usr/bin/time -o $(t_pfx).time
 t_run = $(TRACER) $(SHELL) $(SH_TEST_OPTS) $@
 
 # prefix stdout messages with ':', and stderr messages with '!'
@@ -45,7 +48,6 @@ else
   pfx = $@
 endif
 
-# TRACER='strace -f -o $@.strace -s 100000'
 run_test = $(quiet_pre) ( $(t_wrap) ) $(quiet_post)
 
 test-bin-$(RUBY_VERSION)/rainbows: ruby_bin = $(shell which $(ruby))
