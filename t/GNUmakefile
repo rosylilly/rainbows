@@ -29,7 +29,7 @@ t_log = $(t_pfx).log
 t_run = $(TRACER) $(SHELL) $(SH_TEST_OPTS) $@
 
 # prefix stdout messages with ':', and stderr messages with '!'
-t_wrap = ( ( ( $(RM) $(t_code); \
+t_wrap = ( ( ( echo 42 > $(t_code); \
   $(t_run); \
   echo $$? > $(t_code) ) \
   | sed 's/^/$(pfx):/' 1>&3 ) 2>&1 \
