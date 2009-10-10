@@ -26,14 +26,14 @@ module Rainbows
       [:TERM, :INT].each { |sig| trap(sig) { exit(0) } } # instant shutdown
       logger.info "worker=#{worker.nr} ready with ThreadSpawn"
 
-      while alive && master_pid == Process.ppid
+      begin
         ret = begin
           alive.chmod(m = 0 == m ? 1 : 0)
           IO.select(LISTENERS, nil, nil, timeout/2.0) or next
         rescue Errno::EINTR
           retry
         rescue Errno::EBADF
-          alive = false
+          break
         end
 
         ret.first.each do |l|
@@ -47,7 +47,12 @@ module Rainbows
           end
           threads.add(Thread.new(c) { |c| process_client(c) })
         end
-      end
+      rescue
+        if alive
+          logger.error "Unhandled listen loop exception #{e.inspect}."
+          logger.error e.backtrace.join("\n")
+        end
+      end while alive && master_pid == Process.ppid
       join_spawned_threads(threads)
     end
 
