@@ -84,7 +84,7 @@ module Rainbows
       limit = worker_connections
       revactorize_listeners!
       clients = {}
-      alive = worker.tmp
+      alive = true
 
       listeners = LISTENERS.map do |s|
         Actor.spawn(s) do |l|
@@ -107,20 +107,19 @@ module Rainbows
 
       m = 0
       begin
+        worker.tmp.chmod(m = 0 == m ? 1 : 0)
+        if listeners.any? { |l| l.dead? } || master_pid != Process.ppid
+          alive = false
+          clients.each_pair { |a,_| a[:quit] = true }
+        end
         Actor.receive do |filter|
-          filter.after(1) do
-            alive.chmod(m = 0 == m ? 1 : 0)
-            if listeners.any? { |l| l.dead? } || master_pid != Process.ppid
-              alive = false
-            end
-          end
+          filter.after(timeout) { redo }
           filter.when(Case[:exit, Actor, Object]) do |_,actor,_|
             orig = clients.size
             clients.delete(actor.object_id)
             orig >= limit and listeners.each { |l| l << :resume }
           end
         end
-        alive or clients.each_pair { |a,_| a[:quit] = true }
       end while alive || clients.size > 0
     end
 
