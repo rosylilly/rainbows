@@ -32,6 +32,7 @@ module Rainbows
       buf = client.read or return # this probably does not happen...
       hp = HttpParser.new
       env = {}
+      alive = true
       remote_addr = ::Revactor::TCP::Socket === client ?
                     client.remote_addr : LOCALHOST
 
@@ -52,9 +53,10 @@ module Rainbows
           response = app.call(env)
         end
 
-        out = [ hp.keepalive? ? CONN_ALIVE : CONN_CLOSE ] if hp.headers?
+        alive = hp.keepalive? && ! Actor.current[:quit]
+        out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if hp.headers?
         HttpResponse.write(client, response, out)
-      end while hp.keepalive? and hp.reset.nil? and env.clear
+      end while alive and hp.reset.nil? and env.clear
       client.close
     # if we get any error, try to write something back to the client
     # assuming we haven't closed the socket, but don't get hung up
@@ -81,18 +83,18 @@ module Rainbows
 
       limit = worker_connections
       revactorize_listeners!
-      clients = 0
+      clients = {}
       alive = worker.tmp
 
       listeners = LISTENERS.map do |s|
         Actor.spawn(s) do |l|
           begin
-            while clients >= limit
-              logger.info "busy: clients=#{clients} >= limit=#{limit}"
+            while clients.size >= limit
+              logger.info "busy: clients=#{clients.size} >= limit=#{limit}"
               Actor.receive { |filter| filter.when(:resume) {} }
             end
             actor = Actor.spawn(l.accept) { |c| process_client(c) }
-            clients += 1
+            clients[actor.object_id] = false
             root.link(actor)
           rescue Errno::EAGAIN, Errno::ECONNABORTED
           rescue Errno::EBADF
@@ -113,12 +115,13 @@ module Rainbows
             end
           end
           filter.when(Case[:exit, Actor, Object]) do |_,actor,_|
-            orig = clients
-            clients -= 1
+            orig = clients.size
+            clients.delete(actor.object_id)
             orig >= limit and listeners.each { |l| l << :resume }
           end
         end
-      end while alive || clients > 0
+        alive or clients.each_pair { |a,_| a[:quit] = true }
+      end while alive || clients.size > 0
     end
 
   private
