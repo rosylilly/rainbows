@@ -32,7 +32,7 @@ module Rainbows
           IO.select(LISTENERS, nil, nil, timeout/2.0) or next
         rescue Errno::EINTR
           retry
-        rescue Errno::EBADF
+        rescue Errno::EBADF, TypeError
           break
         end
 
