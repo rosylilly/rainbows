@@ -45,11 +45,8 @@ module Rainbows
           end
           threads.add(Thread.new(c) { |c| process_client(c) })
         end
-      rescue
-        if alive
-          logger.error "Unhandled listen loop exception #{e.inspect}."
-          logger.error e.backtrace.join("\n")
-        end
+      rescue Object => e
+        listen_loop_error(e) if alive
       end while alive && master_pid == Process.ppid
       join_spawned_threads(threads)
     end

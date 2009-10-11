@@ -16,6 +16,12 @@ module Rainbows
       client.close rescue nil
     end
 
+    # TODO: migrate into Unicorn::HttpServer
+    def listen_loop_error(e)
+      logger.error "Unhandled listen loop exception #{e.inspect}."
+      logger.error e.backtrace.join("\n")
+    end
+
     # once a client is accepted, it is processed in its entirety here
     # in 3 easy steps: read request, call app, write app response
     def process_client(client)

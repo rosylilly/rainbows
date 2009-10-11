@@ -81,10 +81,7 @@ module Rainbows
             end
           end
         rescue Object => e
-          if LISTENERS.first
-            logger.error "Unhandled listen loop exception #{e.inspect}."
-            logger.error e.backtrace.join("\n")
-          end
+          listen_loop_error(e) if LISTENERS.first
         end while LISTENERS.first
       }
     end

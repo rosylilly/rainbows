@@ -102,10 +102,7 @@ module Rainbows
             root.link(actor)
           rescue Errno::EAGAIN, Errno::ECONNABORTED
           rescue Object => e
-            if alive
-              logger.error "Unhandled listen loop exception #{e.inspect}."
-              logger.error e.backtrace.join("\n")
-            end
+            listen_loop_error(e) if alive
           end while alive
         end
       end
