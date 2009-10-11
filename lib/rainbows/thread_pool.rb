@@ -28,7 +28,7 @@ module Rainbows
         maintain_thread_count(threads)
         threads.list.each do |thr|
           alive.chmod(m = 0 == m ? 1 : 0)
-          thr.join(timeout / 2.0) and break
+          thr.join(timeout) and break
         end
       end
       join_worker_threads(threads)
@@ -62,7 +62,7 @@ module Rainbows
         begin
           ret = begin
             Thread.current[:t] = Time.now
-            IO.select(LISTENERS, nil, nil, timeout/2.0) or next
+            IO.select(LISTENERS, nil, nil, timeout) or next
           rescue Errno::EINTR
             retry
           rescue Errno::EBADF, TypeError

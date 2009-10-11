@@ -23,7 +23,7 @@ module Rainbows
       begin
         ret = begin
           alive.chmod(m = 0 == m ? 1 : 0)
-          IO.select(LISTENERS, nil, nil, timeout/2.0) or next
+          IO.select(LISTENERS, nil, nil, timeout) or next
         rescue Errno::EINTR
           retry
         rescue Errno::EBADF, TypeError
