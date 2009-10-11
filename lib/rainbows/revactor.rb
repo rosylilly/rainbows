@@ -74,19 +74,17 @@ module Rainbows
     # for connections and doesn't die until the parent dies (or is
     # given a INT, QUIT, or TERM signal)
     def worker_loop(worker)
-      ppid = master_pid
       init_worker_process(worker)
-      alive = worker.tmp # tmp is our lifeline to the master process
 
       root = Actor.current
       root.trap_exit = true
 
       limit = worker_connections
-      listeners = revactorize_listeners
-      logger.info "worker=#{worker.nr} ready with Revactor"
+      revactorize_listeners!
       clients = 0
+      alive = worker.tmp
 
-      listeners.map! do |s|
+      listeners = LISTENERS.map do |s|
         Actor.spawn(s) do |l|
           begin
             while clients >= limit
@@ -109,10 +107,9 @@ module Rainbows
       begin
         Actor.receive do |filter|
           filter.after(1) do
-            if alive
-              alive.chmod(m = 0 == m ? 1 : 0)
-              listeners.each { |l| alive = false if l.dead? }
-              ppid == Process.ppid or alive = false
+            alive.chmod(m = 0 == m ? 1 : 0)
+            if listeners.any? { |l| l.dead? } || master_pid != Process.ppid
+              alive = false
             end
           end
           filter.when(Case[:exit, Actor, Object]) do |_,actor,_|
@@ -136,8 +133,8 @@ module Rainbows
       client.close rescue nil
     end
 
-    def revactorize_listeners
-      LISTENERS.map do |s|
+    def revactorize_listeners!
+      LISTENERS.map! do |s|
         if TCPServer === s
           ::Revactor::TCP.listen(s, nil)
         elsif defined?(::Revactor::UNIX) && UNIXServer === s
@@ -146,7 +143,8 @@ module Rainbows
           logger.error "your version of Revactor can't handle #{s.inspect}"
           nil
         end
-      end.compact
+      end
+      LISTENERS.compact!
     end
 
   end
