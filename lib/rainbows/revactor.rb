@@ -97,6 +97,8 @@ module Rainbows
             clients += 1
             root.link(actor)
           rescue Errno::EAGAIN, Errno::ECONNABORTED
+          rescue Errno::EBADF
+            break
           rescue Object => e
             listen_loop_error(e) if alive
           end while alive
