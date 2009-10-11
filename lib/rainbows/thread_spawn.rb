@@ -29,45 +29,28 @@ module Rainbows
         rescue Errno::EBADF, TypeError
           break
         end
+        alive.chmod(m = 0 == m ? 1 : 0)
 
         ret.first.each do |l|
-          nuke_old_thread(threads, limit)
-          c = begin
-            l.accept_nonblock
-          rescue Errno::EAGAIN, Errno::ECONNABORTED
-            next
+          # Sleep if we're busy, another less busy worker process may
+          # take it for us if we sleep. This is gross but other options
+          # still suck because they require expensive/complicated
+          # synchronization primitives for _every_ case, not just this
+          # unlikely one.  Since this case is (or should be) uncommon,
+          # just busy wait when we have to.
+          while threads.list.size > limit # unlikely
+            sleep(0.1) # hope another process took it
+            break # back to IO.select
           end
-          threads.add(Thread.new(c) { |c| process_client(c) })
+          begin
+            threads.add(Thread.new(l.accept_nonblock) {|c| process_client(c) })
+          rescue Errno::EAGAIN, Errno::ECONNABORTED
+          end
         end
       rescue Object => e
-        listen_loop_error(e) if alive
-      end while alive && master_pid == Process.ppid
-      join_spawned_threads(threads)
-    end
-
-    def nuke_old_thread(threads, limit)
-      while (list = threads.list).size > limit
-        list.each do |thr|
-          thr.alive? or return # it _just_ died, we don't need it
-          next if (age = (Time.now - (thr[:t] || next))) < timeout
-          thr.kill # no-op if already dead
-          logger.error "killed #{thr.inspect} for being too old: #{age}"
-          return
-        end
-        # nothing to kill, yield to another thread
-        Thread.pass
-      end
-    end
-
-    def join_spawned_threads(threads)
-      logger.info "Joining spawned threads..."
-      t0 = Time.now
-      timeleft = timeout
-      threads.list.each { |thr|
-        thr.join(timeleft)
-        timeleft -= (Time.now - t0)
-      }
-      logger.info "Done joining spawned threads."
+        listen_loop_error(e) if LISTENERS.first
+      end while LISTENERS.first && master_pid == Process.ppid
+      join_threads(threads.list)
     end
 
   end

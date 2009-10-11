@@ -2,7 +2,8 @@
 
 module Rainbows
 
-  # base class for Rainbows concurrency models
+  # base class for Rainbows concurrency models, this is currently
+  # used by ThreadSpawn and ThreadPool models
   module Base
 
     include Unicorn
@@ -41,10 +42,10 @@ module Rainbows
       buf = client.readpartial(CHUNK_SIZE)
       hp = HttpParser.new
       env = {}
+      alive = true
       remote_addr = TCPSocket === client ? client.peeraddr.last : LOCALHOST
 
       begin # loop
-        Thread.current[:t] = Time.now
         while ! hp.headers(env, buf)
           buf << client.readpartial(CHUNK_SIZE)
         end
@@ -61,9 +62,10 @@ module Rainbows
           response = app.call(env)
         end
 
-        out = [ hp.keepalive? ? CONN_ALIVE : CONN_CLOSE ] if hp.headers?
+        alive = hp.keepalive? && ! Thread.current[:quit]
+        out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if hp.headers?
         HttpResponse.write(client, response, out)
-      end while hp.keepalive? and hp.reset.nil? and env.clear
+      end while alive and hp.reset.nil? and env.clear
       client.close
     # if we get any error, try to write something back to the client
     # assuming we haven't closed the socket, but don't get hung up
@@ -77,6 +79,22 @@ module Rainbows
       emergency_response(client, ERROR_500_RESPONSE)
       logger.error "Read error: #{e.inspect}"
       logger.error e.backtrace.join("\n")
+    end
+
+    def join_threads(threads)
+      logger.info "Joining threads..."
+      threads.each { |thr| thr[:quit] = true }
+      t0 = Time.now
+      timeleft = timeout * 2.0
+      m = 0
+      while (nr = threads.count { |thr| thr.alive? }) > 0 && timeleft > 0
+        threads.each { |thr|
+          worker.tmp.chmod(m = 0 == m ? 1 : 0)
+          thr.join(1)
+          break if (timeleft -= (Time.now - t0)) < 0
+        }
+      end
+      logger.info "Done joining threads. #{nr} left running"
     end
 
     def self.included(klass)

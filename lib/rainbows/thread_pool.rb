@@ -20,63 +20,38 @@ module Rainbows
 
     def worker_loop(worker)
       init_worker_process(worker)
-      threads = ThreadGroup.new
-      alive = worker.tmp
+      pool = (1..worker_connections).map { new_worker_thread }
       m = 0
 
       while LISTENERS.first && master_pid == Process.ppid
-        maintain_thread_count(threads)
-        threads.list.each do |thr|
-          alive.chmod(m = 0 == m ? 1 : 0)
+        pool.each do |thr|
+          worker.tmp.chmod(m = 0 == m ? 1 : 0)
+          # if any worker dies, something is serious wrong, bail
           thr.join(timeout) and break
         end
       end
-      join_worker_threads(threads)
-    end
-
-    def join_worker_threads(threads)
-      logger.info "Joining worker threads..."
-      t0 = Time.now
-      timeleft = timeout
-      threads.list.each { |thr|
-        thr.join(timeleft)
-        timeleft -= (Time.now - t0)
-      }
-      logger.info "Done joining worker threads."
-    end
-
-    def maintain_thread_count(threads)
-      threads.list.each do |thr|
-        next if (Time.now - (thr[:t] || next)) < timeout
-        thr.kill
-        logger.error "killed #{thr.inspect} for being too old"
-      end
-
-      while threads.list.size < worker_connections
-        threads.add(new_worker_thread)
-      end
+      join_threads(threads)
     end
 
     def new_worker_thread
       Thread.new {
         begin
-          ret = begin
-            Thread.current[:t] = Time.now
-            IO.select(LISTENERS, nil, nil, timeout) or next
+          begin
+            ret = IO.select(LISTENERS, nil, nil, timeout) or next
+            ret.first.each do |sock|
+              begin
+                process_client(sock.accept_nonblock)
+              rescue Errno::EAGAIN, Errno::ECONNABORTED
+              end
+            end
           rescue Errno::EINTR
-            retry
+            next
           rescue Errno::EBADF, TypeError
             return
           end
-          ret.first.each do |sock|
-            begin
-              process_client(sock.accept_nonblock)
-            rescue Errno::EAGAIN, Errno::ECONNABORTED
-            end
-          end
         rescue Object => e
           listen_loop_error(e) if LISTENERS.first
-        end while LISTENERS.first
+        end while ! Thread.current[:quit] && LISTENERS.first
       }
     end
 
