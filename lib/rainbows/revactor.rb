@@ -78,10 +78,6 @@ module Rainbows
       init_worker_process(worker)
       alive = worker.tmp # tmp is our lifeline to the master process
 
-      trap(:USR1) { reopen_worker_logs(worker.nr) }
-      trap(:QUIT) { alive = false; LISTENERS.each { |s| s.close rescue nil } }
-      [:TERM, :INT].each { |sig| trap(sig) { exit!(0) } } # instant shutdown
-
       root = Actor.current
       root.trap_exit = true
 

@@ -22,6 +22,19 @@ module Rainbows
       logger.error e.backtrace.join("\n")
     end
 
+    def init_worker_process(worker)
+      super(worker)
+
+      # we're don't use the self-pipe mechanism in the Rainbows! worker
+      # since we don't defer reopening logs
+      HttpServer::SELF_PIPE.each { |x| x.close }.clear
+      trap(:USR1) { reopen_worker_logs(worker.nr) rescue nil }
+      # closing anything we IO.select on will raise EBADF
+      trap(:QUIT) { HttpServer::LISTENERS.map! { |s| s.close rescue nil } }
+      [:TERM, :INT].each { |sig| trap(sig) { exit(0) } } # instant shutdown
+      logger.info "Rainbows! #@use worker_connections=#@worker_connections"
+    end
+
     # once a client is accepted, it is processed in its entirety here
     # in 3 easy steps: read request, call app, write app response
     def process_client(client)

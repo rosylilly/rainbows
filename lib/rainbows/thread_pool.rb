@@ -24,12 +24,6 @@ module Rainbows
       alive = worker.tmp
       m = 0
 
-      # closing anything we IO.select on will raise EBADF
-      trap(:USR1) { reopen_worker_logs(worker.nr) rescue nil }
-      trap(:QUIT) { LISTENERS.map! { |s| s.close rescue nil } }
-      [:TERM, :INT].each { |sig| trap(sig) { exit(0) } } # instant shutdown
-      logger.info "worker=#{worker.nr} ready with ThreadPool"
-
       while LISTENERS.first && master_pid == Process.ppid
         maintain_thread_count(threads)
         threads.list.each do |thr|

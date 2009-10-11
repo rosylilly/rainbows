@@ -20,12 +20,6 @@ module Rainbows
       m = 0
       limit = worker_connections
 
-      # closing anything we IO.select on will raise EBADF
-      trap(:USR1) { reopen_worker_logs(worker.nr) rescue nil }
-      trap(:QUIT) { LISTENERS.map! { |s| s.close rescue nil } }
-      [:TERM, :INT].each { |sig| trap(sig) { exit(0) } } # instant shutdown
-      logger.info "worker=#{worker.nr} ready with ThreadSpawn"
-
       begin
         ret = begin
           alive.chmod(m = 0 == m ? 1 : 0)
