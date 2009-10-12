@@ -27,3 +27,16 @@ processing of the request body as it is being uploaded.
 
 In this case, haproxy or any similar (non-request-body-buffering) load
 balancer should be used to balance requests between different machines.
+
+== Denial-of-Service Concerns
+
+Since \Rainbows! is designed to talk to slow clients with long-held
+connections, it may be subject to brute force denial-of-service attacks.
+In Unicorn and Mongrel, we've already enabled the "httpready" accept
+filter for FreeBSD and the TCP_DEFER_ACCEPT option in Linux; but it is
+still possible to build clients that work around and fool these
+mechanisms.
+
+\Rainbows! itself does not feature any explicit protection against brute
+force denial-of-service attacks.  We believe this is best handled by
+dedicated firewalls provided by the operating system.
