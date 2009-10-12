@@ -5,7 +5,7 @@ HTTP parser and configuration language; \Rainbows! is more ambitious.
 
 == Architectural Diagrams
 
-=== Unicorn uses a 1:1 mapping of clients to processes
+=== Unicorn uses a 1:1 mapping of processes to clients
 
      unicorn master
      \_ unicorn worker[0]
@@ -18,7 +18,7 @@ HTTP parser and configuration language; \Rainbows! is more ambitious.
      \_ unicorn worker[M]
         \_ client[M]
 
-=== \Rainbows! uses a M:N mapping of clients to processes
+=== \Rainbows! uses a M:N mapping of processes to clients
 
     rainbows master
      \_ rainbows worker[0]
