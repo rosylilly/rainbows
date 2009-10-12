@@ -32,7 +32,7 @@ module Rainbows
       trap(:USR1) { reopen_worker_logs(worker.nr) rescue nil }
       # closing anything we IO.select on will raise EBADF
       trap(:QUIT) { HttpServer::LISTENERS.map! { |s| s.close rescue nil } }
-      [:TERM, :INT].each { |sig| trap(sig) { exit(0) } } # instant shutdown
+      [:TERM, :INT].each { |sig| trap(sig) { exit!(0) } } # instant shutdown
       logger.info "Rainbows! #@use worker_connections=#@worker_connections"
     end
 
