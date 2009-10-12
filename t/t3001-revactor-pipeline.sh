@@ -3,12 +3,14 @@
 require_revactor
 
 eval $(unused_listen)
-rtmpfiles unicorn_config curl_out curl_err pid fifo tmp ok
+rtmpfiles unicorn_config curl_out curl_err pid fifo tmp ok r_err r_out
 
 rm -f $fifo
 mkfifo $fifo
 
 cat > $unicorn_config <<EOF
+stderr_path "$r_err"
+stdout_path "$r_out"
 listen "$listen"
 pid "$pid"
 Rainbows! do
@@ -41,3 +43,4 @@ test 2 -eq $(grep '^HTTP/1.1 200 OK' $tmp | wc -l)
 test 1 -eq $(grep '^Connection: keep-alive' $tmp | wc -l)
 test 1 -eq $(grep '^Connection: close' $tmp | wc -l)
 test x"$(cat $ok)" = xok
+! grep Error $r_err

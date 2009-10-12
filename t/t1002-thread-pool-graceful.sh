@@ -34,4 +34,4 @@ nr=$(sort < $curl_out | uniq | wc -l)
 
 test "$nr" -eq 1
 test x$(sort < $curl_out | uniq) = xHello
-grep -v Error $r_err
+! grep Error $r_err

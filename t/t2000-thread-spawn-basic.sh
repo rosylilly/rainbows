@@ -2,12 +2,14 @@
 . ./test-lib.sh
 
 eval $(unused_listen)
-rtmpfiles unicorn_config curl_out curl_err pid
+rtmpfiles unicorn_config curl_out curl_err pid r_err r_out
 
 nr_client=30
 nr_thread=10
 
 cat > $unicorn_config <<EOF
+stderr_path "$r_err"
+stdout_path "$r_out"
 listen "$listen"
 pid "$pid"
 Rainbows! do
@@ -33,3 +35,4 @@ kill $(cat $pid)
 test x"$(wc -l < $curl_out)" = x$nr_client
 nr=$(sort < $curl_out | uniq | wc -l)
 test "$nr" -eq $nr_client
+! grep Error $r_err

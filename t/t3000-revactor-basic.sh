@@ -3,7 +3,7 @@
 require_revactor
 
 eval $(unused_listen)
-rtmpfiles unicorn_config curl_out curl_err pid
+rtmpfiles unicorn_config curl_out curl_err pid r_err r_out
 
 nr_client=30
 nr_actor=10
@@ -11,6 +11,8 @@ nr_actor=10
 cat > $unicorn_config <<EOF
 listen "$listen"
 pid "$pid"
+stderr_path "$r_err"
+stdout_path "$r_out"
 Rainbows! do
   use :Revactor
   worker_connections $nr_actor
@@ -35,3 +37,4 @@ test x"$(wc -l < $curl_out)" = x$nr_client
 nr=$(sort < $curl_out | uniq | wc -l)
 
 test "$nr" -eq 1
+! grep Error $r_err
