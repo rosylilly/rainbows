@@ -94,7 +94,7 @@ module Rainbows
               Actor.receive { |filter| filter.when(:resume) {} }
             end
             actor = Actor.spawn(l.accept) { |c| process_client(c) }
-            clients[actor.object_id] = false
+            clients[actor.object_id] = actor
             root.link(actor)
           rescue Errno::EAGAIN, Errno::ECONNABORTED
           rescue Errno::EBADF
@@ -106,18 +106,24 @@ module Rainbows
       end
 
       m = 0
-      begin
+      check_quit = lambda do
         worker.tmp.chmod(m = 0 == m ? 1 : 0)
-        if listeners.any? { |l| l.dead? } || master_pid != Process.ppid
+        if listeners.any? { |l| l.dead? } ||
+           master_pid != Process.ppid ||
+           LISTENERS.first.nil?
           alive = false
-          clients.each_pair { |a,_| a[:quit] = true }
+          clients.each_value { |a| a[:quit] = true }
         end
+      end
+
+      begin
         Actor.receive do |filter|
-          filter.after(timeout) { redo }
+          filter.after(timeout, &check_quit)
           filter.when(Case[:exit, Actor, Object]) do |_,actor,_|
             orig = clients.size
             clients.delete(actor.object_id)
             orig >= limit and listeners.each { |l| l << :resume }
+            check_quit.call
           end
         end
       end while alive || clients.size > 0
