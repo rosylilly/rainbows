@@ -3,6 +3,55 @@
 While \Rainbows! depends on Unicorn for its process/socket management,
 HTTP parser and configuration language; \Rainbows! is more ambitious.
 
+== Architectural Diagrams
+
+=== Unicorn uses a 1:1 mapping of clients to processes
+
+     unicorn master
+     \_ unicorn worker[0]
+     |  \_ client[0]
+     \_ unicorn worker[1]
+     |  \_ client[1]
+     \_ unicorn worker[2]
+     |  \_ client[2]
+     ...
+     \_ unicorn worker[M]
+        \_ client[M]
+
+=== \Rainbows! uses a M:N mapping of clients to processes
+
+    rainbows master
+     \_ rainbows worker[0]
+     |  \_ client[0,0]
+     |  \_ client[0,1]
+     |  \_ client[0,2]
+     |  ...
+     |  \_ client[0,N]
+     \_ rainbows worker[1]
+     |  \_ client[1,0]
+     |  \_ client[1,1]
+     |  \_ client[1,2]
+     |  \_ client[1,3]
+     |  ...
+     |  \_ client[0,N]
+     \_ rainbows worker[2]
+     |  \_ client[2,0]
+     |  \_ client[2,1]
+     |  \_ client[2,2]
+     |  ...
+     |  \_ client[0,N]
+     ...
+     \_ rainbows worker[M]
+        \_ client[3,0]
+        \_ client[3,1]
+        \_ client[3,2]
+        ...
+        \_ client[0,N]
+
+In both cases, workers share common listen sockets with the master and
+pull connections off the listen queue only if the worker has resources
+available.
+
 == Differences from Unicorn
 
 * log rotation is handled immediately in \Rainbows! whereas Unicorn has
