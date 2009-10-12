@@ -30,7 +30,7 @@ module Rainbows
           thr.join(timeout) and break
         end
       end
-      join_threads(threads)
+      join_threads(pool, worker)
     end
 
     def new_worker_thread

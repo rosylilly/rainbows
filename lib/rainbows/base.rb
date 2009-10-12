@@ -81,7 +81,7 @@ module Rainbows
       logger.error e.backtrace.join("\n")
     end
 
-    def join_threads(threads)
+    def join_threads(threads, worker)
       logger.info "Joining threads..."
       threads.each { |thr| thr[:quit] = true }
       t0 = Time.now
