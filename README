@@ -129,8 +129,8 @@ and we'll try our best to fix it.
 All feedback (bug reports, user/development dicussion, patches, pull
 requests) go to the mailing list/newsgroup.  Patches must be sent inline
 (git format-patch -M + git send-email).  No subscription is necessary
-to post on the mailing list.  No top posting.  Address replies +To:+ (or
-+Cc:+) the original sender and +Cc:+ the mailing list.
+to post on the mailing list.  No top posting.  Address replies +To:+
+the mailing list.
 
 * email: mailto:rainbows-talk@rubyforge.org
 * archives: http://rubyforge.org/pipermail/rainbows-talk
