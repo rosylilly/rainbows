@@ -82,8 +82,6 @@ module Rainbows
         else
           @state = :close
         end
-        rescue Object => e
-          handle_error(e)
       end
 
       def on_write_complete
@@ -137,6 +135,8 @@ module Rainbows
         when :trailers
           @hp.trailers(@env, @buf << data) and app_call
         end
+        rescue Object => e
+          handle_error(e)
       end
     end
 
