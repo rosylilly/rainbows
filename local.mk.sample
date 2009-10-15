@@ -25,8 +25,9 @@ ifdef gem_paths
   RUBYLIB := $(subst $(sp),:,$(addsuffix /lib,$(gem_paths)))
 endif
 
-# pipefail is THE reason to use bash (v3+)
-SHELL := /bin/bash -e -o pipefail
+# pipefail is THE reason to use bash (v3+) or never revisions of ksh93
+# SHELL := /bin/bash -e -o pipefail
+SHELL := /bin/ksh93 -e -o pipefail
 
 full-test: test-18 test-19
 test-18:
