@@ -8,11 +8,6 @@ module Rainbows
     include Unicorn::Const
 
     RACK_DEFAULTS = ::Unicorn::HttpRequest::DEFAULTS.merge({
-
-      # we need to observe many of the rules for thread-safety even
-      # with Revactor or Rev, so we're considered multithread-ed even
-      # when we're not technically...
-      "rack.multithread" => true,
       "SERVER_SOFTWARE" => "Rainbows! #{RAINBOWS_VERSION}",
     })
 
