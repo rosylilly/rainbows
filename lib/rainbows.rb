@@ -7,6 +7,7 @@ module Rainbows
   require 'rainbows/http_server'
   require 'rainbows/http_response'
   require 'rainbows/base'
+  autoload :AppPool, 'rainbows/app_pool'
 
   class << self
 
