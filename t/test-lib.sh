@@ -42,6 +42,14 @@ require_revactor () {
 	fi
 }
 
+require_rev() {
+	if ! $ruby -rrev -e "puts Rev::VERSION" >/dev/null 2>&1
+	then
+		echo >&2 "skipping $T since we don't have Rev"
+		exit 0
+	fi
+}
+
 # given a list of variable names, create temporary files and assign
 # the pathnames to those variables
 rtmpfiles () {
