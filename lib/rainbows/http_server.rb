@@ -31,7 +31,7 @@ module Rainbows
       Module === mod or
         raise ArgumentError, "concurrency model #{model.inspect} not supported"
       extend(mod)
-      @use = model
+      Const::RACK_DEFAULTS['rainbows.model'] = @use = model
     end
 
     def worker_connections(*args)
