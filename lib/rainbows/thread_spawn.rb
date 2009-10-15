@@ -2,13 +2,19 @@
 module Rainbows
 
   # Spawns a new thread for every client connection we accept().  This
-  # model is recommended for platforms where spawning threads is
-  # inexpensive.
+  # model is recommended for platforms like Ruby 1.8 where spawning new
+  # threads is inexpensive.
+  #
+  # This model should provide a high level of compatibility with all
+  # Ruby implementations, and most libraries and applications.
+  # Applications running under this model should be thread-safe
+  # but not necessarily reentrant.
   #
   # If you're connecting to external services and need to perform DNS
   # lookups, consider using the "resolv-replace" library which replaces
   # parts of the core Socket package with concurrent DNS lookup
   # capabilities
+
   module ThreadSpawn
 
     include Base

@@ -12,22 +12,25 @@ module Rainbows
   # thousands of simultaneous client connections, but with only a
   # single-threaded app dispatch.  It is suited for slow clients and
   # fast applications (applications that do not have slow network
-  # dependencies).
+  # dependencies).  It does not require your Rack application to
+  # be reentrant or thread-safe.
   #
-  # Compatibility: Whatever \Rev itself supports, currently Ruby 1.8/1.9.
+  # Compatibility: Whatever \Rev itself supports, currently Ruby
+  # 1.8/1.9.
   #
-  # This model does not implement TeeInput for streaming requests to
-  # the Rack application.  This means env["rack.input"] will
-  # be fully buffered in memory or to a temporary file before the
-  # application is called.
+  # This model does not implement as streaming "rack.input" which
+  # allows the Rack application to process data as it arrives.  This
+  # means "rack.input" will be fully buffered in memory or to a
+  # temporary file before the application is entered.
   #
   # Caveats: this model can buffer all output for slow clients in
   # memory.  This can be a problem if your application generates large
   # responses (including static files served with Rack) as it will cause
   # the memory footprint of your process to explode.  If your workers
   # seem to be eating a lot of memory from this, consider the
-  # {mall}[http://bogomips.org/mall/] library which allows access to
-  # the mallopt(3) in the standard C library from Ruby.
+  # {mall}[http://bogomips.org/mall/] library which allows access to the
+  # mallopt(3) function from Ruby.
+
   module Rev
 
     # global vars because class/instance variables are confusing me :<

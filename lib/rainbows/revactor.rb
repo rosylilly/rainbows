@@ -14,12 +14,14 @@ module Rainbows
   # +worker_connections+ will limit the number of client Actors we have
   # running at any one time.
   #
-  # Applications using this model are required to be reentrant, but
-  # generally do not have to worry about race conditions.  Multiple
-  # instances of the same app may run in the same address space
+  # Applications using this model are required to be reentrant, but do
+  # not have to worry about race conditions unless they use threads
+  # internally.  \Rainbows! does not spawn threads under this model.
+  # Multiple instances of the same app may run in the same address space
   # sequentially (but at interleaved points).  Any network dependencies
   # in the application using this model should be implemented using the
-  # \Revactor library as well.
+  # \Revactor library as well, to take advantage of the networking
+  # concurrency features this model provides.
 
   module Revactor
     require 'rainbows/revactor/tee_input'
