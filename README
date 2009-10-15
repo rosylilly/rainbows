@@ -26,6 +26,11 @@ CPU/memory/disk concurrency.
 sleepy apps.  Additionally it does not support streaming "rack.input" to
 the application.
 
+For application concurrency, we have the Rainbows::AppPool Rack
+middleware that allows us to limit application concurrency independently
+of network concurrency.  Rack::Lock as distributed by Rack may also be
+used to limit application concurrency to one (per-worker).
+
 == Features
 
 * Designed for {Rack}[http://rack.rubyforge.org/], the standard for
@@ -58,6 +63,9 @@ the application.
 * HTTP server push
 * Long polling
 * Reverse Ajax
+
+\Rainbows may also be used to service slow clients even with fast
+applications using the \Rev concurrency model.
 
 == License
 
