@@ -22,10 +22,9 @@ We have {more on the way}[link:TODO.html] for handling network concurrency.
 Additionally, we also use multiple processes (managed by Unicorn) for
 CPU/memory/disk concurrency.
 
-\* the \Rev concurrency model does not support streaming "rack.input" to
-the application.  All other models support a streaming "rack.input" which
-allows the Rack application to read data as it arrives on the socket
-without fully buffering it first.
+\* our \Rev concurrency model is only recommended for slow clients, not
+sleepy apps.  Additionally it does not support streaming "rack.input" to
+the application.
 
 == Features
 
