@@ -3,7 +3,7 @@
 module Rainbows
 
   module Const
-    RAINBOWS_VERSION = '0.1.1'
+    RAINBOWS_VERSION = '0.2.0'
 
     include Unicorn::Const
 
