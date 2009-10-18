@@ -1,2 +1,3 @@
 #!/bin/sh
-. ./lib-input-trailer.sh Rev
+model=Rev
+. ./lib-input-trailer.sh

@@ -1,4 +1,3 @@
-model=$1
 . ./test-lib.sh
 echo "graceful test for model=$model"
 require_for_model

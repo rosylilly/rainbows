@@ -1,2 +1,3 @@
 #!/bin/sh
-. ./lib-graceful.sh Revactor
+model=Revactor
+. ./lib-graceful.sh

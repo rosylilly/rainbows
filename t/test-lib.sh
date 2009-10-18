@@ -1,7 +1,18 @@
 #!/bin/sh
 # Copyright (c) 2009 Rainbows! developers
 
-set -o pipefail >/dev/null 2>&1 || : # non-POSIX, but useful in ksh/bash
+# pipefail is non-POSIX, but useful in ksh/bash
+(
+	set +e
+	set -o pipefail
+)
+if test $? -eq 0
+then
+	set -o pipefail
+else
+	echo >&2 "WARNING: your shell does not understand pipefail"
+fi
+
 set -e
 set -u
 T=$(basename $0)

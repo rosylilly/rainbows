@@ -1,2 +1,3 @@
 #!/bin/sh
-. ./lib-input-trailer.sh ThreadPool
+model=ThreadPool
+. ./lib-input-trailer.sh

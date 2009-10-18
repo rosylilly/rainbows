@@ -1,2 +1,3 @@
 #!/bin/sh
-. ./lib-graceful.sh ThreadSpawn
+model=ThreadSpawn
+. ./lib-graceful.sh

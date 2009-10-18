@@ -1,2 +1,3 @@
 #!/bin/sh
-. ./lib-input-trailer.sh Revactor
+model=Revactor
+. ./lib-input-trailer.sh

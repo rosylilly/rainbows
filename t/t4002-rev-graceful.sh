@@ -1,2 +1,3 @@
 #!/bin/sh
-. ./lib-graceful.sh Rev
+model=Rev
+. ./lib-graceful.sh

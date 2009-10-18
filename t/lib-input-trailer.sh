@@ -1,4 +1,3 @@
-model=$1
 . ./test-lib.sh
 test -r random_blob || die "random_blob required, run with 'make $0'"
 echo "input trailer test model=$model"

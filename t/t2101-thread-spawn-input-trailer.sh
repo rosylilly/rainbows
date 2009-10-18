@@ -1,2 +1,3 @@
 #!/bin/sh
-. ./lib-input-trailer.sh ThreadSpawn
+model=ThreadSpawn
+. ./lib-input-trailer.sh

@@ -1,2 +1,3 @@
 #!/bin/sh
-. ./lib-graceful.sh ThreadPool
+model=ThreadPool
+. ./lib-graceful.sh
