@@ -21,7 +21,6 @@ module Rainbows
 
     def worker_loop(worker)
       init_worker_process(worker)
-      RACK_DEFAULTS["rack.multithread"] = true
       threads = ThreadGroup.new
       alive = worker.tmp
       m = 0

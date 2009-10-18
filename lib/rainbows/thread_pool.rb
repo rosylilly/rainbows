@@ -27,7 +27,6 @@ module Rainbows
 
     def worker_loop(worker)
       init_worker_process(worker)
-      RACK_DEFAULTS["rack.multithread"] = true
       pool = (1..worker_connections).map { new_worker_thread }
       m = 0
 
