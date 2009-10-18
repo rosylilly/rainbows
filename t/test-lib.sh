@@ -14,8 +14,19 @@ else
 fi
 
 set -e
-set -u
+
 T=$(basename $0)
+if test -z "$model"
+then
+	case $T in
+	t1???-thread-pool-*.sh) model=ThreadPool ;;
+	t2???-thread-spawn-*.sh) model=ThreadSpawn ;;
+	t3???-revactor-*.sh) model=Revactor ;;
+	t4???-rev-*.sh) model=Rev ;;
+	esac
+fi
+
+set -u
 ruby="${ruby-ruby}"
 
 # ensure a sane environment
