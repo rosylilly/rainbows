@@ -50,6 +50,13 @@ require_rev() {
 	fi
 }
 
+require_for_model () {
+	case $model in
+	Rev) require_rev ;;
+	Revactor) require_revactor ;;
+	esac
+}
+
 # given a list of variable names, create temporary files and assign
 # the pathnames to those variables
 rtmpfiles () {

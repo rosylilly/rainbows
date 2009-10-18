@@ -1,10 +1,7 @@
 model=$1
 . ./test-lib.sh
 echo "graceful test for model=$model"
-case $model in
-Rev) require_rev ;;
-Revactor) require_revactor ;;
-esac
+require_for_model
 
 eval $(unused_listen)
 rtmpfiles unicorn_config curl_out pid r_err r_out fifo
