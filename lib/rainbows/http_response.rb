@@ -13,6 +13,7 @@ module Rainbows
         status = CODES[status.to_i] || status
 
         headers.each do |key, value|
+          next if %r{\AX-Rainbows-}i =~ key
           next if SKIP.include?(key.downcase)
           if value =~ /\n/
             out.concat(value.split(/\n/).map! { |v| "#{key}: #{v}\r\n" })
