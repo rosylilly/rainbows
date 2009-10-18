@@ -64,5 +64,6 @@ rtmpfiles () {
 dbgcat () {
 	id=$1
 	eval '_file=$'$id
+	echo "==> $id <=="
 	sed -e "s/^/$id:/" < $_file
 }
