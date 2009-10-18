@@ -55,7 +55,7 @@ module Rainbows
           response = app.call(env)
         end
 
-        alive = hp.keepalive? && ! Actor.current[:quit]
+        alive = hp.keepalive? && G.alive
         out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if hp.headers?
         HttpResponse.write(client, response, out)
       end while alive and hp.reset.nil? and env.clear
@@ -86,7 +86,6 @@ module Rainbows
       limit = worker_connections
       revactorize_listeners!
       clients = {}
-      alive = true
 
       listeners = LISTENERS.map do |s|
         Actor.spawn(s) do |l|
@@ -99,23 +98,16 @@ module Rainbows
             clients[actor.object_id] = actor
             root.link(actor)
           rescue Errno::EAGAIN, Errno::ECONNABORTED
-          rescue Errno::EBADF
-            break
           rescue Object => e
-            listen_loop_error(e) if alive
-          end while alive
+            listen_loop_error(e)
+          end while G.alive
         end
       end
 
       m = 0
       check_quit = lambda do
         worker.tmp.chmod(m = 0 == m ? 1 : 0)
-        if listeners.any? { |l| l.dead? } ||
-           master_pid != Process.ppid ||
-           LISTENERS.first.nil?
-          alive = false
-          clients.each_value { |a| a[:quit] = true }
-        end
+        G.alive = false if master_pid != Process.ppid
       end
 
       begin
@@ -128,7 +120,7 @@ module Rainbows
             check_quit.call
           end
         end
-      end while alive || clients.size > 0
+      end while G.alive || clients.size > 0
     end
 
   private

@@ -8,6 +8,7 @@ module Rainbows
 
     include Unicorn
     include Rainbows::Const
+    G = Rainbows::G
 
     # write a response without caring if it went out or not for error
     # messages.
@@ -17,22 +18,28 @@ module Rainbows
       client.close rescue nil
     end
 
-    # TODO: migrate into Unicorn::HttpServer
     def listen_loop_error(e)
-      return if HttpServer::LISTENERS.first.nil? || IOError === e
+      G.alive or return
       logger.error "Unhandled listen loop exception #{e.inspect}."
       logger.error e.backtrace.join("\n")
     end
 
     def init_worker_process(worker)
       super(worker)
+      G.cur = 0
+      G.max = worker_connections
+      G.logger = logger
+      G.app = app
 
       # we're don't use the self-pipe mechanism in the Rainbows! worker
       # since we don't defer reopening logs
       HttpServer::SELF_PIPE.each { |x| x.close }.clear
       trap(:USR1) { reopen_worker_logs(worker.nr) rescue nil }
-      # closing anything we IO.select on will raise EBADF
-      trap(:QUIT) { HttpServer::LISTENERS.map! { |s| s.close rescue nil } }
+      trap(:QUIT) do
+        G.alive = false
+        # closing anything we IO.select on will raise EBADF
+        HttpServer::LISTENERS.map! { |s| s.close rescue nil }
+      end
       [:TERM, :INT].each { |sig| trap(sig) { exit!(0) } } # instant shutdown
       logger.info "Rainbows! #@use worker_connections=#@worker_connections"
     end
@@ -63,7 +70,7 @@ module Rainbows
           response = app.call(env)
         end
 
-        alive = hp.keepalive? && ! Thread.current[:quit]
+        alive = hp.keepalive? && G.alive
         out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if hp.headers?
         HttpResponse.write(client, response, out)
       end while alive and hp.reset.nil? and env.clear
@@ -83,8 +90,7 @@ module Rainbows
     end
 
     def join_threads(threads, worker)
-      logger.info "Joining threads..."
-      threads.each { |thr| thr[:quit] = true }
+      Rainbows::G.alive = false
       expire = Time.now + (timeout * 2.0)
       m = 0
       while (nr = threads.count { |thr| thr.alive? }) > 0
@@ -94,11 +100,11 @@ module Rainbows
           break if Time.now >= expire
         }
       end
-      logger.info "Done joining threads. #{nr} left running"
     end
 
     def self.included(klass)
       klass.const_set :LISTENERS, HttpServer::LISTENERS
+      klass.const_set :G, Rainbows::G
     end
 
   end

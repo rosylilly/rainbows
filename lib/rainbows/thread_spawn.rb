@@ -27,9 +27,10 @@ module Rainbows
       limit = worker_connections
 
       begin
+        G.alive && master_pid == Process.ppid or break
         ret = begin
           alive.chmod(m = 0 == m ? 1 : 0)
-          IO.select(LISTENERS, nil, nil, timeout) or next
+          IO.select(LISTENERS, nil, nil, 1) or next
         rescue Errno::EINTR
           retry
         rescue Errno::EBADF, TypeError
@@ -55,7 +56,7 @@ module Rainbows
         end
       rescue Object => e
         listen_loop_error(e)
-      end while LISTENERS.first && master_pid == Process.ppid
+      end while true
       join_threads(threads.list, worker)
     end
 

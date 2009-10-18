@@ -33,19 +33,15 @@ module Rainbows
 
   module Rev
 
-    # global vars because class/instance variables are confusing me :<
-    # this struct is only accessed inside workers and thus private to each
-    G = Struct.new(:nr, :max, :logger, :alive, :app).new
-
     include Base
 
     class Client < ::Rev::IO
       include Unicorn
       include Rainbows::Const
-      G = Rainbows::Rev::G
+      G = Rainbows::G
 
       def initialize(io)
-        G.nr += 1
+        G.cur += 1
         super(io)
         @remote_addr = ::TCPSocket === io ? io.peeraddr.last : LOCALHOST
         @env = {}
@@ -91,7 +87,7 @@ module Rainbows
       end
 
       def on_close
-        G.nr -= 1
+        G.cur -= 1
       end
 
       def tmpio
@@ -143,10 +139,10 @@ module Rainbows
     end
 
     class Server < ::Rev::IO
-      G = Rainbows::Rev::G
+      G = Rainbows::G
 
       def on_readable
-        return if G.nr >= G.max
+        return if G.cur >= G.max
         begin
           Client.new(@_io.accept_nonblock).attach(::Rev::Loop.default)
         rescue Errno::EAGAIN, Errno::ECONNBORTED
@@ -160,13 +156,21 @@ module Rainbows
     # given a INT, QUIT, or TERM signal)
     def worker_loop(worker)
       init_worker_process(worker)
-      G.nr = 0
-      G.max = worker_connections
-      G.alive = true
-      G.logger = logger
-      G.app = app
+      graceful_waiter = nil
+      trap(:QUIT) do
+        G.alive = false
+        LISTENERS.map! { |s| s.close rescue nil }
+        # Rev may get stuck in a loop with no events possible, spawn a new
+        # thread to join on graceful exits when our client count goes to zero
+        graceful_waiter = Thread.new {
+          sleep(0.1) while G.cur > 0
+          exit
+        }
+      end
+
       LISTENERS.map! { |s| Server.new(s).attach(::Rev::Loop.default) }
       ::Rev::Loop.default.run
+      graceful_waiter.join(timeout * 2.0)
     end
 
   end

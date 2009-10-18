@@ -3,6 +3,12 @@ require 'unicorn'
 
 module Rainbows
 
+  # global vars because class/instance variables are confusing me :<
+  # this struct is only accessed inside workers and thus private to each
+  G = Struct.new(:cur, :max, :logger, :alive, :app).new
+  # G.cur may not be used the network concurrency model
+  G.alive = true
+
   require 'rainbows/const'
   require 'rainbows/http_server'
   require 'rainbows/http_response'

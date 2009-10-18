@@ -30,7 +30,7 @@ module Rainbows
       pool = (1..worker_connections).map { new_worker_thread }
       m = 0
 
-      while LISTENERS.first && master_pid == Process.ppid
+      while G.alive && master_pid == Process.ppid
         pool.each do |thr|
           worker.tmp.chmod(m = 0 == m ? 1 : 0)
           # if any worker dies, something is serious wrong, bail
@@ -44,21 +44,20 @@ module Rainbows
       Thread.new {
         begin
           begin
-            ret = IO.select(LISTENERS, nil, nil, timeout) or next
-            ret.first.each do |sock|
-              begin
-                process_client(sock.accept_nonblock)
-              rescue Errno::EAGAIN, Errno::ECONNABORTED
-              end
-            end
+            ret = IO.select(LISTENERS, nil, nil, 1) and
+                  ret.first.each do |sock|
+                    begin
+                      process_client(sock.accept_nonblock)
+                    rescue Errno::EAGAIN, Errno::ECONNABORTED
+                    end
+                  end
           rescue Errno::EINTR
-            next
           rescue Errno::EBADF, TypeError
             break
           end
         rescue Object => e
           listen_loop_error(e)
-        end while ! Thread.current[:quit] && LISTENERS.first
+        end while G.alive
       }
     end
 
