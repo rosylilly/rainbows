@@ -55,6 +55,7 @@ module Rainbows
       end
 
       def handle_error(e)
+        @state = :close
         msg = case e
         when EOFError,Errno::ECONNRESET,Errno::EPIPE,Errno::EINVAL,Errno::EBADF
           ERROR_500_RESPONSE
@@ -66,8 +67,6 @@ module Rainbows
           ERROR_500_RESPONSE
         end
         write(msg)
-        ensure
-          @state = :close
       end
 
       def app_call
