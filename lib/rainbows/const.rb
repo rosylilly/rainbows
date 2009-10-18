@@ -9,6 +9,10 @@ module Rainbows
 
     RACK_DEFAULTS = ::Unicorn::HttpRequest::DEFAULTS.merge({
       "SERVER_SOFTWARE" => "Rainbows! #{RAINBOWS_VERSION}",
+
+      # using the Rev model, we'll automatically chunk pipe and socket objects
+      # if they're the response body
+      'rainbows.autochunk' => false,
     })
 
     CONN_CLOSE = "Connection: close\r\n"

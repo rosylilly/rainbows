@@ -14,6 +14,7 @@ module Rainbows
   require 'rainbows/http_response'
   require 'rainbows/base'
   autoload :AppPool, 'rainbows/app_pool'
+  autoload :DevFdResponse, 'rainbows/dev_fd_response'
 
   class << self
 
