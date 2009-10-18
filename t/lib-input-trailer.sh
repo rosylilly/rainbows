@@ -1,7 +1,6 @@
 . ./test-lib.sh
 test -r random_blob || die "random_blob required, run with 'make $0'"
 echo "input trailer test model=$model"
-require_for_model
 
 eval $(unused_listen)
 rtmpfiles unicorn_config tmp r_err r_out pid fifo ok

@@ -1,6 +1,5 @@
 . ./test-lib.sh
 echo "graceful test for model=$model"
-require_for_model
 
 eval $(unused_listen)
 rtmpfiles unicorn_config curl_out pid r_err r_out fifo

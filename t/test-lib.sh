@@ -23,11 +23,17 @@ then
 	t2???-thread-spawn-*.sh) model=ThreadSpawn ;;
 	t3???-revactor-*.sh) model=Revactor ;;
 	t4???-rev-*.sh) model=Rev ;;
+	*) model=any ;;
 	esac
 fi
 
 set -u
 ruby="${ruby-ruby}"
+
+case $model in
+Rev) require_rev ;;
+Revactor) require_revactor ;;
+esac
 
 # ensure a sane environment
 TZ=UTC LC_ALL=C LANG=C
@@ -70,13 +76,6 @@ require_rev() {
 		echo >&2 "skipping $T since we don't have Rev"
 		exit 0
 	fi
-}
-
-require_for_model () {
-	case $model in
-	Rev) require_rev ;;
-	Revactor) require_revactor ;;
-	esac
 }
 
 # given a list of variable names, create temporary files and assign

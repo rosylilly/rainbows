@@ -1,6 +1,5 @@
 . ./test-lib.sh
 echo "parser error test for model=$model"
-require_for_model
 
 eval $(unused_listen)
 rtmpfiles unicorn_config pid r_err r_out tmp fifo ok
