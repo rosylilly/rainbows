@@ -1,7 +1,4 @@
-#!/bin/sh
-nr_client=${nr_client-25}
-nr_actor=${nr_actor-50}
-
+nr_client=${nr_client-4}
 . ./test-lib.sh
 test -r random_blob || die "random_blob required, run with 'make $0'"
 
@@ -14,12 +11,10 @@ pid "$pid"
 stderr_path "$r_err"
 stdout_path "$r_out"
 Rainbows! do
-  use :Revactor
-  worker_connections $nr_actor
+  use :$model
 end
 EOF
 
-echo pid=$pid
 rainbows -D sha1.ru -c $unicorn_config
 wait_for_pid $pid
 
