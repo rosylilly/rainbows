@@ -66,21 +66,25 @@ module Rainbows
       end
 
       def app_call
-        @input.rewind
-        @env[RACK_INPUT] = @input
-        @env[REMOTE_ADDR] = @remote_addr
-        response = G.app.call(@env.update(RACK_DEFAULTS))
-        alive = @hp.keepalive? && G.alive
-        out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if @hp.headers?
-        HttpResponse.write(self, response, out)
-        if alive
-          @env.clear
-          @hp.reset
-          @state = :headers
-          on_read("") # in case next request was fully-buffered
-        else
-          @state = :close
-        end
+        begin
+          (@env[RACK_INPUT] = @input).rewind
+          alive = @hp.keepalive?
+          @env[REMOTE_ADDR] = @remote_addr
+          response = G.app.call(@env.update(RACK_DEFAULTS))
+          alive &&= G.alive
+          out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if @hp.headers?
+          HttpResponse.write(self, response, out)
+          if alive
+            @env.clear
+            @hp.reset
+            @state = :headers
+            # keepalive requests are always body-less, so @input is unchanged
+            @hp.headers(@env, @buf) and next
+          else
+            @state = :close
+          end
+          return
+        end while true
       end
 
       def on_write_complete
