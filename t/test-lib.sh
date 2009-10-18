@@ -30,11 +30,6 @@ fi
 set -u
 ruby="${ruby-ruby}"
 
-case $model in
-Rev) require_rev ;;
-Revactor) require_revactor ;;
-esac
-
 # ensure a sane environment
 TZ=UTC LC_ALL=C LANG=C
 export LANG LC_ALL TZ
@@ -62,18 +57,12 @@ wait_for_pid () {
 	done
 }
 
-require_revactor () {
-	if ! $ruby -rrevactor -e "puts Revactor::VERSION" >/dev/null 2>&1
+require_check () {
+	lib=$1
+	const=$2
+	if ! $ruby -r$lib -e "puts $const" >/dev/null 2>&1
 	then
-		echo >&2 "skipping $T since we don't have Revactor"
-		exit 0
-	fi
-}
-
-require_rev() {
-	if ! $ruby -rrev -e "puts Rev::VERSION" >/dev/null 2>&1
-	then
-		echo >&2 "skipping $T since we don't have Rev"
+		echo >&2 "skipping $T since we don't have $lib"
 		exit 0
 	fi
 }
@@ -95,3 +84,8 @@ dbgcat () {
 	echo "==> $id <=="
 	sed -e "s/^/$id:/" < $_file
 }
+
+case $model in
+Rev) require_check rev Rev::VERSION ;;
+Revactor) require_check revactor Revactor::VERSION ;;
+esac

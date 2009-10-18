@@ -3,7 +3,6 @@ nr_client=${nr_client-25}
 nr_actor=${nr_actor-50}
 
 . ./test-lib.sh
-require_revactor
 test -r random_blob || die "random_blob required, run with 'make $0'"
 
 eval $(unused_listen)

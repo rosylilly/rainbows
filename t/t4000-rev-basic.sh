@@ -1,6 +1,5 @@
 #!/bin/sh
 . ./test-lib.sh
-require_rev
 
 eval $(unused_listen)
 rtmpfiles unicorn_config pid r_err r_out tmp fifo ok

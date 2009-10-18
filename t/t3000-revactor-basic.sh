@@ -1,6 +1,5 @@
 #!/bin/sh
 . ./test-lib.sh
-require_revactor
 
 eval $(unused_listen)
 rtmpfiles unicorn_config curl_out curl_err pid r_err r_out

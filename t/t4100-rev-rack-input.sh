@@ -3,7 +3,6 @@ nr_client=${nr_client-25}
 nr=${nr-50}
 
 . ./test-lib.sh
-require_rev
 test -r random_blob || die "random_blob required, run with 'make $0'"
 
 eval $(unused_listen)
