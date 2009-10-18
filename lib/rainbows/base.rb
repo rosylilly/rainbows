@@ -85,14 +85,13 @@ module Rainbows
     def join_threads(threads, worker)
       logger.info "Joining threads..."
       threads.each { |thr| thr[:quit] = true }
-      t0 = Time.now
-      timeleft = timeout * 2.0
+      expire = Time.now + (timeout * 2.0)
       m = 0
-      while (nr = threads.count { |thr| thr.alive? }) > 0 && timeleft > 0
+      while (nr = threads.count { |thr| thr.alive? }) > 0
         threads.each { |thr|
           worker.tmp.chmod(m = 0 == m ? 1 : 0)
           thr.join(1)
-          break if (timeleft -= (Time.now - t0)) < 0
+          break if Time.now >= expire
         }
       end
       logger.info "Done joining threads. #{nr} left running"
