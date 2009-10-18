@@ -22,7 +22,7 @@ if ARGV.grep("--no-headers").empty?
 end
 
 digest = Digest::MD5.new
-if buf = $stdin.read(bs)
+if buf = $stdin.readpartial(bs)
   begin
     digest.update(buf)
     $stdout.write("%x\r\n" % [ buf.size ])
