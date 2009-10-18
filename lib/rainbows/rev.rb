@@ -77,6 +77,7 @@ module Rainbows
           @env.clear
           @hp.reset
           @state = :headers
+          on_read("") # in case next request was fully-buffered
         else
           @state = :close
         end
