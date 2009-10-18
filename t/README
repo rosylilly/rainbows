@@ -14,7 +14,7 @@ comfortable writing integration tests with.
 * {GNU make}[http://www.gnu.org/software/make/]
 * {socat}[http://www.dest-unreach.org/socat/]
 * {curl}[http://curl.haxx.se/]
-* standard UNIX shell utilities (Bourne sh, awk, sed, grep, tee, ...)
+* standard UNIX shell utilities (Bourne sh, awk, sed, grep, ...)
 
 We do not use bashisms or any non-portable, non-POSIX constructs
 in our shell code.  We use the "pipefail" option if available and

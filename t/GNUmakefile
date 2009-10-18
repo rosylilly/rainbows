@@ -44,7 +44,7 @@ else
     SH_TEST_OPTS += -x
   endif
   quiet_pre = @echo '* $@';
-  quiet_post = 2>&1 | tee $(t_log); exit $$(cat $(t_code))
+  quiet_post = 2>&1 | ./bin/utee $(t_log); exit $$(cat $(t_code))
   pfx = $@
 endif
 
