@@ -1,7 +1,8 @@
 use Rack::ContentLength
-use Rack::ContentType
 
 run lambda { |env|
+  /\A100-continue\z/i =~ env['HTTP_EXPECT'] and return [ 100, {}, [] ]
+
   nr = 1
   env["PATH_INFO"] =~ %r{/([\d\.]+)\z} and nr = $1.to_f
 
@@ -12,5 +13,5 @@ run lambda { |env|
     Kernel
   end).sleep(nr)
 
-  [ 200, {}, [ "Hello\n" ] ]
+  [ 200, {'Content-Type' => 'text/plain'}, [ "Hello\n" ] ]
 }
