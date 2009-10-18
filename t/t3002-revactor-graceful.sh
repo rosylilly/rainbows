@@ -17,7 +17,7 @@ Rainbows! do
 end
 EOF
 
-SLEEP_CLASS=Actor rainbows -D sleep.ru -c $unicorn_config
+rainbows -D sleep.ru -c $unicorn_config
 wait_for_pid $pid
 
 for i in $(awk "BEGIN{for(i=0;i<$nr_client;++i) print i}" </dev/null)

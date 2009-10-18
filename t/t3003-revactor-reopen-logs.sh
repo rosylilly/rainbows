@@ -19,7 +19,7 @@ Rainbows! do
 end
 EOF
 
-SLEEP_CLASS=Actor rainbows -D sleep.ru -c $unicorn_config
+rainbows -D sleep.ru -c $unicorn_config
 wait_for_pid $pid
 
 start=$(date +%s)
