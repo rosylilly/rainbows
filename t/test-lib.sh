@@ -4,7 +4,7 @@
 # pipefail is non-POSIX, but useful in ksh/bash
 (
 	set +e
-	set -o pipefail
+	set -o pipefail 2>/dev/null
 )
 if test $? -eq 0
 then
