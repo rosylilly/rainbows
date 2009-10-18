@@ -19,6 +19,7 @@ module Rainbows
 
     # TODO: migrate into Unicorn::HttpServer
     def listen_loop_error(e)
+      return if HttpServer::LISTENERS.first.nil? || IOError === e
       logger.error "Unhandled listen loop exception #{e.inspect}."
       logger.error e.backtrace.join("\n")
     end

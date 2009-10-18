@@ -55,10 +55,10 @@ module Rainbows
           rescue Errno::EINTR
             next
           rescue Errno::EBADF, TypeError
-            return
+            break
           end
         rescue Object => e
-          listen_loop_error(e) if LISTENERS.first
+          listen_loop_error(e)
         end while ! Thread.current[:quit] && LISTENERS.first
       }
     end

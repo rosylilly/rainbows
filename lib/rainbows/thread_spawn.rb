@@ -55,7 +55,7 @@ module Rainbows
           end
         end
       rescue Object => e
-        listen_loop_error(e) if LISTENERS.first
+        listen_loop_error(e)
       end while LISTENERS.first && master_pid == Process.ppid
       join_threads(threads.list, worker)
     end
