@@ -42,7 +42,7 @@ module Rainbows
 
       # queued, optional response bodies, it should only be unpollable "fast"
       # devices where read(2) is uninterruptable.  Unfortunately, NFS and ilk
-      # are also part of this.  We'll also stick AsyncResponse bodies in
+      # are also part of this.  We'll also stick DeferredResponse bodies in
       # here to prevent connections from being closed on us.
       attr_reader :deferred_bodies
 
@@ -87,11 +87,7 @@ module Rainbows
           alive &&= G.alive
           out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if @hp.headers?
 
-          if response.last.respond_to?(:to_path)
-            AsyncResponse.new(self, response, out)
-          else
-            HttpResponse.write(self, response, out)
-          end
+          DeferredResponse.write(self, response, out)
           if alive
             @env.clear
             @hp.reset
@@ -107,7 +103,7 @@ module Rainbows
 
       def on_write_complete
         if body = @deferred_bodies.first
-          return if AsyncResponse === body
+          return if DeferredResponse === body
           begin
             begin
               write(body.sysread(CHUNK_SIZE))
@@ -188,42 +184,49 @@ module Rainbows
 
     end
 
-    class AsyncResponse < ::Rev::IO
+    class DeferredResponse < ::Rev::IO
       include Unicorn
       include Rainbows::Const
       G = Rainbows::G
 
-      def initialize(client, response, out)
-        @client = client
-        @body = response.last # have to consider response being frozen
+      def self.defer!(client, response, out)
+        body = response.last
+        headers = Rack::Utils::HeaderHash.new(response[1])
 
         # to_io is not part of the Rack spec, but make an exception
         # here since we can't get here without checking to_path first
-        io = @body.to_io if @body.respond_to?(:to_io)
-        io ||= ::IO.new($1.to_i) if @body.to_path =~ %r{\A/dev/fd/(\d+)\z}
-        io ||= File.open(@body.to_path, 'rb') # could be a FIFO
-
-        headers = Rack::Utils::HeaderHash.new(response[1])
-        @do_chunk = !!(headers['Transfer-Encoding'] =~ %r{\Achunked\z}i)
-        @do_chunk = false if headers.delete('X-Rainbows-Autochunk') == 'no'
-
+        io = body.to_io if body.respond_to?(:to_io)
+        io ||= ::IO.new($1.to_i) if body.to_path =~ %r{\A/dev/fd/(\d+)\z}
+        io ||= File.open(File.expand_path(body.to_path), 'rb')
         st = io.stat
-        if st.socket? || st.pipe?
-          super(io)
-          client.deferred_bodies << attach(::Rev::Loop.default)
 
+        if st.socket? || st.pipe?
+          do_chunk = !!(headers['Transfer-Encoding'] =~ %r{\Achunked\z}i)
+          do_chunk = false if headers.delete('X-Rainbows-Autochunk') == 'no'
           # too tricky to support keepalive/pipelining when a response can
           # take an indeterminate amount of time here.
-          out = [ CONN_CLOSE ] if out
+          out[0] = CONN_CLOSE
+
+          io = new(io, client, do_chunk, body).attach(::Rev::Loop.default)
         elsif st.file?
           headers.delete('Transfer-Encoding')
           headers['Content-Length'] ||= st.size.to_s
-          client.deferred_bodies << io
         else # char/block device, directory, whatever... nobody cares
-          return HttpResponse.write(@client, response, out)
+          return response
         end
-        response = [ response.first, headers.to_hash, [] ]
-        HttpResponse.write(@client, response, out)
+        client.deferred_bodies << io
+        [ response.first, headers.to_hash, [] ]
+      end
+
+      def self.write(client, response, out)
+        response.last.respond_to?(:to_path) and
+          response = defer!(client, response, out)
+        HttpResponse.write(client, response, out)
+      end
+
+      def initialize(io, client, do_chunk, body)
+        super(io)
+        @client, @do_chunk, @body = client, do_chunk, body
       end
 
       def on_read(data)
