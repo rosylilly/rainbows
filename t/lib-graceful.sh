@@ -35,7 +35,7 @@ nr=$(sort < $curl_out | uniq | wc -l)
 
 test "$nr" -eq 1
 test x$(sort < $curl_out | uniq) = xHello
-! grep Error $r_err
+check_stderr
 while kill -0 $rainbows_pid >/dev/null 2>&1
 do
 	sleep 1

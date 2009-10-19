@@ -53,7 +53,7 @@ test 2 -eq $(grep '^HTTP/1.1 200 OK' $tmp | wc -l)
 test 1 -eq $(grep '^Connection: keep-alive' $tmp | wc -l)
 test 1 -eq $(grep '^Connection: close' $tmp | wc -l)
 test x"$(cat $ok)" = xok
-! grep Error $r_err
+check_stderr
 
 
 echo "burst pipelining"
@@ -74,8 +74,7 @@ test 1 -eq $(grep '^Connection: keep-alive' $tmp | wc -l)
 test 1 -eq $(grep '^Connection: close' $tmp | wc -l)
 test x"$(cat $ok)" = xok
 
-! grep Error $r_err
-
+check_stderr
 
 echo "HTTP/0.9 request should not return headers"
 (

@@ -31,7 +31,6 @@ echo elapsed=$(( $(date +%s) - $start ))
 kill $(cat $pid)
 
 test $APP_POOL_SIZE -eq $(sort < $curl_out | uniq | wc -l)
-! test -s $curl_err
+test ! -s $curl_err
 
-! grep Error $r_err
-#
+check_stderr

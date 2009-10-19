@@ -85,6 +85,19 @@ dbgcat () {
 	sed -e "s/^/$id:/" < $_file
 }
 
+check_stderr () {
+	set +u
+	_r_err=${1-${r_err}}
+	set -u
+	if grep Error $_r_err
+	then
+		die "Errors found in $_r_err"
+	elif grep SIGKILL $_r_err
+	then
+		die "SIGKILL found in $_r_err"
+	fi
+}
+
 case $model in
 Rev) require_check rev Rev::VERSION ;;
 Revactor) require_check revactor Revactor::VERSION ;;

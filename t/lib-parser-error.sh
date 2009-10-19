@@ -28,4 +28,4 @@ kill $(cat $pid)
 
 dbgcat tmp
 grep -F 'HTTP/1.1 400 Bad Request' $tmp
-! grep Error $r_err
+check_stderr

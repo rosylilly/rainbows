@@ -23,7 +23,7 @@ for i in $(awk "BEGIN{for(i=0;i<$nr_client;++i) print i}" </dev/null)
 do
 	( curl -sSf http://$listen/2 >> $curl_out 2>> $curl_err ) &
 done
-! grep Error $r_err
+check_stderr
 
 rm $r_rot
 mv $r_err $r_rot
@@ -36,14 +36,14 @@ dbgcat r_err
 
 wait
 echo elapsed=$(( $(date +%s) - $start ))
-! test -s $curl_err
+test ! -s $curl_err
 test x"$(wc -l < $curl_out)" = x$nr_client
 nr=$(sort < $curl_out | uniq | wc -l)
 
 test "$nr" -eq 1
 test x$(sort < $curl_out | uniq) = xHello
-! grep Error $r_err
-! grep Error $r_rot
+check_stderr
+check_stderr $r_rot
 
 before_rot=$(wc -c < $r_rot)
 before_err=$(wc -c < $r_err)
@@ -56,5 +56,5 @@ test $after_err -gt $before_err && echo "before_err -gt after_err"
 
 kill $(cat $pid)
 dbgcat r_err
-! grep Error $r_err
-! grep Error $r_rot
+check_stderr
+check_stderr $r_rot

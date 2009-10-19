@@ -35,4 +35,4 @@ test 1 -eq $(sort < $curl_out | uniq | wc -l)
 blob_sha1=$( expr "$(sha1sum < random_blob)" : '\([a-f0-9]\+\)')
 echo blob_sha1=$blob_sha1
 test x"$blob_sha1" = x"$(sort < $curl_out | uniq)"
-! grep Error $r_err
+check_stderr

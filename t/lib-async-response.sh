@@ -35,7 +35,7 @@ dbgcat c
 dbgcat r_err
 dbgcat curl_err
 test ! -s $curl_err
-grep Error $r_err && die "errors in $r_err"
+check_stderr
 
 while kill -0 $rainbows_pid >/dev/null 2>&1
 do

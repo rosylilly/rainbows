@@ -28,8 +28,7 @@ echo "small blob"
 
 fgrep 'HTTP/1.1 200 OK' $tmp
 test xok = x"$(cat $ok)"
-! grep Error $r_err
-
+check_stderr
 
 echo "big blob"
 (
@@ -41,7 +40,7 @@ echo "big blob"
 
 fgrep 'HTTP/1.1 200 OK' $tmp
 test xok = x"$(cat $ok)"
-! grep Error $r_err
+check_stderr
 
 echo "staggered blob"
 (
@@ -61,7 +60,6 @@ echo "staggered blob"
 
 fgrep 'HTTP/1.1 200 OK' $tmp
 test xok = x"$(cat $ok)"
-! grep Error $r_err
-
+check_stderr
 
 kill $(cat $pid)
