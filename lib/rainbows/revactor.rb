@@ -112,7 +112,7 @@ module Rainbows
 
       begin
         Actor.receive do |filter|
-          filter.after(timeout, &check_quit)
+          filter.after(1, &check_quit)
           filter.when(Case[:exit, Actor, Object]) do |_,actor,_|
             orig = clients.size
             clients.delete(actor.object_id)
