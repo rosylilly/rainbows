@@ -14,7 +14,7 @@ ifeq ($(RUBYLIB),)
 else
   RUBYLIB := $(rainbows_lib):$(RUBYLIB)
 endif
-export RUBYLIB
+export RUBYLIB RUBY_VERSION
 
 T = $(wildcard t[0-9][0-9][0-9][0-9]-*.sh)
 

@@ -25,7 +25,7 @@ do
 done
 check_stderr
 
-rm $r_rot
+rm -f $r_rot
 mv $r_err $r_rot
 
 kill -USR1 $(cat $pid)

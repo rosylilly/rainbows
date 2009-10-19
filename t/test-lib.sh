@@ -27,8 +27,10 @@ then
 	esac
 fi
 
+ruby="${ruby-'ruby'}"
+RUBY_VERSION=${RUBY_VERSION-$($ruby -e 'puts RUBY_VERSION')}
+t_pfx=$PWD/trash/$T-$RUBY_VERSION
 set -u
-ruby="${ruby-ruby}"
 
 # ensure a sane environment
 TZ=UTC LC_ALL=C LANG=C
@@ -40,8 +42,22 @@ die () {
 	exit 1
 }
 
-_TEST_RM_LIST=""
-trap 'rm -f $_TEST_RM_LIST' 0
+_test_on_exit () {
+	code=$?
+	case $code in
+	0)
+		echo "ok $T"
+		rm -f $_TEST_OK_RM_LIST
+	;;
+	*) echo "not ok $T" ;;
+	esac
+	rm -f $_TEST_RM_LIST
+	exit $code
+}
+
+_TEST_RM_LIST=
+_TEST_OK_RM_LIST=
+trap _test_on_exit EXIT
 PATH=$PWD/bin:$PATH
 export PATH
 
@@ -73,14 +89,16 @@ rtmpfiles () {
 	for id in "$@"
 	do
 		name=$id
-		_tmp=$(mktemp -t rainbows.$$.$id.XXXXXXXX)
+		_tmp=$t_pfx.$id
+		> $_tmp
 		eval "$id=$_tmp"
-		_TEST_RM_LIST="$_TEST_RM_LIST $_tmp"
+		_TEST_OK_RM_LIST="$_TEST_OK_RM_LIST $_tmp"
 
 		case $name in
 		*fifo)
 			rm -f $_tmp
 			mkfifo $_tmp
+			_TEST_RM_LIST="$_TEST_RM_LIST $_tmp"
 			;;
 		esac
 	done
