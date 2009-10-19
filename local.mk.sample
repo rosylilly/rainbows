@@ -22,12 +22,16 @@ endif
 ifdef gem_paths
   sp :=
   sp +=
-  RUBYLIB := $(subst $(sp),:,$(addsuffix /lib,$(gem_paths)))
+  export RUBYLIB := $(subst $(sp),:,$(addsuffix /lib,$(gem_paths)))
 endif
 
 # pipefail is THE reason to use bash (v3+) or never revisions of ksh93
 # SHELL := /bin/bash -e -o pipefail
 SHELL := /bin/ksh93 -e -o pipefail
+
+# trace execution of tests
+# TRACER = strace -f -o $(t_pfx).strace -s 100000
+TRACER = /usr/bin/time -v -o $(t_pfx).time
 
 full-test: test-18 test-19
 test-18:
@@ -60,3 +64,7 @@ doc_gz:
 	touch doc/NEWS.atom.xml -d "$$(awk 'NR==1{print $$4,$$5,$$6}' NEWS)"
 	for i in $(docs); do \
 	  gzip --rsyncable -9 < $$i > $$i.gz; touch -r $$i $$i.gz; done
+
+# launches any of the following shells with RUBYLIB set
+irb sh bash ksh:
+	$@
