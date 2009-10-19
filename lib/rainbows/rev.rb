@@ -156,26 +156,31 @@ module Rainbows
 
     end
 
+    # This timer handles the fchmod heartbeat to prevent our master
+    # from killing us.
+    class Heartbeat < ::Rev::TimerWatcher
+      G = Rainbows::G
+
+      def initialize(tmp)
+        @m, @tmp = 0, tmp
+        super(1, true)
+      end
+
+      def on_timer
+        @tmp.chmod(@m = 0 == @m ? 1 : 0)
+        exit if (! G.alive && G.cur <= 0)
+      end
+    end
+
     # runs inside each forked worker, this sits around and waits
     # for connections and doesn't die until the parent dies (or is
     # given a INT, QUIT, or TERM signal)
     def worker_loop(worker)
       init_worker_process(worker)
-      graceful_waiter = nil
-      trap(:QUIT) do
-        G.alive = false
-        LISTENERS.map! { |s| s.close rescue nil }
-        # Rev may get stuck in a loop with no events possible, spawn a new
-        # thread to join on graceful exits when our client count goes to zero
-        graceful_waiter = Thread.new {
-          sleep(0.1) while G.cur > 0
-          exit
-        }
-      end
-
-      LISTENERS.map! { |s| Server.new(s).attach(::Rev::Loop.default) }
-      ::Rev::Loop.default.run
-      graceful_waiter.join(timeout * 2.0)
+      rloop = ::Rev::Loop.default
+      Heartbeat.new(worker.tmp).attach(rloop)
+      LISTENERS.map! { |s| Server.new(s).attach(rloop) }
+      rloop.run
     end
 
   end
