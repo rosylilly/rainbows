@@ -7,6 +7,13 @@ of the time waiting on network activity.  Thus memory usage and memory
 bandwidth for keeping connections open are often limiting factors as
 well.
 
+As of October 2009, absolutely ZERO work has been done for performance
+validation and tuning.  Furthermore, \Rainbows! is NOT expected to do well on
+traditional benchmarks.  Remember that \Rainbows! is only designed for
+applications that sleep and/or trickle network traffic.  In the future,
+*may* do well in traditional benchmarks as a side effect, but that will
+never be the primary goal of the project.
+
 == \Rainbows! configuration
 
 * Don't set +worker_connections+ too high.  It is often better to start
@@ -17,6 +24,13 @@ well.
   available.  Additional worker processes can better utilize SMP, are more
   robust against crashes and are more likely to be fairly scheduled by
   the kernel.
+
+* If your workers do not seem to be releasing memory to the OS after
+  traffic spikes, consider the {mall}[http://bogomips.org/mall/] library
+  which allows access to the mallopt(3) function from Ruby. As of
+  October 2009 tcmalloc (the default allocator for Ruby Enterprise
+  Edition) does not release memory back to the kernel, the best it can
+  do is use madvise(2) in an effort to swap out unused pages.
 
 == nginx configuration
 
