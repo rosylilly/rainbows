@@ -4,8 +4,6 @@ echo "input trailer test model=$model"
 
 eval $(unused_listen)
 rtmpfiles unicorn_config tmp r_err r_out pid fifo ok
-rm -f $fifo
-mkfifo $fifo
 
 cat > $unicorn_config <<EOF
 listen "$listen"

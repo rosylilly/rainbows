@@ -72,9 +72,17 @@ require_check () {
 rtmpfiles () {
 	for id in "$@"
 	do
+		name=$id
 		_tmp=$(mktemp -t rainbows.$$.$id.XXXXXXXX)
 		eval "$id=$_tmp"
 		_TEST_RM_LIST="$_TEST_RM_LIST $_tmp"
+
+		case $name in
+		*fifo)
+			rm -f $_tmp
+			mkfifo $_tmp
+			;;
+		esac
 	done
 }
 

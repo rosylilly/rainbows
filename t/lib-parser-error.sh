@@ -3,8 +3,6 @@ echo "parser error test for model=$model"
 
 eval $(unused_listen)
 rtmpfiles unicorn_config pid r_err r_out tmp fifo ok
-rm -f $fifo
-mkfifo $fifo
 
 cat > $unicorn_config <<EOF
 listen "$listen"

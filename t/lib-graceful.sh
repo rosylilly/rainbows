@@ -3,8 +3,6 @@ echo "graceful test for model=$model"
 
 eval $(unused_listen)
 rtmpfiles unicorn_config curl_out pid r_err r_out fifo
-rm -f $fifo
-mkfifo $fifo
 
 cat > $unicorn_config <<EOF
 listen "$listen"
