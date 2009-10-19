@@ -13,10 +13,10 @@ suck; differently.
 
 For network concurrency, models we currently support are:
 
-* {:ThreadSpawn}[link:Rainbows/ThreadSpawn.html]
-* {:ThreadPool}[link:Rainbows/ThreadPool.html]
 * {:Revactor}[link:Rainbows/Revactor.html]
+* {:ThreadPool}[link:Rainbows/ThreadPool.html]
 * {:Rev}[link:Rainbows/Rev.html]*
+* {:ThreadSpawn}[link:Rainbows/ThreadSpawn.html]
 
 We have {more on the way}[link:TODO.html] for handling network concurrency.
 Additionally, we also use multiple processes (managed by Unicorn) for
