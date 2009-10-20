@@ -76,7 +76,7 @@ check_stderr
 
 echo "HTTP/0.9 request should not return headers"
 (
-	printf 'GET /\r\n\r\n'
+	printf 'GET /\r\n'
 	cat $fifo > $tmp &
 	wait
 	echo ok > $ok
