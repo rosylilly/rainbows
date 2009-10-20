@@ -7,7 +7,7 @@ then
 fi
 echo "large file response slurp avoidance for model=$model"
 eval $(unused_listen)
-rtmpfiles unicorn_config tmp r_err r_out pid ok
+rtmpfiles unicorn_config tmp r_err r_out pid ok fifo
 
 cat > $unicorn_config <<EOF
 listen "$listen"
@@ -29,10 +29,25 @@ echo "rss_before=$rss_before"
 
 for i in a b c
 do
-	size=$( (curl -sSfv http://$listen/random_blob && echo ok > $ok) | wc -c)
+	size=$( (curl -sSfv http://$listen/random_blob && echo ok >$ok) |wc -c)
 	test $size -eq $random_blob_size
 	test xok = x$(cat $ok)
 done
+
+echo "HTTP/1.0 test" # this was a problem during development
+size=$( (curl -0 -sSfv http://$listen/random_blob && echo ok >$ok) |wc -c)
+test $size -eq $random_blob_size
+test xok = x$(cat $ok)
+
+echo "HTTP/0.9 test"
+(
+	printf 'GET /random_blob\r\n'
+	cat $fifo > $tmp &
+	wait
+	echo ok > $ok
+) | socat - TCP:$listen > $fifo
+cmp $tmp random_blob
+test xok = x$(cat $ok)
 
 dbgcat r_err
 curl -v http://$listen/rss

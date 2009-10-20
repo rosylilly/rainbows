@@ -30,12 +30,6 @@ module Rainbows
       include Rainbows::Const
       G = Rainbows::G
 
-      # queued, optional response bodies, it should only be unpollable "fast"
-      # devices where read(2) is uninterruptable.  Unfortunately, NFS and ilk
-      # are also part of this.  We'll also stick DeferredResponse bodies in
-      # here to prevent connections from being closed on us.
-      attr_reader :deferred_bodies
-
       def initialize(io)
         G.cur += 1
         super(io)
@@ -51,6 +45,15 @@ module Rainbows
       def quit
         @deferred_bodies.clear
         @state = :close
+      end
+
+      # queued, optional response bodies, it should only be unpollable "fast"
+      # devices where read(2) is uninterruptable.  Unfortunately, NFS and ilk
+      # are also part of this.  We'll also stick DeferredResponse bodies in
+      # here to prevent connections from being closed on us.
+      def defer_body(io)
+        @deferred_bodies << io
+        on_write_complete unless @hp.headers? # triggers a write
       end
 
       def handle_error(e)
@@ -100,6 +103,7 @@ module Rainbows
             rescue EOFError # expected at file EOF
               @deferred_bodies.shift
               body.close
+              close if :close == @state && @deferred_bodies.empty?
             end
           rescue Object => e
             handle_error(e)
@@ -195,7 +199,11 @@ module Rainbows
           do_chunk = false if headers.delete('X-Rainbows-Autochunk') == 'no'
           # too tricky to support keepalive/pipelining when a response can
           # take an indeterminate amount of time here.
-          out[0] = CONN_CLOSE
+          if out.nil?
+            do_chunk = false
+          else
+            out[0] = CONN_CLOSE
+          end
 
           io = new(io, client, do_chunk, body).attach(::Rev::Loop.default)
         elsif st.file?
@@ -204,7 +212,7 @@ module Rainbows
         else # char/block device, directory, whatever... nobody cares
           return response
         end
-        client.deferred_bodies << io
+        client.defer_body(io)
         [ response.first, headers.to_hash, [] ]
       end
 
