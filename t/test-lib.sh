@@ -90,15 +90,17 @@ rtmpfiles () {
 	do
 		name=$id
 		_tmp=$t_pfx.$id
-		> $_tmp
 		eval "$id=$_tmp"
-		_TEST_OK_RM_LIST="$_TEST_OK_RM_LIST $_tmp"
 
 		case $name in
 		*fifo)
 			rm -f $_tmp
 			mkfifo $_tmp
 			_TEST_RM_LIST="$_TEST_RM_LIST $_tmp"
+			;;
+		*)
+			> $_tmp
+			_TEST_OK_RM_LIST="$_TEST_OK_RM_LIST $_tmp"
 			;;
 		esac
 	done
