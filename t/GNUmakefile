@@ -55,8 +55,7 @@ test-bin-$(RUBY_VERSION)/rainbows: ../bin/rainbows
 	mkdir -p $(@D)
 	install -m 755 $^ $@+
 	$(ruby) -i -p -e '$$_.gsub!(%r{^#!.*$$},"#!$(ruby_bin)")' $@+
-	cmp $@+ $@ 2>/dev/null || mv $@+ $@
-	$(RM) $@+
+	mv $@+ $@
 
 req_random_blob := $(wildcard t?1??-*.sh)
 random_blob:
