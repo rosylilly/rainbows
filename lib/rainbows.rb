@@ -56,6 +56,7 @@ module Rainbows
     :ThreadSpawn => 30,
     :ThreadPool => 10,
     :Rev => 50,
+    :EventMachine => 50,
   }.each do |model, _|
     u = model.to_s.gsub(/([a-z0-9])([A-Z0-9])/) { "#{$1}_#{$2.downcase!}" }
     autoload model, "rainbows/#{u.downcase!}"
