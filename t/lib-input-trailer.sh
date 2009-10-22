@@ -18,11 +18,11 @@ wait_for_pid $pid
 
 echo "small blob"
 (
-	echo hello world | content-md5-put
 	cat $fifo > $tmp &
+	echo hello world | content-md5-put
 	wait
 	echo ok > $ok
-) | socat - TCP:$listen | utee $fifo
+) | socat - TCP:$listen > $fifo
 
 fgrep 'HTTP/1.1 200 OK' $tmp
 test xok = x"$(cat $ok)"
@@ -30,11 +30,11 @@ check_stderr
 
 echo "big blob"
 (
-	content-md5-put < random_blob
 	cat $fifo > $tmp &
+	content-md5-put < random_blob
 	wait
 	echo ok > $ok
-) | socat - TCP:$listen | utee $fifo
+) | socat - TCP:$listen > $fifo
 
 fgrep 'HTTP/1.1 200 OK' $tmp
 test xok = x"$(cat $ok)"
@@ -42,19 +42,19 @@ check_stderr
 
 echo "staggered blob"
 (
+	cat $fifo > $tmp &
 	(
 		dd bs=164 count=1 < random_blob
 		sleep 2
 		dd bs=4545 count=1 < random_blob
 		sleep 2
 		dd bs=1234 count=1 < random_blob
-		echo ok > $ok
+		echo subok > $ok
 	) 2>/dev/null | content-md5-put
-	test xok = x"$(cat $ok)"
-	cat $fifo > $tmp &
+	test xsubok = x"$(cat $ok)"
 	wait
 	echo ok > $ok
-) | socat - TCP:$listen | utee $fifo
+) | socat - TCP:$listen > $fifo
 
 fgrep 'HTTP/1.1 200 OK' $tmp
 test xok = x"$(cat $ok)"
