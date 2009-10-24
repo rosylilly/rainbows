@@ -18,6 +18,9 @@ EOF
 rainbows -D sleep.ru -c $unicorn_config
 wait_for_pid $pid
 
+# ensure our server is started and responding before signaling
+curl -sSf http://$listen/ >/dev/null
+
 start=$(date +%s)
 for i in $(awk "BEGIN{for(i=0;i<$nr_client;++i) print i}" </dev/null)
 do
