@@ -2,21 +2,10 @@ nr_client=${nr_client-4}
 . ./test-lib.sh
 test -r random_blob || die "random_blob required, run with 'make $0'"
 
-eval $(unused_listen)
-rtmpfiles unicorn_config curl_out curl_err r_err r_out pid
-
-cat > $unicorn_config <<EOF
-listen "$listen"
-pid "$pid"
-stderr_path "$r_err"
-stdout_path "$r_out"
-Rainbows! do
-  use :$model
-end
-EOF
-
+rainbows_setup
+rtmpfiles curl_out curl_err
 rainbows -D sha1.ru -c $unicorn_config
-wait_for_pid $pid
+rainbows_wait_start
 
 start=$(date +%s)
 for i in $(awk "BEGIN{for(i=0;i<$nr_client;++i) print i}" </dev/null)

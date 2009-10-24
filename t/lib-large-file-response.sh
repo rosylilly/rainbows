@@ -6,20 +6,11 @@ then
 	exit 0
 fi
 echo "large file response slurp avoidance for model=$model"
-eval $(unused_listen)
-rtmpfiles unicorn_config tmp r_err r_out pid ok fifo
 
-cat > $unicorn_config <<EOF
-listen "$listen"
-stderr_path "$r_err"
-stdout_path "$r_out"
-pid "$pid"
-Rainbows! { use :$model }
-EOF
-
+rainbows_setup
 # can't load Rack::Lint here since it'll cause Rev to slurp
 rainbows -E none -D large-file-response.ru -c $unicorn_config
-wait_for_pid $pid
+rainbows_wait_start
 
 random_blob_size=$(wc -c < random_blob)
 curl -v http://$listen/rss

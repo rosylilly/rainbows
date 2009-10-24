@@ -3,20 +3,10 @@
 nr_client=${nr_client-2}
 . ./test-lib.sh
 
-eval $(unused_listen)
-rtmpfiles unicorn_config curl_out curl_err pid r_err r_out r_rot
-
-
-cat > $unicorn_config <<EOF
-listen "$listen"
-pid "$pid"
-stderr_path "$r_err"
-stdout_path "$r_out"
-Rainbows! { use :$model }
-EOF
-
+rtmpfiles curl_out curl_err r_rot
+rainbows_setup
 rainbows -D sleep.ru -c $unicorn_config
-wait_for_pid $pid
+rainbows_wait_start
 
 # ensure our server is started and responding before signaling
 curl -sSf http://$listen/ >/dev/null

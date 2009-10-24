@@ -1,20 +1,10 @@
 . ./test-lib.sh
 echo "graceful test for model=$model"
 
-eval $(unused_listen)
-rtmpfiles unicorn_config curl_out pid r_err r_out fifo
-
-cat > $unicorn_config <<EOF
-listen "$listen"
-stderr_path "$r_err"
-stdout_path "$r_out"
-pid "$pid"
-Rainbows! { use :$model }
-EOF
-
+rtmpfiles curl_out
+rainbows_setup
 rainbows -D sleep.ru -c $unicorn_config
-wait_for_pid $pid
-rainbows_pid=$(cat $pid)
+rainbows_wait_start
 
 curl -sSfv -T- </dev/null http://$listen/5 > $curl_out 2> $fifo &
 

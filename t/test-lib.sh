@@ -23,7 +23,7 @@ then
 	t2???-thread-spawn-*.sh) model=ThreadSpawn ;;
 	t3???-revactor-*.sh) model=Revactor ;;
 	t4???-rev-*.sh) model=Rev ;;
-	*) model=any ;;
+	*) model=Base ;;
 	esac
 fi
 
@@ -124,6 +124,44 @@ check_stderr () {
 	then
 		die "SIGKILL found in $_r_err"
 	fi
+}
+
+rainbows_setup () {
+	eval $(unused_listen)
+	rtmpfiles unicorn_config pid r_err r_out fifo tmp ok
+	cat > $unicorn_config <<EOF
+listen "$listen"
+pid "$pid"
+stderr_path "$r_err"
+stdout_path "$r_out"
+
+before_fork do |server, worker|
+  # test script will block while reading from $fifo,
+  # so notify the script on the first worker we spawn
+  # by opening the FIFO
+  if worker.nr == 0
+    File.open("$fifo", "wb").close
+  end
+end
+EOF
+	{
+		if test $# -ge 1
+		then
+			echo 'Rainbows! do'
+			echo "  use :$1"
+			test $# -eq 2 && echo "  worker_connections $2"
+			echo end
+		else
+			echo "Rainbows! { use :$model }"
+		fi
+	} >> $unicorn_config
+}
+
+rainbows_wait_start () {
+	# "cat $fifo" will block until the before_fork hook is called in
+	# the Unicorn config file
+	test x = x"$(cat $fifo)"
+	rainbows_pid=$(cat $pid)
 }
 
 case $model in

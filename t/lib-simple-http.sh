@@ -6,22 +6,9 @@ echo "simple HTTP connection keepalive/pipelining tests for $model"
 tbase=$(expr "$T" : '^\(t....\)-').ru
 test -f "$tbase" || die "$tbase missing for $T"
 
-eval $(unused_listen)
-rtmpfiles unicorn_config pid r_err r_out tmp fifo ok
-
-cat > $unicorn_config <<EOF
-listen "$listen"
-pid "$pid"
-stderr_path "$r_err"
-stdout_path "$r_out"
-EOF
-if test x$model != xany
-then
-	echo "Rainbows! { use :$model }" >> $unicorn_config
-fi
-
+rainbows_setup
 rainbows -D $tbase -c $unicorn_config
-wait_for_pid $pid
+rainbows_wait_start
 
 echo "single request"
 curl -sSfv http://$listen/
