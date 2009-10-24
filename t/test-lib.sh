@@ -27,8 +27,8 @@ then
 	esac
 fi
 
-ruby="${ruby-'ruby'}"
-RUBY_VERSION=${RUBY_VERSION-$($ruby -e 'puts RUBY_VERSION')}
+RUBY="${RUBY-ruby}"
+RUBY_VERSION=${RUBY_VERSION-$($RUBY -e 'puts RUBY_VERSION')}
 t_pfx=$PWD/trash/$T-$RUBY_VERSION
 set -u
 
@@ -76,7 +76,7 @@ wait_for_pid () {
 require_check () {
 	lib=$1
 	const=$2
-	if ! $ruby -r$lib -e "puts $const" >/dev/null 2>&1
+	if ! $RUBY -r$lib -e "puts $const" >/dev/null 2>&1
 	then
 		echo >&2 "skipping $T since we don't have $lib"
 		exit 0

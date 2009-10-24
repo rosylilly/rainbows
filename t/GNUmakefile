@@ -2,11 +2,11 @@
 
 all::
 
-ruby = ruby
+RUBY = ruby
 rainbows_lib := $(shell cd ../lib && pwd)
 -include ../local.mk
 ifeq ($(RUBY_VERSION),)
-  RUBY_VERSION := $(shell $(ruby) -e 'puts RUBY_VERSION')
+  RUBY_VERSION := $(shell $(RUBY) -e 'puts RUBY_VERSION')
 endif
 
 ifeq ($(RUBYLIB),)
@@ -50,11 +50,11 @@ endif
 
 run_test = $(quiet_pre) ( $(t_wrap) ) $(quiet_post)
 
-test-bin-$(RUBY_VERSION)/rainbows: ruby_bin = $(shell which $(ruby))
+test-bin-$(RUBY_VERSION)/rainbows: ruby_bin = $(shell which $(RUBY))
 test-bin-$(RUBY_VERSION)/rainbows: ../bin/rainbows
 	mkdir -p $(@D)
 	install -m 755 $^ $@+
-	$(ruby) -i -p -e '$$_.gsub!(%r{^#!.*$$},"#!$(ruby_bin)")' $@+
+	$(RUBY) -i -p -e '$$_.gsub!(%r{^#!.*$$},"#!$(ruby_bin)")' $@+
 	mv $@+ $@
 
 req_random_blob := $(wildcard t?1??-*.sh)
@@ -65,7 +65,7 @@ random_blob:
 $(req_random_blob): random_blob
 
 $(T): trash/.gitignore
-$(T): export ruby := $(ruby)
+$(T): export RUBY := $(RUBY)
 $(T): export PATH := $(CURDIR)/test-bin-$(RUBY_VERSION):$(PATH)
 $(T): test-bin-$(RUBY_VERSION)/rainbows
 	$(run_test)
