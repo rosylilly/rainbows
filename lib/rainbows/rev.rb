@@ -172,7 +172,7 @@ module Rainbows
         return if G.cur >= G.max
         begin
           Client.new(@_io.accept_nonblock).attach(::Rev::Loop.default)
-        rescue Errno::EAGAIN, Errno::ECONNBORTED
+        rescue Errno::EAGAIN, Errno::ECONNABORTED
         end
       end
 
