@@ -1,21 +1,8 @@
 #!/bin/sh
 # Copyright (c) 2009 Rainbows! developers
+. ./my-tap-lib.sh
 
-# pipefail is non-POSIX, but useful in ksh/bash
-(
-	set +e
-	set -o pipefail 2>/dev/null
-)
-if test $? -eq 0
-then
-	set -o pipefail
-else
-	echo >&2 "WARNING: your shell does not understand pipefail"
-fi
-
-set -e
-
-T=$(basename $0)
+set +u
 if test -z "$model"
 then
 	case $T in
@@ -27,37 +14,12 @@ then
 	esac
 fi
 
+set -e
 RUBY="${RUBY-ruby}"
 RUBY_VERSION=${RUBY_VERSION-$($RUBY -e 'puts RUBY_VERSION')}
 t_pfx=$PWD/trash/$T-$RUBY_VERSION
 set -u
 
-# ensure a sane environment
-TZ=UTC LC_ALL=C LANG=C
-export LANG LC_ALL TZ
-unset CDPATH
-
-die () {
-	echo >&2 "$@"
-	exit 1
-}
-
-_test_on_exit () {
-	code=$?
-	case $code in
-	0)
-		echo "ok $T"
-		rm -f $_TEST_OK_RM_LIST
-	;;
-	*) echo "not ok $T" ;;
-	esac
-	rm -f $_TEST_RM_LIST
-	exit $code
-}
-
-_TEST_RM_LIST=
-_TEST_OK_RM_LIST=
-trap _test_on_exit EXIT
 PATH=$PWD/bin:$PATH
 export PATH
 
@@ -73,12 +35,13 @@ wait_for_pid () {
 	done
 }
 
+# requires $1 and prints out the value of $2
 require_check () {
 	lib=$1
 	const=$2
 	if ! $RUBY -r$lib -e "puts $const" >/dev/null 2>&1
 	then
-		echo >&2 "skipping $T since we don't have $lib"
+		t_info "skipping $T since we don't have $lib"
 		exit 0
 	fi
 }
@@ -96,11 +59,11 @@ rtmpfiles () {
 		*fifo)
 			rm -f $_tmp
 			mkfifo $_tmp
-			_TEST_RM_LIST="$_TEST_RM_LIST $_tmp"
+			T_RM_LIST="$T_RM_LIST $_tmp"
 			;;
 		*)
 			> $_tmp
-			_TEST_OK_RM_LIST="$_TEST_OK_RM_LIST $_tmp"
+			T_OK_RM_LIST="$T_OK_RM_LIST $_tmp"
 			;;
 		esac
 	done
@@ -126,6 +89,7 @@ check_stderr () {
 	fi
 }
 
+# rainbows_setup [ MODEL [ WORKER_CONNECTIONS ] ]
 rainbows_setup () {
 	eval $(unused_listen)
 	rtmpfiles unicorn_config pid r_err r_out fifo tmp ok
@@ -134,6 +98,12 @@ listen "$listen"
 pid "$pid"
 stderr_path "$r_err"
 stdout_path "$r_out"
+
+# close my-tap-lib.sh FDs
+unless ENV['UNICORN_FD']
+  IO.for_fd(3).close rescue nil
+  IO.for_fd(4).close rescue nil
+end
 
 before_fork do |server, worker|
   # test script will block while reading from $fifo,

@@ -3,51 +3,95 @@
 nr_client=${nr_client-2}
 . ./test-lib.sh
 
-rtmpfiles curl_out curl_err r_rot
-rainbows_setup
-rainbows -D sleep.ru -c $unicorn_config
-rainbows_wait_start
+t_plan 18 "reopen rotated logs"
 
-# ensure our server is started and responding before signaling
-curl -sSf http://$listen/ >/dev/null
+t_begin "setup and startup" && {
+	rtmpfiles curl_out curl_err r_rot
+	rainbows_setup $model
+	rainbows -D sleep.ru -c $unicorn_config
+	rainbows_wait_start
+}
 
-start=$(date +%s)
-for i in $(awk "BEGIN{for(i=0;i<$nr_client;++i) print i}" </dev/null)
-do
-	( curl -sSf http://$listen/2 >> $curl_out 2>> $curl_err ) &
-done
-check_stderr
+t_begin "ensure server is responsive" && {
+	curl -sSf http://$listen/ >/dev/null
+}
 
-rm -f $r_rot
-mv $r_err $r_rot
+t_begin "start $nr_client concurrent requests" && {
+	start=$(date +%s)
+	for i in $(awk "BEGIN{for(i=0;i<$nr_client;++i) print i}" </dev/null)
+	do
+		( curl -sSf http://$listen/2 >> $curl_out 2>> $curl_err ) &
+	done
+}
 
-kill -USR1 $(cat $pid)
-wait_for_pid $r_err
+t_begin "ensure stderr log is clean" && check_stderr
+
+t_begin "external log rotation" && {
+	rm -f $r_rot
+	mv $r_err $r_rot
+}
+
+t_begin "send reopen log signal (USR1)" && {
+	kill -USR1 $rainbows_pid
+}
+
+t_begin "wait for rotated log to reappear" && {
+	nr=60
+	while ! test -f $r_err && test $nr -ge 0
+	do
+		sleep 1
+		nr=$(( $nr - 1 ))
+	done
+}
 
 dbgcat r_rot
 dbgcat r_err
 
-wait
-echo elapsed=$(( $(date +%s) - $start ))
-test ! -s $curl_err
-test x"$(wc -l < $curl_out)" = x$nr_client
-nr=$(sort < $curl_out | uniq | wc -l)
+t_begin "wait curl requests to finish" && {
+	wait
+	t_info elapsed=$(( $(date +%s) - $start ))
+}
 
-test "$nr" -eq 1
-test x$(sort < $curl_out | uniq) = xHello
-check_stderr
-check_stderr $r_rot
+t_begin "ensure no errors from curl" && {
+	test ! -s $curl_err
+}
 
-before_rot=$(wc -c < $r_rot)
-before_err=$(wc -c < $r_err)
-curl -sSfv http://$listen/
-after_rot=$(wc -c < $r_rot)
-after_err=$(wc -c < $r_err)
+t_begin "curl got $nr_client responses" && {
+	test "$(wc -l < $curl_out)" -eq $nr_client
+}
 
-test $after_rot -eq $before_rot && echo "before_rot -eq after_rot"
-test $after_err -gt $before_err && echo "before_err -gt after_err"
+t_begin "all responses were identical" && {
+	nr=$(sort < $curl_out | uniq | wc -l)
+	test "$nr" -eq 1
+}
 
-kill $(cat $pid)
+t_begin 'response was "Hello"' && {
+	test x$(sort < $curl_out | uniq) = xHello
+}
+
+t_begin "current server stderr is clean" && check_stderr
+
+t_begin "rotated stderr is clean" && {
+	check_stderr $r_rot
+}
+
+t_begin "server is now writing logs to new stderr" && {
+	before_rot=$(wc -c < $r_rot)
+	before_err=$(wc -c < $r_err)
+	curl -sSfv http://$listen/
+	after_rot=$(wc -c < $r_rot)
+	after_err=$(wc -c < $r_err)
+	test $after_rot -eq $before_rot
+	test $after_err -gt $before_err
+}
+
+t_begin "stop server" && {
+	kill $rainbows_pid
+}
+
 dbgcat r_err
-check_stderr
-check_stderr $r_rot
+
+t_begin "current server stderr is clean" && check_stderr
+t_begin "rotated stderr is clean" && check_stderr $r_rot
+
+t_done

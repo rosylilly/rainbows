@@ -36,4 +36,4 @@ rescue Errno::EEXIST
   retry
 end
 sock.close rescue nil
-puts %Q(listen=#{addr}:#{port} _TEST_RM_LIST="$_TEST_RM_LIST #{lock_path}")
+puts %Q(listen=#{addr}:#{port} T_RM_LIST="$T_RM_LIST #{lock_path}")
