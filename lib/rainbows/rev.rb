@@ -118,7 +118,7 @@ module Rainbows
         # here since we can't get here without checking to_path first
         io = body.to_io if body.respond_to?(:to_io)
         io ||= ::IO.new($1.to_i) if body.to_path =~ %r{\A/dev/fd/(\d+)\z}
-        io ||= File.open(File.expand_path(body.to_path), 'rb')
+        io ||= File.open(body.to_path, 'rb')
         st = io.stat
 
         if st.socket? || st.pipe?
