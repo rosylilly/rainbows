@@ -1,5 +1,12 @@
 #!/bin/sh
 . ./test-lib.sh
+case $model in
+Thread*) ;;
+*)
+	t_info "skipping $T since it's not compatible with $model"
+	exit 0
+	;;
+esac
 nr_client=30 APP_POOL_SIZE=4
 
 t_plan 6 "AppPool Rack middleware test for $model"
