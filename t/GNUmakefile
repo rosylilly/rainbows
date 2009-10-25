@@ -17,7 +17,7 @@ endif
 export RUBYLIB RUBY_VERSION
 
 models := ThreadPool ThreadSpawn Revactor Rev
-all_models := $(models) Base
+all_models := $(models) Base EventMachine
 
 T = $(wildcard t[0-9][0-9][0-9][0-9]-*.sh)
 
@@ -26,6 +26,9 @@ $(T): MODELS = $(models)
 
 # some tests can be run with all models
 t0000-simple-http.sh: MODELS = $(all_models)
+t0002-graceful.sh: MODELS = $(all_models)
+t0002-parser-error.sh: MODELS = $(all_models)
+t0003-reopen-logs.sh: MODELS = $(all_models)
 
 # this test is not compatible with non-Thread models yet
 t9000-rack-app-pool.sh: MODELS = ThreadPool ThreadSpawn

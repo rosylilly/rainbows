@@ -37,6 +37,11 @@ module Rainbows
       alias write send_data
       alias receive_data on_read
 
+      def quit
+        super
+        close_connection_after_writing
+      end
+
       def app_call
         begin
           (@env[RACK_INPUT] = @input).rewind
@@ -54,7 +59,7 @@ module Rainbows
             # keepalive requests are always body-less, so @input is unchanged
             @hp.headers(@env, @buf) and next
           else
-            @state = :close
+            quit
           end
           return
         end while true
@@ -89,6 +94,11 @@ module Rainbows
         @em_conns = conns
       end
 
+      def close
+        detach
+        @l.close
+      end
+
       def notify_readable
         return if @em_conns.size >= @limit
         begin
@@ -109,8 +119,14 @@ module Rainbows
       EM.run {
         conns = EM.instance_variable_get(:@conns) or
           raise RuntimeError, "EM @conns instance variable not accessible!"
-        EM.add_periodic_timer(1) { worker.tmp.chmod(m = 0 == m ? 1 : 0) }
-        LISTENERS.each { |s| EM.attach(s, Server, s, conns) }
+        EM.add_periodic_timer(1) do
+          worker.tmp.chmod(m = 0 == m ? 1 : 0)
+          unless G.alive
+            conns.each_value { |client| Client === client and client.quit }
+            EM.stop if conns.empty? && EM.reactor_running?
+          end
+        end
+        LISTENERS.map! { |s| EM.attach(s, Server, s, conns) }
       }
     end
 
