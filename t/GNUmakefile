@@ -35,6 +35,9 @@ t9000-rack-app-pool.sh: MODELS = ThreadPool ThreadSpawn
 $(T):
 	$(MAKE) $(foreach m,$(MODELS),$(addprefix $(m).,$@))
 
+$(all_models):
+	$(MAKE) $(filter $@.%,$(MODEL_T))
+
 all:: $(T)
 
 # can't rely on "set -o pipefail" since we don't require bash or ksh93 :<
