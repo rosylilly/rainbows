@@ -19,12 +19,10 @@ module Rainbows
 
     # graceful exit, like SIGQUIT
     def quit
-      @deferred_bodies.clear
       @state = :close
     end
 
     def handle_error(e)
-      quit
       msg = case e
       when EOFError,Errno::ECONNRESET,Errno::EPIPE,Errno::EINVAL,Errno::EBADF
         ERROR_500_RESPONSE
@@ -36,6 +34,7 @@ module Rainbows
         ERROR_500_RESPONSE
       end
       write(msg)
+      quit
     end
 
     def tmpio

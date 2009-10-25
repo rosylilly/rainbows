@@ -62,7 +62,7 @@ module Rainbows
             # keepalive requests are always body-less, so @input is unchanged
             @hp.headers(@env, @buf) and next
           else
-            @state = :close
+            quit
           end
           return
         end while true
