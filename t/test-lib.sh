@@ -5,19 +5,15 @@
 set +u
 if test -z "$model"
 then
-	case $T in
-	t1???-thread-pool-*.sh) model=ThreadPool ;;
-	t2???-thread-spawn-*.sh) model=ThreadSpawn ;;
-	t3???-revactor-*.sh) model=Revactor ;;
-	t4???-rev-*.sh) model=Rev ;;
-	*) model=Base ;;
-	esac
+	# defaulting to Base would unfortunately fail some concurrency tests
+	model=ThreadSpawn
+	t_info "model undefined, defaulting to $model"
 fi
 
 set -e
 RUBY="${RUBY-ruby}"
 RUBY_VERSION=${RUBY_VERSION-$($RUBY -e 'puts RUBY_VERSION')}
-t_pfx=$PWD/trash/$T-$RUBY_VERSION
+t_pfx=$PWD/trash/$model.$T-$RUBY_VERSION
 set -u
 
 PATH=$PWD/bin:$PATH

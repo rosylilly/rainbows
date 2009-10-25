@@ -3,7 +3,7 @@
 t_plan 24 "simple HTTP connection keepalive/pipelining tests for $model"
 
 t_begin "checking for config.ru for $model" && {
-	tbase=$(expr "$T" : '^\(t....\)-').ru
+	tbase=simple-http_$model.ru
 	test -f "$tbase"
 }
 

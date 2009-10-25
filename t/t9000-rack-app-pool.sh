@@ -2,11 +2,11 @@
 . ./test-lib.sh
 nr_client=30 APP_POOL_SIZE=4
 
-t_plan 6 "AppPool Rack middleware test"
+t_plan 6 "AppPool Rack middleware test for $model"
 
 t_begin "configure and start" && {
 	rtmpfiles curl_out curl_err
-	rainbows_setup ThreadSpawn 50
+	rainbows_setup $model 50
 	APP_POOL_SIZE=$APP_POOL_SIZE rainbows -D t9000.ru -c $unicorn_config
 	rainbows_wait_start
 }

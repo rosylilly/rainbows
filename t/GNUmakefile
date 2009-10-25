@@ -16,7 +16,24 @@ else
 endif
 export RUBYLIB RUBY_VERSION
 
+models := ThreadPool ThreadSpawn Revactor Rev
+all_models := $(models) Base
+
 T = $(wildcard t[0-9][0-9][0-9][0-9]-*.sh)
+
+MODEL_T := $(foreach m,$(all_models),$(addprefix $(m).,$(T)))
+$(T): MODELS = $(models)
+
+# some tests can be run with all models
+t0000-simple-http.sh: MODELS = $(all_models)
+
+# this test is not compatible with non-Thread models yet
+t9000-rack-app-pool.sh: MODELS = ThreadPool ThreadSpawn
+
+# recursively run per-model tests
+# haven't figured out a good way to make make non-recursive here, yet...
+$(T):
+	$(MAKE) $(foreach m,$(MODELS),$(addprefix $(m).,$@))
 
 all:: $(T)
 
@@ -25,7 +42,6 @@ t_pfx = trash/$@-$(RUBY_VERSION)
 TEST_OPTS =
 # TRACER = strace -f -o $(t_pfx).strace -s 100000
 # TRACER = /usr/bin/time -o $(t_pfx).time
-run_test = $(TRACER) $(SHELL) $(SH_TEST_OPTS) $@ $(TEST_OPTS)
 
 ifdef V
   ifeq ($(V),2)
@@ -42,18 +58,19 @@ test-bin-$(RUBY_VERSION)/rainbows: ../bin/rainbows
 	$(RUBY) -i -p -e '$$_.gsub!(%r{^#!.*$$},"#!$(ruby_bin)")' $@+
 	mv $@+ $@
 
-req_random_blob := $(wildcard t?1??-*.sh)
 random_blob:
 	dd if=/dev/urandom bs=1M count=10 of=$@+
 	mv $@+ $@
 
-$(req_random_blob): random_blob
+$(T): random_blob
 
-$(T): trash/.gitignore
-$(T): export RUBY := $(RUBY)
-$(T): export PATH := $(CURDIR)/test-bin-$(RUBY_VERSION):$(PATH)
-$(T): test-bin-$(RUBY_VERSION)/rainbows
-	@$(run_test)
+$(MODEL_T): export model = $(firstword $(subst ., ,$@))
+$(MODEL_T): script = $(subst $(model).,,$@)
+$(MODEL_T): trash/.gitignore
+$(MODEL_T): export RUBY := $(RUBY)
+$(MODEL_T): export PATH := $(CURDIR)/test-bin-$(RUBY_VERSION):$(PATH)
+$(MODEL_T): test-bin-$(RUBY_VERSION)/rainbows
+	$(TRACER) $(SHELL) $(SH_TEST_OPTS) $(script) $(TEST_OPTS)
 
 trash/.gitignore:
 	mkdir -p $(@D)

@@ -1,3 +1,4 @@
+#!/bin/sh
 . ./test-lib.sh
 test -r random_blob || die "random_blob required, run with 'make $0'"
 

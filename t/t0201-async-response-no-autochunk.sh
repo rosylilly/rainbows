@@ -1,3 +1,3 @@
 #!/bin/sh
 CONFIG_RU=async-response-no-autochunk.ru
-. ./lib-async-response.sh
+. ./t0200-async-response.sh

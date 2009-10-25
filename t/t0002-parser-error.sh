@@ -1,3 +1,4 @@
+#!/bin/sh
 . ./test-lib.sh
 t_plan 5 "parser error test for $model"
 

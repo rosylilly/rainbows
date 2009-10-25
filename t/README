@@ -28,9 +28,13 @@ To run the entire test suite with 8 tests running at once:
 
   make -j8
 
-To run one individual test:
+To run one individual test for all concurrency models:
 
-  make t0000-basic.sh
+  make t0000-simple-http.sh
+
+To run one individual test for one concurrency model:
+
+  make Revactor.t0000-simple-http.sh
 
 You may also increase verbosity by setting the "V" variable for
 GNU make.  To disable trapping of stdout/stderr:

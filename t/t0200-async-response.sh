@@ -1,3 +1,4 @@
+#!/bin/sh
 CONFIG_RU=${CONFIG_RU-'async-response.ru'}
 . ./test-lib.sh
 

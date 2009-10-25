@@ -1,3 +1,4 @@
+#!/bin/sh
 . ./test-lib.sh
 
 t_plan 4 "graceful exit test for $model"
