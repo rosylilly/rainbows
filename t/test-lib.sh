@@ -133,4 +133,5 @@ rainbows_wait_start () {
 case $model in
 Rev) require_check rev Rev::VERSION ;;
 Revactor) require_check revactor Revactor::VERSION ;;
+EventMachine) require_check eventmachine EventMachine::VERSION ;;
 esac
