@@ -16,7 +16,10 @@ else
 endif
 export RUBYLIB RUBY_VERSION
 
-models := ThreadPool ThreadSpawn Revactor Rev EventMachine
+models := ThreadPool ThreadSpawn Rev EventMachine
+ifeq ($(RUBY_VERSION),1.9.1) # 1.9.2-preview1 was broken
+  models += Revactor
+endif
 all_models := $(models) Base
 
 T = $(wildcard t[0-9][0-9][0-9][0-9]-*.sh)
