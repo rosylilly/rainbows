@@ -33,7 +33,10 @@ module Rainbows
       extend(mod)
       Const::RACK_DEFAULTS['rainbows.model'] = @use = model
       Const::RACK_DEFAULTS['rack.multithread'] = !!(/Thread/ =~ model.to_s)
-      Const::RACK_DEFAULTS['rainbows.autochunk'] = (model.to_s == "Rev")
+      case model
+      when :Rev, :EventMachine
+        Const::RACK_DEFAULTS['rainbows.autochunk'] = true
+      end
     end
 
     def worker_connections(*args)
