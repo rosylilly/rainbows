@@ -40,8 +40,23 @@ Gem::Specification.new do |s|
 
   s.test_files = test_files
 
-  s.add_dependency(%q<rack>)
+  # we need Unicorn for the HTTP parser and process management
   s.add_dependency(%q<unicorn>, ["~> 0.93.1"])
+
+  # Unicorn already depends on Rack
+  # s.add_dependency(%q<rack>)
+
+  # optional runtime dependencies depending on configuration
+  # see local.mk.sample for the exact versions we've tested with
+  #
+  # the next version of Revactor will include UNIX domain socket support
+  # s.add_dependency(%q<revactor>, [">= 0.1.4"])
+  #
+  # Revactor depends on Rev, too, 0.3.0 got the ability to attach IOs
+  # s.add_dependency(%q<rev>, [">= 0.3.0"])
+  #
+  # We use the new EM::attach/watch API in 0.12.10
+  # s.add_dependency(%q<eventmachine>, ["~> 0.12.10"])
 
   # s.licenses = %w(GPLv2 Ruby) # accessor not compatible with older Rubygems
 end

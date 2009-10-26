@@ -5,7 +5,7 @@
 # This is depends on a bunch of GNU-isms from bash, sed, touch.
 
 DLEXT := so
-gems := rev-0.3.1 rack-1.0.0 iobuffer-0.1.1 eventmachine-0.12.10
+gems := rev-0.3.1 rack-1.0.1 iobuffer-0.1.1 eventmachine-0.12.10
 
 # Avoid loading rubygems to speed up tests because gmake is
 # fork+exec heavy with Ruby.
