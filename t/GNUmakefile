@@ -65,7 +65,7 @@ test-bin-$(RUBY_VERSION)/rainbows: ../bin/rainbows
 	mv $@+ $@
 
 random_blob:
-	dd if=/dev/urandom bs=1M count=10 of=$@+
+	dd if=/dev/urandom bs=1M count=30 of=$@+
 	mv $@+ $@
 
 $(T): random_blob
