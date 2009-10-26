@@ -73,12 +73,22 @@ random_blob:
 
 $(T): random_blob
 
+dependencies := socat curl
+deps := $(addprefix .dep+,$(dependencies))
+$(deps): dep_bin = $(lastword $(subst +, ,$@))
+$(deps):
+	@which $(dep_bin) > $@+ 2>/dev/null || :
+	@test -s $@+ || \
+	  { echo >&2 "E `$(dep_bin)' not found in PATH=$(PATH)"; exit 1; }
+	@mv $@+ $@
+dep: $(deps)
+
 $(MODEL_T): export model = $(firstword $(subst ., ,$@))
 $(MODEL_T): script = $(subst $(model).,,$@)
 $(MODEL_T): trash/.gitignore
 $(MODEL_T): export RUBY := $(RUBY)
 $(MODEL_T): export PATH := $(CURDIR)/test-bin-$(RUBY_VERSION):$(PATH)
-$(MODEL_T): test-bin-$(RUBY_VERSION)/rainbows
+$(MODEL_T): test-bin-$(RUBY_VERSION)/rainbows dep
 	$(TRACER) $(SHELL) $(SH_TEST_OPTS) $(script) $(TEST_OPTS)
 
 trash/.gitignore:

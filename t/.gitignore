@@ -1,3 +1,4 @@
 /test-results-*
 /test-bin-*
 /random_blob
+/.dep+*
