@@ -93,7 +93,7 @@ module Rainbows
       Rainbows::G.alive = false
       expire = Time.now + (timeout * 2.0)
       m = 0
-      while (nr = threads.count { |thr| thr.alive? }) > 0
+      until (threads.delete_if { |thr| ! thr.alive? }).empty?
         threads.each { |thr|
           worker.tmp.chmod(m = 0 == m ? 1 : 0)
           thr.join(1)
