@@ -1,5 +1,6 @@
 # -*- encoding: binary -*-
 require 'eventmachine'
+EM::VERSION >= '0.12.10' or abort 'eventmachine 0.12.10 is required'
 require 'rainbows/ev_core'
 
 module Rainbows
@@ -14,8 +15,8 @@ module Rainbows
   # thread-safe, reentrancy is only required for the DevFdResponse body
   # generator.
   #
-  # Compatibility: Whatever \EventMachine and Unicorn both  support,
-  # currently Ruby 1.8/1.9.
+  # Compatibility: Whatever \EventMachine ~> 0.12.10 and Unicorn both
+  # support, currently Ruby 1.8/1.9.
   #
   # This model does not implement as streaming "rack.input" which allows
   # the Rack application to process data as it arrives.  This means
@@ -96,9 +97,9 @@ module Rainbows
           response = [ response.first, headers.to_hash, [] ]
           HttpResponse.write(self, response, out)
           if do_chunk
-            EM.attach(io, ResponseChunkPipe, io, self)
+            EM.watch(io, ResponseChunkPipe, self).notify_readable = true
           else
-            EM.enable_proxy(EM.attach(io, ResponsePipe, io, self), self)
+            EM.enable_proxy(EM.attach(io, ResponsePipe, self), self)
           end
         else
           HttpResponse.write(self, response, out)
@@ -111,8 +112,8 @@ module Rainbows
     end
 
     module ResponsePipe
-      def initialize(io, client)
-        @io, @client = io, client
+      def initialize(client)
+        @client = client
       end
 
       def unbind
@@ -137,6 +138,9 @@ module Rainbows
             retry
           rescue Errno::EAGAIN
             return
+          rescue EOFError
+            detach
+            return
           end
           @client.send_data(sprintf("%x\r\n", data.size))
           @client.send_data(data)
@@ -147,22 +151,21 @@ module Rainbows
 
     module Server
 
-      def initialize(listener, conns)
-        @l = listener
+      def initialize(conns)
         @limit = Rainbows::G.max + HttpServer::LISTENERS.size
         @em_conns = conns
       end
 
       def close
         detach
-        @l.close
+        @io.close
       end
 
       def notify_readable
         return if @em_conns.size >= @limit
         begin
-          io = @l.accept_nonblock
-          sig = EM.attach_fd(io.fileno, false, false)
+          io = @io.accept_nonblock
+          sig = EM.attach_fd(io.fileno, false)
           @em_conns[sig] = Client.new(sig, io)
         rescue Errno::EAGAIN, Errno::ECONNABORTED
         end
@@ -175,7 +178,11 @@ module Rainbows
     def worker_loop(worker)
       init_worker_process(worker)
       m = 0
-      logger.info "EventMachine: epoll=#{EM.epoll} kqueue=#{EM.kqueue}"
+
+      # enable them both, should be non-fatal if not supported
+      EM.epoll
+      EM.kqueue
+      logger.info "EventMachine: epoll=#{EM.epoll?} kqueue=#{EM.kqueue?}"
       EM.run {
         conns = EM.instance_variable_get(:@conns) or
           raise RuntimeError, "EM @conns instance variable not accessible!"
@@ -186,7 +193,9 @@ module Rainbows
             EM.stop if conns.empty? && EM.reactor_running?
           end
         end
-        LISTENERS.map! { |s| EM.attach(s, Server, s, conns) }
+        LISTENERS.map! do |s|
+          EM.watch(s, Server, conns) { |c| c.notify_readable = true }
+        end
       }
     end
 
