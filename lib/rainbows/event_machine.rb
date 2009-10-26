@@ -31,6 +31,9 @@ module Rainbows
       include Rainbows::EvCore
       G = Rainbows::G
 
+      # Apps may return this Rack response: AsyncResponse = [ -1, {}, [] ]
+      ASYNC_CALLBACK = 'async.callback'.freeze
+
       def initialize(io)
         @_io = io
       end
@@ -48,7 +51,15 @@ module Rainbows
           (@env[RACK_INPUT] = @input).rewind
           alive = @hp.keepalive?
           @env[REMOTE_ADDR] = @remote_addr
-          response = G.app.call(@env.update(RACK_DEFAULTS))
+          @env[ASYNC_CALLBACK] = @response_write ||= method(:response_write)
+
+          response = catch(:async) { G.app.call(@env.update(RACK_DEFAULTS)) }
+
+          # too tricky to support pipelining with :async since the
+          # second (pipelined) request could be a stuck behind a
+          # long-running async response
+          (response.nil? || -1 == response.first) and return @state = :close
+
           alive &&= G.alive
           out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if @hp.headers?
           response_write(response, out, alive)
@@ -64,7 +75,7 @@ module Rainbows
         end while true
       end
 
-      def response_write(response, out, alive)
+      def response_write(response, out = [], alive = false)
         body = response.last
         unless body.respond_to?(:to_path)
           HttpResponse.write(self, response, out)
