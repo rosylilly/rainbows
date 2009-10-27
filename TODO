@@ -7,17 +7,8 @@ care about.
   unit tests, only integration tests that exercise externally
   visible parts.
 
-* (maybe) make our tests TAP-compatible.  Unfortunately the the
-  only shell library we've seen for TAP seems to use bashisms.
-
 * Rev + Thread - current Rev model with threading, which will give
   us a streaming (but rewindable) "rack.input".
-
-* EventMachine - much like Rev, but we haven't looked at this one much
-  (our benevolent dictator doesn't like C++).  If we can figure out how
-  to do Rev without Revactor, then this should be pretty easy.
-
-* EventMachine + catch/throw :async API used in Thin
 
 * EventMachine.spawn - should be like Revactor, maybe?
 
@@ -27,6 +18,8 @@ care about.
   sure how TeeInput can be done with this.
 
 * Omnibus - haven't looked into it, probably like Revactor with 1.8?
+
+* Packet - pure Ruby, EventMachine-like library
 
 * Rubinius Actors - should be like Revactor and easily doable once
   Rubinius gets more mature.
