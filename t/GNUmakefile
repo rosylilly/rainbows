@@ -2,6 +2,8 @@
 
 all::
 
+pid := $(shell echo $$PPID)
+
 RUBY = $(ruby)
 rainbows_lib := $(shell cd ../lib && pwd)
 -include ../local.mk
@@ -63,13 +65,13 @@ endif
 test-bin-$(RUBY_VERSION)/rainbows: ruby_bin = $(shell which $(RUBY))
 test-bin-$(RUBY_VERSION)/rainbows: ../bin/rainbows
 	mkdir -p $(@D)
-	install -m 755 $^ $@+
-	$(RUBY) -i -p -e '$$_.gsub!(%r{^#!.*$$},"#!$(ruby_bin)")' $@+
-	mv $@+ $@
+	install -m 755 $^ $@.$(pid)
+	$(RUBY) -i -p -e '$$_.gsub!(%r{^#!.*$$},"#!$(ruby_bin)")' $@.$(pid)
+	mv $@.$(pid) $@
 
 random_blob:
-	dd if=/dev/urandom bs=1M count=30 of=$@+
-	mv $@+ $@
+	dd if=/dev/urandom bs=1M count=30 of=$@.$(pid)
+	mv $@.$(pid) $@
 
 $(T): random_blob
 
@@ -77,10 +79,10 @@ dependencies := socat curl
 deps := $(addprefix .dep+,$(dependencies))
 $(deps): dep_bin = $(lastword $(subst +, ,$@))
 $(deps):
-	@which $(dep_bin) > $@+ 2>/dev/null || :
-	@test -s $@+ || \
+	@which $(dep_bin) > $@.$(pid) 2>/dev/null || :
+	@test -s $@.$(pid) || \
 	  { echo >&2 "E `$(dep_bin)' not found in PATH=$(PATH)"; exit 1; }
-	@mv $@+ $@
+	@mv $@.$(pid) $@
 dep: $(deps)
 
 $(MODEL_T): export model = $(firstword $(subst ., ,$@))
