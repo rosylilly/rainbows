@@ -39,14 +39,18 @@ module Rainbows
   # AppPool should be used if you want to enforce a lower value of +P+
   # than +N+.
   #
-  # AppPool has no effect on the Rev concurrency model as that is
-  # single-threaded/single-instance as far as application concurrency goes.
-  # In other words, +P+ is always +one+ when using Rev.  AppPool currently
-  # only works with the ThreadSpawn and ThreadPool models.  It does not
-  # yet work reliably with the Revactor model, yet.
+  # AppPool has no effect on the Rev or EventMachine concurrency models
+  # as those are single-threaded/single-instance as far as application
+  # concurrency goes.  In other words, +P+ is always +one+ when using
+  # Rev or EventMachine.  AppPool currently only works with the
+  # ThreadSpawn and ThreadPool models.  It does not yet work reliably
+  # with the Revactor model, but actors are far more lightweight and
+  # probably better suited for lightweight applications that would
+  # not benefit from AppPool.
   #
   # Since this is Rack middleware, you may load this in your Rack
-  # config.ru file and even use it in servers other than \Rainbows!
+  # config.ru file and even use it in threaded servers other than
+  # \Rainbows!
   #
   #   use Rainbows::AppPool, :size => 30
   #   map "/lobster" do
