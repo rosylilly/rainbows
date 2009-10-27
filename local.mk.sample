@@ -5,18 +5,24 @@
 # This is depends on a bunch of GNU-isms from bash, sed, touch.
 
 DLEXT := so
-gems := rev-0.3.1 rack-1.0.1 iobuffer-0.1.1 eventmachine-0.12.10
+gems := rack-1.0.1
+# gems += unicorn-0.93.3 # installed via setup.rb
+gems += rev-0.3.1 iobuffer-0.1.1
+gems += eventmachine-0.12.10
+gems += async_sinatra-0.1.5 sinatra-0.9.4
 
 # Avoid loading rubygems to speed up tests because gmake is
 # fork+exec heavy with Ruby.
+prefix = $(HOME)
 ifeq ($(r19),)
-  RUBY := $(HOME)/bin/ruby
-  gem_paths := $(addprefix $(HOME)/lib/ruby/gems/1.8/gems/,$(gems))
+  RUBY := $(prefix)/bin/ruby
+  gem_paths := $(addprefix $(prefix)/lib/ruby/gems/1.8/gems/,$(gems))
 else
-  export PATH := $(HOME)/ruby-1.9/bin:$(PATH)
-  RUBY := $(HOME)/ruby-1.9/bin/ruby --disable-gems
-  gems := $(gems) case-0.5 revactor-0.1.4
-  gem_paths := $(addprefix $(HOME)/ruby-1.9/lib/ruby/gems/1.9.1/gems/,$(gems))
+  prefix := $(prefix)/ruby-1.9
+  export PATH := $(prefix)/bin:$(PATH)
+  RUBY := $(prefix)/bin/ruby --disable-gems
+  gems += case-0.5 revactor-0.1.4
+  gem_paths := $(addprefix $(prefix)/lib/ruby/gems/1.9.1/gems/,$(gems))
 endif
 
 ifdef gem_paths
