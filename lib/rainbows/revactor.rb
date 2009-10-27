@@ -1,9 +1,6 @@
 # -*- encoding: binary -*-
 require 'revactor'
-
-# workaround revactor 0.1.4 still using the old Rev::Buffer
-# ref: http://rubyforge.org/pipermail/revactor-talk/2009-October/000034.html
-defined?(Rev::Buffer) or Rev::Buffer = IO::Buffer
+Revactor::VERSION >= '0.1.5' or abort 'revactor 0.1.5 is required'
 
 module Rainbows
 
@@ -137,16 +134,13 @@ module Rainbows
 
     def revactorize_listeners!
       LISTENERS.map! do |s|
-        if TCPServer === s
+        case s
+        when TCPServer
           ::Revactor::TCP.listen(s, nil)
-        elsif defined?(::Revactor::UNIX) && UNIXServer === s
+        when UNIXServer
           ::Revactor::UNIX.listen(s)
-        else
-          logger.error "your version of Revactor can't handle #{s.inspect}"
-          nil
         end
       end
-      LISTENERS.compact!
     end
 
   end

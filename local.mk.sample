@@ -21,7 +21,7 @@ else
   prefix := $(prefix)/ruby-1.9
   export PATH := $(prefix)/bin:$(PATH)
   RUBY := $(prefix)/bin/ruby --disable-gems
-  gems += case-0.5 revactor-0.1.4
+  gems += case-0.5 revactor-0.1.5
   gem_paths := $(addprefix $(prefix)/lib/ruby/gems/1.9.1/gems/,$(gems))
 endif
 

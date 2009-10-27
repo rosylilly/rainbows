@@ -31,6 +31,7 @@ $(T): MODELS = $(models)
 
 # some tests can be run with all models
 t0000-simple-http.sh: MODELS = $(all_models)
+t0001-unix-http.sh: MODELS = $(all_models)
 t0002-graceful.sh: MODELS = $(all_models)
 t0002-parser-error.sh: MODELS = $(all_models)
 t0003-reopen-logs.sh: MODELS = $(all_models)

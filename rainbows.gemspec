@@ -49,8 +49,8 @@ Gem::Specification.new do |s|
   # optional runtime dependencies depending on configuration
   # see local.mk.sample for the exact versions we've tested with
   #
-  # the next version of Revactor will include UNIX domain socket support
-  # s.add_dependency(%q<revactor>, [">= 0.1.4"])
+  # Revactor >= 0.1.5 includes UNIX domain socket support
+  # s.add_dependency(%q<revactor>, [">= 0.1.5"])
   #
   # Revactor depends on Rev, too, 0.3.0 got the ability to attach IOs
   # s.add_dependency(%q<rev>, [">= 0.3.0"])
