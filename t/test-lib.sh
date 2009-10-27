@@ -57,6 +57,10 @@ rtmpfiles () {
 			mkfifo $_tmp
 			T_RM_LIST="$T_RM_LIST $_tmp"
 			;;
+		*socket)
+			rm -f $_tmp
+			T_RM_LIST="$T_RM_LIST $_tmp"
+			;;
 		*)
 			> $_tmp
 			T_OK_RM_LIST="$T_OK_RM_LIST $_tmp"
