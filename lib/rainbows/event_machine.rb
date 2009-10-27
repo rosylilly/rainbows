@@ -18,6 +18,10 @@ module Rainbows
   # Compatibility: Whatever \EventMachine ~> 0.12.10 and Unicorn both
   # support, currently Ruby 1.8/1.9.
   #
+  # This model is compatible with users of "async.callback" in the Rack
+  # environment such as
+  # {async_sinatra}[http://github.com/raggi/async_sinatra].
+  #
   # This model does not implement as streaming "rack.input" which allows
   # the Rack application to process data as it arrives.  This means
   # "rack.input" will be fully buffered in memory or to a temporary file
