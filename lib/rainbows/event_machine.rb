@@ -51,7 +51,7 @@ module Rainbows
           (@env[RACK_INPUT] = @input).rewind
           alive = @hp.keepalive?
           @env[REMOTE_ADDR] = @remote_addr
-          @env[ASYNC_CALLBACK] = @response_write ||= method(:response_write)
+          @env[ASYNC_CALLBACK] = method(:response_write)
 
           response = catch(:async) { G.app.call(@env.update(RACK_DEFAULTS)) }
 
