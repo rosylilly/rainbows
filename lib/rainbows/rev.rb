@@ -1,6 +1,5 @@
 # -*- encoding: binary -*-
-require 'rev'
-Rev::VERSION >= '0.3.0' or abort 'rev >= 0.3.0 is required'
+require 'rainbows/rev/heartbeat'
 require 'rainbows/ev_core'
 
 module Rainbows
@@ -165,22 +164,6 @@ module Rainbows
         @do_chunk and @client.write("0\r\n\r\n")
         @client.quit
         @body.respond_to?(:close) and @body.close
-      end
-    end
-
-    # This timer handles the fchmod heartbeat to prevent our master
-    # from killing us.
-    class Heartbeat < ::Rev::TimerWatcher
-      G = Rainbows::G
-
-      def initialize(tmp)
-        @m, @tmp = 0, tmp
-        super(1, true)
-      end
-
-      def on_timer
-        @tmp.chmod(@m = 0 == @m ? 1 : 0)
-        exit if (! G.alive && G.cur <= 0)
       end
     end
 
