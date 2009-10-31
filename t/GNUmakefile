@@ -82,7 +82,7 @@ $(deps): dep_bin = $(lastword $(subst +, ,$@))
 $(deps):
 	@which $(dep_bin) > $@.$(pid) 2>/dev/null || :
 	@test -s $@.$(pid) || \
-	  { echo >&2 "E `$(dep_bin)' not found in PATH=$(PATH)"; exit 1; }
+	  { echo >&2 "E '$(dep_bin)' not found in PATH=$(PATH)"; exit 1; }
 	@mv $@.$(pid) $@
 dep: $(deps)
 
