@@ -44,6 +44,11 @@ module Rainbows
       Thread.new {
         begin
           begin
+            # TODO: check if select() or accept() is a problem on large
+            # SMP systems under Ruby 1.9.  Hundreds of native threads
+            # all working off the same socket could be a thundering herd
+            # problem.  On the other hand, a thundering herd may not
+            # even incur as much overhead as an extra Mutex#synchronize
             ret = IO.select(LISTENERS, nil, nil, 1) and
                   ret.first.each do |sock|
                     begin
