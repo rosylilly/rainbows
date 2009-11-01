@@ -114,7 +114,7 @@ module Rainbows
           if do_chunk
             EM.watch(io, ResponseChunkPipe, self).notify_readable = true
           else
-            EM.enable_proxy(EM.attach(io, ResponsePipe, self), self)
+            EM.enable_proxy(EM.attach(io, ResponsePipe, self), self, 16384)
           end
         else
           HttpResponse.write(self, response, out)
