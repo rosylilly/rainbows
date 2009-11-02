@@ -35,7 +35,8 @@ module Rainbows
         ERROR_500_RESPONSE
       end
       write(msg)
-      quit
+      ensure
+        quit
     end
 
     # TeeInput doesn't map too well to this right now...
