@@ -14,7 +14,6 @@ module Rainbows
       @hp = HttpParser.new
       @state = :headers # [ :body [ :trailers ] ] :app_call :close
       @buf = ""
-      @deferred_bodies = [] # for (fast) regular files only
     end
 
     # graceful exit, like SIGQUIT

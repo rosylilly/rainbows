@@ -34,6 +34,7 @@ module Rainbows
         G.cur += 1
         super(io)
         post_init
+        @deferred_bodies = [] # for (fast) regular files only
       end
 
       # queued, optional response bodies, it should only be unpollable "fast"
