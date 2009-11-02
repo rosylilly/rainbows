@@ -31,9 +31,9 @@ module Rainbows
       Module === mod or
         raise ArgumentError, "concurrency model #{model.inspect} not supported"
       extend(mod)
-      Const::RACK_DEFAULTS['rainbows.model'] = @use = model
+      Const::RACK_DEFAULTS['rainbows.model'] = @use = model.to_sym
       Const::RACK_DEFAULTS['rack.multithread'] = !!(/Thread/ =~ model.to_s)
-      case model
+      case @use
       when :Rev, :EventMachine
         Const::RACK_DEFAULTS['rainbows.autochunk'] = true
       end
