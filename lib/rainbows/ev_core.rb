@@ -1,5 +1,7 @@
 # -*- encoding: binary -*-
 
+require 'tempfile'
+
 module Rainbows
 
   # base module for evented models like Rev and EventMachine
@@ -36,15 +38,6 @@ module Rainbows
       quit
     end
 
-    def tmpio
-      io = Util.tmpio
-      def io.size
-        # already sync=true at creation, so no need to flush before stat
-        stat.size
-      end
-      io
-    end
-
     # TeeInput doesn't map too well to this right now...
     def on_read(data)
       case @state
@@ -62,7 +55,8 @@ module Rainbows
             write(EXPECT_100_RESPONSE)
             @env.delete(HTTP_EXPECT)
           end
-          @input = len && len <= MAX_BODY ? StringIO.new("") : tmpio
+          @input = len && len <= MAX_BODY ?
+                   StringIO.new("") : Tempfile.new(nil).binmode
           @hp.filter_body(@buf2 = @buf.dup, @buf)
           @input << @buf2
           on_read("")
@@ -77,7 +71,10 @@ module Rainbows
           on_read("")
         end
       when :trailers
-        @hp.trailers(@env, @buf << data) and app_call
+        if @hp.trailers(@env, @buf << data)
+          app_call
+          @input.close! if Tempfile === @input
+        end
       end
       rescue Object => e
         handle_error(e)
