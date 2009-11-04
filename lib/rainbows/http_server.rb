@@ -20,6 +20,21 @@ module Rainbows
       @worker_connections ||= MODEL_WORKER_CONNECTIONS[@use]
     end
 
+    #:stopdoc:
+    #
+    # Add one second to the timeout since our fchmod heartbeat is less
+    # precise (and must be more conservative) than Unicorn does.  We
+    # handle many clients per process and can't chmod on every
+    # connection we accept without wasting cycles.  That added to the
+    # fact that we let clients keep idle connections open for long
+    # periods of time means we have to chmod at a fixed interval.
+    alias_method :set_timeout, :timeout=
+    undef_method :timeout=
+    def timeout=(nr)
+      set_timeout(nr + 1)
+    end
+    #:startdoc:
+
     def use(*args)
       model = args.shift or return @use
       mod = begin
