@@ -34,7 +34,7 @@ module Rainbows
         pool.each do |thr|
           worker.tmp.chmod(m = 0 == m ? 1 : 0)
           # if any worker dies, something is serious wrong, bail
-          thr.join(timeout) and break
+          thr.join(1) and break
         end
       end
       join_threads(pool, worker)
