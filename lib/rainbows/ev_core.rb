@@ -1,7 +1,5 @@
 # -*- encoding: binary -*-
 
-require 'tempfile'
-
 module Rainbows
 
   # base module for evented models like Rev and EventMachine
@@ -56,8 +54,7 @@ module Rainbows
             write(EXPECT_100_RESPONSE)
             @env.delete(HTTP_EXPECT)
           end
-          @input = len && len <= MAX_BODY ?
-                   StringIO.new("") : Tempfile.new(nil).binmode
+          @input = len && len <= MAX_BODY ? StringIO.new("") : Util.tmpio
           @hp.filter_body(@buf2 = @buf.dup, @buf)
           @input << @buf2
           on_read("")
@@ -74,7 +71,7 @@ module Rainbows
       when :trailers
         if @hp.trailers(@env, @buf << data)
           app_call
-          @input.close! if Tempfile === @input
+          @input.close if File === @input
         end
       end
       rescue Object => e
