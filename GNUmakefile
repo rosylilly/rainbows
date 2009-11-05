@@ -64,7 +64,7 @@ NEWS: GIT-VERSION-FILE
 	$(rake) -s news_rdoc > $@+
 	mv $@+ $@
 
-SINCE = 0.1.1
+SINCE = 0.4.0
 ChangeLog: log_range = $(shell test -n "$(SINCE)" && echo v$(SINCE)..)
 ChangeLog: GIT-VERSION-FILE
 	@echo "ChangeLog from $(GIT_URL) ($(SINCE)..$(GIT_VERSION))" > $@+
