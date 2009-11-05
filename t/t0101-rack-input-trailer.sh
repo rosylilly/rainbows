@@ -2,13 +2,34 @@
 . ./test-lib.sh
 test -r random_blob || die "random_blob required, run with 'make $0'"
 
-t_plan 11 "input trailer test $model"
+t_plan 13 "input trailer test $model"
 
 t_begin "setup and startup" && {
 	rtmpfiles curl_out
 	rainbows_setup $model
 	rainbows -D content-md5.ru -c $unicorn_config
 	rainbows_wait_start
+}
+
+t_begin "staggered trailer upload" && {
+	zero_md5="1B2M2Y8AsgTpgAmY7PhCfg=="
+	(
+		cat $fifo > $tmp &
+		printf 'PUT /s HTTP/1.1\r\n'
+		printf 'Host: example.com\r\n'
+		printf 'Transfer-Encoding: chunked\r\n'
+		printf 'Trailer: Content-MD5\r\n\r\n'
+		printf '0\r\nContent-MD5: '
+		sleep 5
+		printf '%s\r\n\r\n' $zero_md5
+		wait
+		echo ok > $ok
+	) | socat - TCP:$listen > $fifo
+	test xok = x"$(cat $ok)"
+}
+
+t_begin "HTTP response is OK" && {
+	fgrep 'HTTP/1.1 200 OK' $tmp
 }
 
 t_begin "upload small blob" && {
