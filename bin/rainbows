@@ -4,7 +4,7 @@ require 'unicorn/launcher'
 require 'rainbows'
 require 'optparse'
 
-ENV["RACK_ENV"] = "development"
+ENV["RACK_ENV"] ||= "development"
 daemonize = false
 listeners = []
 options = { :listeners => listeners }
