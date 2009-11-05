@@ -35,7 +35,7 @@ t_begin "all responses identical" && {
 }
 
 t_begin "sha1 matches on-disk sha1" && {
-	blob_sha1=$( expr "$(sha1sum < random_blob)" : '\([a-f0-9]\+\)')
+	blob_sha1=$( expr "$(sha1sum < random_blob)" : '\([a-f0-9]\{40\}\)')
 	t_info blob_sha1=$blob_sha1
 	test x"$blob_sha1" = x"$(sort < $curl_out | uniq)"
 }
