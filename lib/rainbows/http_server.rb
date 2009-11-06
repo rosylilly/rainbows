@@ -47,7 +47,13 @@ module Rainbows
         raise ArgumentError, "concurrency model #{model.inspect} not supported"
       extend(mod)
       Const::RACK_DEFAULTS['rainbows.model'] = @use = model.to_sym
-      Const::RACK_DEFAULTS['rack.multithread'] = !!(/Thread/ =~ model.to_s)
+
+      if /Thread/ =~ model.to_s
+        Const::RACK_DEFAULTS['rack.multithread'] = true
+        # autoload/require is not thread-safe
+        Unicorn.constants.each { |x| Unicorn.const_get(x) }
+      end
+
       case @use
       when :Rev, :EventMachine
         Const::RACK_DEFAULTS['rainbows.autochunk'] = true
