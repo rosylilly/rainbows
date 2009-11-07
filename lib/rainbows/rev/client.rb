@@ -20,9 +20,9 @@ module Rainbows
       # devices where read(2) is uninterruptable.  Unfortunately, NFS and ilk
       # are also part of this.  We'll also stick DeferredResponse bodies in
       # here to prevent connections from being closed on us.
-      def defer_body(io)
+      def defer_body(io, out_headers)
         @deferred_bodies << io
-        on_write_complete unless @hp.headers? # triggers a write
+        on_write_complete unless out_headers # triggers a write
       end
 
       def app_call

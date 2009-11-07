@@ -39,7 +39,7 @@ module Rainbows
         else # char/block device, directory, whatever... nobody cares
           return response
         end
-        client.defer_body(io)
+        client.defer_body(io, out)
         [ response.first, headers.to_hash, [] ]
       end
 
