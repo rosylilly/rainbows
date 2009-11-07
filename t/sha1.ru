@@ -7,10 +7,11 @@ app = lambda do |env|
     return [ 100, {}, [] ]
   digest = Digest::SHA1.new
   input = env['rack.input']
-  buf = input.read(bs)
-  begin
-    digest.update(buf)
-  end while input.read(bs, buf)
+  if buf = input.read(bs)
+    begin
+      digest.update(buf)
+    end while input.read(bs, buf)
+  end
 
   [ 200, {'Content-Type' => 'text/plain'}, [ digest.hexdigest << "\n" ] ]
 end
