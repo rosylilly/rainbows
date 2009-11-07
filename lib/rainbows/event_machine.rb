@@ -53,7 +53,6 @@ module Rainbows
       def app_call
         begin
           (@env[RACK_INPUT] = @input).rewind
-          alive = @hp.keepalive?
           @env[REMOTE_ADDR] = @remote_addr
           @env[ASYNC_CALLBACK] = method(:response_write)
 
@@ -64,7 +63,7 @@ module Rainbows
           # long-running async response
           (response.nil? || -1 == response.first) and return @state = :close
 
-          alive &&= G.alive
+          alive = @hp.keepalive? && G.alive
           out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if @hp.headers?
           response_write(response, out, alive)
 

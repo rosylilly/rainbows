@@ -49,10 +49,9 @@ module Rainbows
       def app_call
         begin
           (@env[RACK_INPUT] = @input).rewind
-          alive = @hp.keepalive?
           @env[REMOTE_ADDR] = @remote_addr
           response = APP.call(@env.update(RACK_DEFAULTS))
-          alive &&= G.alive
+          alive = @hp.keepalive? && G.alive
           out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if @hp.headers?
 
           DeferredResponse.write(self, response, out)
