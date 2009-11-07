@@ -51,7 +51,7 @@ module Rainbows
           (@env[RACK_INPUT] = @input).rewind
           alive = @hp.keepalive?
           @env[REMOTE_ADDR] = @remote_addr
-          response = G.app.call(@env.update(RACK_DEFAULTS))
+          response = APP.call(@env.update(RACK_DEFAULTS))
           alive &&= G.alive
           out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if @hp.headers?
 
@@ -97,7 +97,7 @@ module Rainbows
       G = Rainbows::G
 
       def on_readable
-        return if G.cur >= G.max
+        return if G.cur >= MAX
         begin
           Client.new(@_io.accept_nonblock).attach(::Rev::Loop.default)
         rescue Errno::EAGAIN, Errno::ECONNABORTED
@@ -173,8 +173,10 @@ module Rainbows
     # given a INT, QUIT, or TERM signal)
     def worker_loop(worker)
       init_worker_process(worker)
+      Client.const_set(:APP, G.server.app)
+      Server.const_set(:MAX, G.server.worker_connections)
       rloop = ::Rev::Loop.default
-      Heartbeat.new(worker.tmp).attach(rloop)
+      Heartbeat.new(1, true).attach(rloop)
       LISTENERS.map! { |s| Server.new(s).attach(rloop) }
       rloop.run
     end

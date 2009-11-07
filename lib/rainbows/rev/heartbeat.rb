@@ -11,15 +11,9 @@ module Rainbows
     # will also detect and execute the graceful exit if triggered
     # by SIGQUIT
     class Heartbeat < ::Rev::TimerWatcher
-      # +tmp+ must be a +File+ that responds to +chmod+
-      def initialize(tmp)
-        @m, @tmp = 0, tmp
-        super(1, true)
-      end
 
       def on_timer
-        @tmp.chmod(@m = 0 == @m ? 1 : 0)
-        exit if (! G.alive && G.cur <= 0)
+        exit if (! G.tick && G.cur <= 0)
       end
 
     end

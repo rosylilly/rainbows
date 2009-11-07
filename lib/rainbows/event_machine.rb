@@ -57,7 +57,7 @@ module Rainbows
           @env[REMOTE_ADDR] = @remote_addr
           @env[ASYNC_CALLBACK] = method(:response_write)
 
-          response = catch(:async) { G.app.call(@env.update(RACK_DEFAULTS)) }
+          response = catch(:async) { APP.call(@env.update(RACK_DEFAULTS)) }
 
           # too tricky to support pipelining with :async since the
           # second (pipelined) request could be a stuck behind a
@@ -166,22 +166,17 @@ module Rainbows
 
     module Server
 
-      def initialize(conns)
-        @limit = Rainbows::G.max + HttpServer::LISTENERS.size
-        @em_conns = conns
-      end
-
       def close
         detach
         @io.close
       end
 
       def notify_readable
-        return if @em_conns.size >= @limit
+        return if CUR.size >= MAX
         begin
           io = @io.accept_nonblock
           sig = EM.attach_fd(io.fileno, false)
-          @em_conns[sig] = Client.new(sig, io)
+          CUR[sig] = Client.new(sig, io)
         rescue Errno::EAGAIN, Errno::ECONNABORTED
         end
       end
@@ -192,24 +187,26 @@ module Rainbows
     # given a INT, QUIT, or TERM signal)
     def worker_loop(worker)
       init_worker_process(worker)
-      m = 0
 
       # enable them both, should be non-fatal if not supported
       EM.epoll
       EM.kqueue
       logger.info "EventMachine: epoll=#{EM.epoll?} kqueue=#{EM.kqueue?}"
+      Client.const_set(:APP, G.server.app)
+      Server.const_set(:MAX, G.server.worker_connections +
+                             HttpServer::LISTENERS.size)
       EM.run {
         conns = EM.instance_variable_get(:@conns) or
           raise RuntimeError, "EM @conns instance variable not accessible!"
+        Server.const_set(:CUR, conns)
         EM.add_periodic_timer(1) do
-          worker.tmp.chmod(m = 0 == m ? 1 : 0)
-          unless G.alive
+          unless G.tick
             conns.each_value { |client| Client === client and client.quit }
             EM.stop if conns.empty? && EM.reactor_running?
           end
         end
         LISTENERS.map! do |s|
-          EM.watch(s, Server, conns) { |c| c.notify_readable = true }
+          EM.watch(s, Server) { |c| c.notify_readable = true }
         end
       }
     end

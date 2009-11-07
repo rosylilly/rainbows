@@ -5,9 +5,20 @@ module Rainbows
 
   # global vars because class/instance variables are confusing me :<
   # this struct is only accessed inside workers and thus private to each
-  G = Struct.new(:cur, :max, :logger, :alive, :app).new
   # G.cur may not be used the network concurrency model
-  G.alive = true
+  class State < Struct.new(:alive,:m,:cur,:server,:tmp)
+    def tick
+      tmp.chmod(self.m = m == 0 ? 1 : 0)
+      alive && server.master_pid == Process.ppid or quit!
+    end
+
+    def quit!
+      self.alive = false
+      server.class.const_get(:LISTENERS).map! { |s| s.close rescue nil }
+      false
+    end
+  end
+  G = State.new(true, 0, 0)
 
   require 'rainbows/const'
   require 'rainbows/http_server'

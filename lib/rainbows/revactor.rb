@@ -101,20 +101,14 @@ module Rainbows
         end
       end
 
-      m = 0
-      check_quit = lambda do
-        worker.tmp.chmod(m = 0 == m ? 1 : 0)
-        G.alive = false if master_pid != Process.ppid
-      end
-
       begin
         Actor.receive do |filter|
-          filter.after(1, &check_quit)
+          filter.after(1) { G.tick }
           filter.when(Case[:exit, Actor, Object]) do |_,actor,_|
             orig = clients.size
             clients.delete(actor.object_id)
             orig >= limit and listeners.each { |l| l << :resume }
-            check_quit.call
+            G.tick
           end
         end
       end while G.alive || clients.size > 0

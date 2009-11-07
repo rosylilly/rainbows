@@ -28,16 +28,15 @@ module Rainbows
     def worker_loop(worker)
       init_worker_process(worker)
       pool = (1..worker_connections).map { new_worker_thread }
-      m = 0
 
-      while G.alive && master_pid == Process.ppid
+      while G.alive
+        # if any worker dies, something is serious wrong, bail
         pool.each do |thr|
-          worker.tmp.chmod(m = 0 == m ? 1 : 0)
-          # if any worker dies, something is serious wrong, bail
-          thr.join(1) and break
+          G.tick
+          thr.join(1) and G.quit!
         end
       end
-      join_threads(pool, worker)
+      join_threads(pool)
     end
 
     def new_worker_thread

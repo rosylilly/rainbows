@@ -22,21 +22,18 @@ module Rainbows
     def worker_loop(worker)
       init_worker_process(worker)
       threads = ThreadGroup.new
-      alive = worker.tmp
-      m = 0
       limit = worker_connections
 
       begin
-        G.alive && master_pid == Process.ppid or break
         ret = begin
-          alive.chmod(m = 0 == m ? 1 : 0)
+          G.tick or break
           IO.select(LISTENERS, nil, nil, 1) or next
         rescue Errno::EINTR
           retry
         rescue Errno::EBADF, TypeError
           break
         end
-        alive.chmod(m = 0 == m ? 1 : 0)
+        G.tick
 
         ret.first.each do |l|
           # Sleep if we're busy, another less busy worker process may
@@ -57,7 +54,7 @@ module Rainbows
       rescue Object => e
         listen_loop_error(e)
       end while true
-      join_threads(threads.list, worker)
+      join_threads(threads.list)
     end
 
   end

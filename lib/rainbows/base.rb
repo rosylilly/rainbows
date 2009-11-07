@@ -26,20 +26,14 @@ module Rainbows
 
     def init_worker_process(worker)
       super(worker)
-      G.cur = 0
-      G.max = worker_connections
-      G.logger = logger
-      G.app = app
+      G.server = self
+      G.tmp = worker.tmp
 
       # we're don't use the self-pipe mechanism in the Rainbows! worker
       # since we don't defer reopening logs
       HttpServer::SELF_PIPE.each { |x| x.close }.clear
       trap(:USR1) { reopen_worker_logs(worker.nr) rescue nil }
-      trap(:QUIT) do
-        G.alive = false
-        # closing anything we IO.select on will raise EBADF
-        HttpServer::LISTENERS.map! { |s| s.close rescue nil }
-      end
+      trap(:QUIT) { G.quit! }
       [:TERM, :INT].each { |sig| trap(sig) { exit!(0) } } # instant shutdown
       logger.info "Rainbows! #@use worker_connections=#@worker_connections"
     end
@@ -89,13 +83,12 @@ module Rainbows
       logger.error e.backtrace.join("\n")
     end
 
-    def join_threads(threads, worker)
-      Rainbows::G.alive = false
+    def join_threads(threads)
+      G.quit!
       expire = Time.now + (timeout * 2.0)
-      m = 0
       until (threads.delete_if { |thr| ! thr.alive? }).empty?
         threads.each { |thr|
-          worker.tmp.chmod(m = 0 == m ? 1 : 0)
+          G.tick
           thr.join(1)
           break if Time.now >= expire
         }

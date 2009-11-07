@@ -28,8 +28,8 @@ module Rainbows
       when HttpParserError # try to tell the client they're bad
         ERROR_400_RESPONSE
       else
-        G.logger.error "Read error: #{e.inspect}"
-        G.logger.error e.backtrace.join("\n")
+        G.server.logger.error "Read error: #{e.inspect}"
+        G.server.logger.error e.backtrace.join("\n")
         ERROR_500_RESPONSE
       end
       write(msg)
