@@ -1,7 +1,4 @@
 # -*- encoding: binary -*-
-require 'rev'
-Rev::VERSION >= '0.3.0' or abort 'rev >= 0.3.0 is required'
-
 module Rainbows
   module Rev
 
