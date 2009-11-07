@@ -2,6 +2,11 @@ nr_client=${nr_client-4}
 . ./test-lib.sh
 test -r random_blob || die "random_blob required, run with 'make $0'"
 
+# basically we don't trust our own implementation of content-md5-put
+# nor our Ruby 1.9 knowledge nor proper use of encodings in Ruby.
+# So we try to use things like curl and sha1sum that are implemented
+# without the Ruby interpreter to validate our own Ruby internals.
+
 t_plan 7 "concurrent rack.input hammer stress test"
 
 t_begin "setup and startup" && {
@@ -35,7 +40,7 @@ t_begin "all responses identical" && {
 }
 
 t_begin "sha1 matches on-disk sha1" && {
-	blob_sha1=$( expr "$(sha1sum < random_blob)" : '\([a-f0-9]\{40\}\)')
+	blob_sha1=$(rsha1 < random_blob)
 	t_info blob_sha1=$blob_sha1
 	test x"$blob_sha1" = x"$(sort < $curl_out | uniq)"
 }
