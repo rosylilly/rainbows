@@ -8,6 +8,10 @@ module Rainbows
     include Rainbows::Const
     G = Rainbows::G
 
+    def self.setup(klass)
+      klass.const_set(:APP, G.server.app)
+    end
+
     def post_init
       @remote_addr = ::TCPSocket === @_io ? @_io.peeraddr.last : LOCALHOST
       @env = {}

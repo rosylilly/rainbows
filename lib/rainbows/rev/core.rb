@@ -20,6 +20,7 @@ module Rainbows
     end # class Server
 
     module Core
+      include Base
 
       # runs inside each forked worker, this sits around and waits
       # for connections and doesn't die until the parent dies (or is
@@ -27,10 +28,9 @@ module Rainbows
       def worker_loop(worker)
         init_worker_process(worker)
         mod = self.class.const_get(@use)
-        client = mod.const_get(:Client)
-        client.const_set(:APP, G.server.app)
-        Server.const_set(:MAX, G.server.worker_connections)
-        Server.const_set(:CL, client)
+        Server.const_set(:MAX, @worker_connections)
+        Server.const_set(:CL, mod.const_get(:Client))
+        EvCore.setup(EvCore)
         rloop = ::Rev::Loop.default
         Heartbeat.new(1, true).attach(rloop)
         LISTENERS.map! { |s| Server.new(s).attach(rloop) }

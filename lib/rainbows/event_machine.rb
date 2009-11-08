@@ -191,9 +191,9 @@ module Rainbows
       EM.epoll
       EM.kqueue
       logger.info "EventMachine: epoll=#{EM.epoll?} kqueue=#{EM.kqueue?}"
-      Client.const_set(:APP, G.server.app)
       Server.const_set(:MAX, G.server.worker_connections +
                              HttpServer::LISTENERS.size)
+      EvCore.setup(Client)
       EM.run {
         conns = EM.instance_variable_get(:@conns) or
           raise RuntimeError, "EM @conns instance variable not accessible!"

@@ -3,8 +3,6 @@ require 'rainbows/ev_core'
 module Rainbows
   module Rev
 
-    include Base
-
     class Client < ::Rev::IO
       include Rainbows::EvCore
       G = Rainbows::G
