@@ -19,6 +19,7 @@ endif
 export RUBYLIB RUBY_VERSION
 
 models := ThreadPool ThreadSpawn Rev EventMachine
+models += RevThreadSpawn
 ifeq ($(RUBY_VERSION),1.9.1) # 1.9.2-preview1 was broken
   models += Revactor
 endif

@@ -20,7 +20,7 @@ module Rainbows
       # here to prevent connections from being closed on us.
       def defer_body(io, out_headers)
         @deferred_bodies << io
-        on_write_complete unless out_headers # triggers a write
+        schedule_write unless out_headers # triggers a write
       end
 
       def app_call
