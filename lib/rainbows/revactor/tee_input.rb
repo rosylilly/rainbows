@@ -24,6 +24,11 @@ module Rainbows
           begin
             if parser.filter_body(dst, buf << socket.read).nil?
               @tmp.write(dst)
+              diff = dst.size - length
+              if diff > 0
+                dst.replace(dst[0,length])
+                @tmp.seek(-diff, IO::SEEK_CUR)
+              end
               return dst
             end
           rescue EOFError

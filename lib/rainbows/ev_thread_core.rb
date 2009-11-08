@@ -17,9 +17,19 @@ module Rainbows
     # we pass ourselves off as a Socket to Unicorn::TeeInput and this
     # is the only method Unicorn::TeeInput requires from the socket
     def readpartial(length, buf = "")
-      buf.replace(@state.pop)
+      length == 0 and return buf.replace("")
+      # try bufferred reads first
+      @tbuf && @tbuf.size > 0 and return buf.replace(@tbuf.read(length))
+
+      tmp = @state.pop
+      diff = tmp.size - length
+      if diff > 0
+        @tbuf ||= ::IO::Buffer.new
+        @tbuf.write(tmp[length, tmp.size])
+        tmp = tmp[0, length]
+      end
       resume
-      buf
+      buf.replace(tmp)
     end
 
     def app_spawn(input)
@@ -59,7 +69,7 @@ module Rainbows
         if 0 == @hp.content_length
           app_spawn(HttpRequest::NULL_IO) # common case
         else # nil or len > 0
-          @state = Queue.new
+          @state, @tbuf = Queue.new, nil
           app_spawn(nil)
         end
       when Queue
