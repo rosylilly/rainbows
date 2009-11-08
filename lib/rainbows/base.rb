@@ -26,7 +26,6 @@ module Rainbows
 
     def init_worker_process(worker)
       super(worker)
-      G.server = self
       G.tmp = worker.tmp
 
       # we're don't use the self-pipe mechanism in the Rainbows! worker

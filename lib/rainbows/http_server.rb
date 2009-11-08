@@ -5,16 +5,14 @@ module Rainbows
   class HttpServer < ::Unicorn::HttpServer
     include Rainbows
 
-    @@instance = nil
-
     class << self
       def setup(block)
-        @@instance.instance_eval(&block)
+        G.server.instance_eval(&block)
       end
     end
 
     def initialize(app, options)
-      @@instance = self
+      G.server = self
       rv = super(app, options)
       defined?(@use) or use(:Base)
       @worker_connections ||= MODEL_WORKER_CONNECTIONS[@use]
