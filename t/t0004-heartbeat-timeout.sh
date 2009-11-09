@@ -37,7 +37,7 @@ t_begin "ensure timeout took 3-6 seconds" && {
 }
 
 t_begin "wait for new worker to start up" && {
-	test x = x"$(cat $fifo)"
+	test xSTART = x"$(cat $fifo)"
 }
 
 t_begin "we get a fresh new worker process" && {

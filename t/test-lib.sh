@@ -110,7 +110,7 @@ before_fork do |server, worker|
   # so notify the script on the first worker we spawn
   # by opening the FIFO
   if worker.nr == 0
-    File.open("$fifo", "wb").close
+    File.open("$fifo", "wb") { |fp| fp.syswrite "START" }
   end
 end
 EOF
@@ -130,7 +130,7 @@ EOF
 rainbows_wait_start () {
 	# "cat $fifo" will block until the before_fork hook is called in
 	# the Unicorn config file
-	test x = x"$(cat $fifo)"
+	test xSTART = x"$(cat $fifo)"
 	rainbows_pid=$(cat $pid)
 }
 
