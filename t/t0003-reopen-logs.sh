@@ -3,7 +3,7 @@
 nr_client=${nr_client-2}
 . ./test-lib.sh
 
-t_plan 18 "reopen rotated logs"
+t_plan 19 "reopen rotated logs"
 
 t_begin "setup and startup" && {
 	rtmpfiles curl_out curl_err r_rot
@@ -38,6 +38,16 @@ t_begin "send reopen log signal (USR1)" && {
 t_begin "wait for rotated log to reappear" && {
 	nr=60
 	while ! test -f $r_err && test $nr -ge 0
+	do
+		sleep 1
+		nr=$(( $nr - 1 ))
+	done
+}
+
+t_begin "wait for worker to reopen logs" && {
+	nr=60
+	re="worker=.* done reopening logs"
+	while ! grep "$re" < $r_err >/dev/null && test $nr -ge 0
 	do
 		sleep 1
 		nr=$(( $nr - 1 ))
