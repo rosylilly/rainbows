@@ -1,5 +1,5 @@
 # SHA1 checksum generator
-bs = ENV['bs'] ? ENV['bs'].to_i : 4096
+bs = ENV['bs'] ? ENV['bs'].to_i : 16384
 require 'digest/sha1'
 use Rack::ContentLength
 app = lambda do |env|

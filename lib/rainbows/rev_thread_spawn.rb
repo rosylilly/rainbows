@@ -18,9 +18,13 @@ module Rainbows
   #
   # Caveats:
   #
-  # * TeeInput performance is terrible unless you match the
-  #   length argument of your env["rack.input"]#read calls
-  #   so that it is equal to Rev::IO::INPUT_SIZE
+  # * TeeInput performance under Ruby 1.8 is terrible unless you
+  #   match the length argument of your env["rack.input"]#read
+  #   calls so that it is greater than or equal to Rev::IO::INPUT_SIZE.
+  #   Most applications depending on Rack to do multipart POST
+  #   processing should be alright as the current Rev::IO::INPUT_SIZE
+  #   of 16384 bytes matches the read size used by
+  #   Rack::Utils::Multipart::parse_multipart.
 
   module RevThreadSpawn
     class Client < Rainbows::Rev::Client
