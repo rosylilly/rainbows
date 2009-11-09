@@ -7,7 +7,7 @@ t_begin "setup and startup" && {
 	rainbows_setup $model
         echo timeout 3 >> $unicorn_config
         echo preload_app true >> $unicorn_config
-	FIFO_PATH=$fifo rainbows -D heartbeat-timeout.ru -c $unicorn_config
+	rainbows -D heartbeat-timeout.ru -c $unicorn_config
 	rainbows_wait_start
 }
 
