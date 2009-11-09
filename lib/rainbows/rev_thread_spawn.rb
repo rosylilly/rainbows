@@ -18,23 +18,24 @@ module Rainbows
   #
   # Caveats:
   #
-  # * TeeInput performance is currently terrible under Ruby 1.9.1-p243
-  #   with few, fast clients.  This appears to be due the Queue
-  #   implementation in 1.9.
+  # * TeeInput performance is terrible unless you match the
+  #   length argument of your env["rack.input"]#read calls
+  #   so that it is equal to Rev::IO::INPUT_SIZE
 
   module RevThreadSpawn
     class Client < Rainbows::Rev::Client
       include EvThreadCore
       LOOP = ::Rev::Loop.default
       DR = Rainbows::Rev::DeferredResponse
+      TEE_RESUMER = ::Rev::AsyncWatcher.new
 
       def pause
-        @lock.synchronize { detach }
+        @lock.synchronize { disable if enabled? }
       end
 
       def resume
-        # we always attach to the loop belonging to the main thread
-        @lock.synchronize { attach(LOOP) }
+        @lock.synchronize { enable unless enabled? }
+        TEE_RESUMER.signal
       end
 
       def write(data)
@@ -74,5 +75,11 @@ module Rainbows
     end
 
     include Rainbows::Rev::Core
+
+    def init_worker_process(worker)
+      super
+      Client::TEE_RESUMER.attach(::Rev::Loop.default)
+    end
+
   end
 end
