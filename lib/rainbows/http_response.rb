@@ -30,7 +30,7 @@ module Rainbows
 
       body.each { |chunk| socket.write(chunk) }
       ensure
-        body.respond_to?(:close) and body.close rescue nil
+        body.respond_to?(:close) and body.close
     end
   end
 end
