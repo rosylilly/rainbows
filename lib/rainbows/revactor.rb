@@ -57,18 +57,8 @@ module Rainbows
         HttpResponse.write(client, response, out)
       end while alive and hp.reset.nil? and env.clear
       client.close
-    # if we get any error, try to write something back to the client
-    # assuming we haven't closed the socket, but don't get hung up
-    # if the socket is already closed or broken.  We'll always ensure
-    # the socket is closed at the end of this function
-    rescue EOFError,Errno::ECONNRESET,Errno::EPIPE,Errno::EINVAL,Errno::EBADF
-      emergency_response(client, Const::ERROR_500_RESPONSE)
-    rescue HttpParserError # try to tell the client they're bad
-      buf.empty? or emergency_response(client, Const::ERROR_400_RESPONSE)
-    rescue Object => e
-      emergency_response(client, Const::ERROR_500_RESPONSE)
-      logger.error "Read error: #{e.inspect}"
-      logger.error e.backtrace.join("\n")
+    rescue => e
+      handle_error(client, e)
     end
 
     # runs inside each forked worker, this sits around and waits
@@ -114,16 +104,28 @@ module Rainbows
       end while G.alive || clients.size > 0
     end
 
-  private
-
-    # write a response without caring if it went out or not
-    # This is in the case of untrappable errors
-    def emergency_response(client, response_str)
+    # if we get any error, try to write something back to the client
+    # assuming we haven't closed the socket, but don't get hung up
+    # if the socket is already closed or broken.  We'll always ensure
+    # the socket is closed at the end of this function
+    def handle_error(client, e)
+      msg = case e
+      when EOFError,Errno::ECONNRESET,Errno::EPIPE,Errno::EINVAL,Errno::EBADF
+        Const::ERROR_500_RESPONSE
+      when HttpParserError # try to tell the client they're bad
+        Const::ERROR_400_RESPONSE
+      else
+        logger.error "Read error: #{e.inspect}"
+        logger.error e.backtrace.join("\n")
+        Const::ERROR_500_RESPONSE
+      end
       client.instance_eval do
         # this is Revactor implementation dependent
-        @_io.write_nonblock(response_str) rescue nil
+        @_io.write_nonblock(msg)
+        close
       end
-      client.close rescue nil
+      rescue
+        nil
     end
 
     def revactorize_listeners!

@@ -10,14 +10,6 @@ module Rainbows
     include Rainbows::Const
     G = Rainbows::G
 
-    # write a response without caring if it went out or not for error
-    # messages.
-    # TODO: merge into Unicorn::HttpServer
-    def emergency_response(client, response_str)
-      client.write_nonblock(response_str) rescue nil
-      client.close rescue nil
-    end
-
     def listen_loop_error(e)
       G.alive or return
       logger.error "Unhandled listen loop exception #{e.inspect}."
@@ -72,14 +64,8 @@ module Rainbows
     # assuming we haven't closed the socket, but don't get hung up
     # if the socket is already closed or broken.  We'll always ensure
     # the socket is closed at the end of this function
-    rescue EOFError,Errno::ECONNRESET,Errno::EPIPE,Errno::EINVAL,Errno::EBADF
-      emergency_response(client, ERROR_500_RESPONSE)
-    rescue HttpParserError # try to tell the client they're bad
-      buf.empty? or emergency_response(client, ERROR_400_RESPONSE)
-    rescue Object => e
-      emergency_response(client, ERROR_500_RESPONSE)
-      logger.error "Read error: #{e.inspect}"
-      logger.error e.backtrace.join("\n")
+    rescue => e
+      handle_error(client, e)
     end
 
     def join_threads(threads)
