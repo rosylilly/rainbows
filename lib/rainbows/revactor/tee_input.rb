@@ -21,17 +21,14 @@ module Rainbows
       # returns nil if reading from the input returns nil
       def tee(length, dst)
         unless parser.body_eof?
-          begin
-            if parser.filter_body(dst, buf << socket.read).nil?
-              @tmp.write(dst)
-              diff = dst.size - length
-              if diff > 0
-                dst.replace(dst[0,length])
-                @tmp.seek(-diff, IO::SEEK_CUR)
-              end
-              return dst
+          if parser.filter_body(dst, buf << socket.read).nil?
+            @tmp.write(dst)
+            diff = dst.size - length
+            if diff > 0
+              dst.replace(dst[0,length])
+              @tmp.seek(-diff, IO::SEEK_CUR)
             end
-          rescue EOFError
+            return dst
           end
         end
         finalize_input
