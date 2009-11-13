@@ -18,6 +18,14 @@ module Rainbows
       @worker_connections ||= MODEL_WORKER_CONNECTIONS[@use]
     end
 
+    def reopen_worker_logs(worker_nr)
+      logger.info "worker=#{worker_nr} reopening logs..."
+      Unicorn::Util.reopen_logs
+      logger.info "worker=#{worker_nr} done reopening logs"
+      rescue
+        G.quit! # let the master reopen and refork us
+    end
+
     #:stopdoc:
     #
     # Add one second to the timeout since our fchmod heartbeat is less
