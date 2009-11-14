@@ -41,7 +41,8 @@ Gem::Specification.new do |s|
   s.test_files = test_files
 
   # we need Unicorn for the HTTP parser and process management
-  s.add_dependency(%q<unicorn>, ["~> 0.94.0"])
+  # Unicorn 0.95.0 should be released on or around Nov 13/14/15, 2009
+  s.add_dependency(%q<unicorn>, ["~> 0.95.0"])
 
   # Unicorn already depends on Rack
   # s.add_dependency(%q<rack>)
