@@ -48,3 +48,42 @@ It depends on the size and amount of static files you're serving.  If
 you're serving a lot of static files (especially large ones), then by
 all means use nginx.  If not, then \Rainbows! is likely a "good enough"
 solution even if nginx will always outperform it in raw throughput.
+
+
+=== How do I support SSL?
+
+If you need a streaming "rack.input" to do upload processing within your
+Rack application, then {stunnel}[http://stunnel.org/] is required.
+Otherwise, nginx is a perfectly good reverse proxy.
+
+Refer to the {Unicorn FAQ}[http://unicorn.bogomips.org/FAQ.html] on how
+to ensure redirects go to "https://" URLs.
+
+
+=== Is there a "rainbows_rails" command like there is "unicorn_rails"?
+
+Only if you write one and plan to support it.
+
+"unicorn_rails" was written primarily to support older versions of
+Rails.  Since \Rainbows! is designed for newer Rails, it can just use
+a "config.ru" file like other Rack frameworks and applications.
+
+For Rails 2.3.x and later, the following config.ru will work for you:
+
+  ENV["RAILS_ENV"] ||= ENV["RACK_ENV"]
+  require "config/environment"
+  use Rails::Rack::Static
+  run ActionController::Dispatcher.new
+
+For older versions of Rails, the following config.ru will work:
+
+  ENV["RAILS_ENV"] ||= ENV["RACK_ENV"]
+  require 'config/boot'
+  require 'config/environment'
+  require 'unicorn/app/old_rails'
+  require 'unicorn/app/old_rails/static' # not needed with Unicorn 0.95+
+  use Unicorn::App::OldRails::Static
+  run Unicorn::App::OldRails.new
+
+One thing to watch out for is that RAILS_ENV will not be set in the
+environment for you, thus we set it to match RACK_ENV.
