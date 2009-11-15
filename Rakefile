@@ -24,6 +24,7 @@ def tags
 end
 
 cgit_url = "http://git.bogomips.org/cgit/rainbows.git"
+git_url = ENV['GIT_URL'] || 'git://git.bogomips.org/rainbows.git'
 
 desc 'prints news as an Atom feed'
 task :news_atom do
@@ -88,8 +89,6 @@ desc "print release notes for Rubyforge"
 task :release_notes do
   require 'rubygems'
 
-  git_url = ENV['GIT_URL'] || 'git://git.bogomips.org/rainbows.git'
-
   spec = Gem::Specification.load('rainbows.gemspec')
   puts spec.description.strip
   puts ""
@@ -116,4 +115,42 @@ task :publish_news do
   rf = RubyForge.new.configure
   rf.login
   rf.post_news('rainbows', subject, body)
+end
+
+desc "post to RAA"
+task :raa_update do
+  require 'rubygems'
+  require 'net/http'
+  require 'net/netrc'
+  rc = Net::Netrc.locate('rainbows-raa') or abort "~/.netrc not found"
+  password = rc.password
+
+  s = Gem::Specification.load('rainbows.gemspec')
+  desc = [ s.description.strip ]
+  desc << ""
+  desc << "* #{s.email}"
+  desc << "* #{git_url}"
+  desc << "* #{cgit_url}"
+  desc = desc.join("\n")
+  uri = URI.parse('http://raa.ruby-lang.org/regist.rhtml')
+  form = {
+    :name => s.name,
+    :short_description => s.summary,
+    :version => s.version.to_s,
+    :status => 'experimental',
+    :owner => s.authors.first,
+    :email => s.email,
+    :category_major => 'Library',
+    :category_minor => 'Web',
+    :url => s.homepage,
+    :download => "http://rubyforge.org/frs/?group_id=8977",
+    :license => "Ruby's",
+    :description_style => 'Plain',
+    :description => desc,
+    :pass => password,
+    :submit => "Update",
+  }
+  res = Net::HTTP.post_form(uri, form)
+  p res
+  puts res.body
 end
