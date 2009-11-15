@@ -2,8 +2,13 @@
 require 'rainbows/rev'
 require 'rainbows/ev_thread_core'
 
+warn "Rainbows::RevThreadSpawn is extremely experimental"
+
 module Rainbows
 
+  # This concurrency model is EXTREMELY experimental and does
+  # not perform very well.
+  #
   # A combination of the Rev and ThreadSpawn models.  This allows Ruby
   # 1.8 and 1.9 to effectively serve more than ~1024 concurrent clients
   # on systems that support kqueue or epoll while still using
