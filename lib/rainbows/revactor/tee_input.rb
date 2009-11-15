@@ -32,13 +32,8 @@ module Rainbows
           end
         end
         finalize_input
-        rescue EOFError
-          # in case client only did a premature shutdown(SHUT_WR)
-          # we do support clients that shutdown(SHUT_WR) after the
-          # _entire_ request has been sent, and those will not have
-          # raised EOFError on us.
-          socket.close if socket
-          raise Unicorn::ClientShutdown, "bytes_read=#{@tmp.size}", []
+        rescue => e
+          client_error(e)
       end
 
       def finalize_input
