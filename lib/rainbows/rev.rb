@@ -24,6 +24,10 @@ module Rainbows
   # temporary file before the application is entered.
 
   module Rev
+
+    # keep-alive timeout scoreboard
+    KATO = {}
+
     include Core
   end
 end

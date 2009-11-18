@@ -23,8 +23,13 @@ module Rainbows
         schedule_write unless out_headers # triggers a write
       end
 
+      def timeout?
+        @_write_buffer.empty? && @deferred_bodies.empty? and close.nil?
+      end
+
       def app_call
         begin
+          KATO.delete(self)
           (@env[RACK_INPUT] = @input).rewind
           @env[REMOTE_ADDR] = @remote_addr
           response = APP.call(@env.update(RACK_DEFAULTS))
@@ -38,6 +43,7 @@ module Rainbows
             @state = :headers
             # keepalive requests are always body-less, so @input is unchanged
             @hp.headers(@env, @buf) and next
+            KATO[self] = Time.now
           else
             quit
           end
