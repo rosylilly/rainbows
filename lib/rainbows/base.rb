@@ -40,7 +40,7 @@ module Rainbows
 
       begin # loop
         while ! hp.headers(env, buf)
-          IO.select([client], nil, nil, 5) or return client.close
+          IO.select([client], nil, nil, G.kato) or return client.close
           buf << client.readpartial(CHUNK_SIZE)
         end
 

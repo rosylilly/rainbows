@@ -10,8 +10,10 @@ module Rainbows
     class Heartbeat < ::Rev::TimerWatcher
 
       def on_timer
-        ot = Time.now - 5
-        KATO.delete_if { |client, time| time < ot and client.timeout? }
+        if (ot = G.kato) > 0
+          ot = Time.now - ot
+          KATO.delete_if { |client, time| time < ot and client.timeout? }
+        end
         exit if (! G.tick && G.cur <= 0)
       end
 

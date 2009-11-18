@@ -74,7 +74,7 @@ module Rainbows
             @state = :headers
             # keepalive requests are always body-less, so @input is unchanged
             @hp.headers(@env, @buf) and next
-            set_comm_inactivity_timeout 5
+            set_comm_inactivity_timeout G.kato
           end
           return
         end while true

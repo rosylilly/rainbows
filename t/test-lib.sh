@@ -115,15 +115,25 @@ before_fork do |server, worker|
 end
 EOF
 	{
+		# set a higher default for tests since we run heavily-loaded
+		# boxes and sometimes sleep 1s in tests
+		kato=5
+		echo 'Rainbows! do'
 		if test $# -ge 1
 		then
-			echo 'Rainbows! do'
 			echo "  use :$1"
 			test $# -eq 2 && echo "  worker_connections $2"
-			echo end
+			if test $# -eq 3
+			then
+				echo "  keepalive_timeout $3"
+			else
+				echo "  keepalive_timeout $kato"
+			fi
 		else
-			echo "Rainbows! { use :$model }"
+			echo "  use :$model"
+			echo "  keepalive_timeout $kato"
 		fi
+		echo end
 	} >> $unicorn_config
 }
 

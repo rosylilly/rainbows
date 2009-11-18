@@ -68,6 +68,11 @@ module Rainbows
       @worker_connections = nr
     end
 
+    def keepalive_timeout(nr)
+      (Integer === nr && nr >= 0) or
+        raise ArgumentError, "keepalive must be a non-negative Integer"
+      G.kato = nr
+    end
   end
 
 end

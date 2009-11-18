@@ -6,7 +6,7 @@ module Rainbows
   # global vars because class/instance variables are confusing me :<
   # this struct is only accessed inside workers and thus private to each
   # G.cur may not be used the network concurrency model
-  class State < Struct.new(:alive,:m,:cur,:server,:tmp)
+  class State < Struct.new(:alive,:m,:cur,:kato,:server,:tmp)
     def tick
       tmp.chmod(self.m = m == 0 ? 1 : 0)
       alive && server.master_pid == Process.ppid or quit!
@@ -18,7 +18,7 @@ module Rainbows
       false
     end
   end
-  G = State.new(true, 0, 0)
+  G = State.new(true, 0, 0, 2)
 
   require 'rainbows/const'
   require 'rainbows/http_server'
@@ -43,6 +43,7 @@ module Rainbows
   #   Rainbows! do
   #     use :Revactor # this may also be :ThreadSpawn or :ThreadPool
   #     worker_connections 400
+  #     keepalive_timeout 0 # zero disables keepalives entirely
   #   end
   #
   #   # the rest of the Unicorn configuration
@@ -53,6 +54,12 @@ module Rainbows
   # each of them.  The total number of clients we're able to serve is
   # +worker_processes+ * +worker_connections+, so in the above example
   # we can serve 8 * 400 = 3200 clients concurrently.
+  #
+  # The default is +keepalive_timeout+ is 2 seconds, which should be
+  # enough under most conditions for browsers to render the page and
+  # start retrieving extra elements for.  Increasing this beyond 5
+  # seconds is not recommended.  Zero disables keepalive entirely
+  # (but pipelining fully-formed requests is still works).
   def Rainbows!(&block)
     block_given? or raise ArgumentError, "Rainbows! requires a block"
     HttpServer.setup(block)

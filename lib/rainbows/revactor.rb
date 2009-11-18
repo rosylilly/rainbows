@@ -23,7 +23,7 @@ module Rainbows
   module Revactor
     require 'rainbows/revactor/tee_input'
 
-    RD_ARGS = { :timeout => 5 }
+    RD_ARGS = {}
 
     include Base
 
@@ -75,6 +75,7 @@ module Rainbows
     # given a INT, QUIT, or TERM signal)
     def worker_loop(worker)
       init_worker_process(worker)
+      RD_ARGS[:timeout] = G.kato if G.kato > 0
 
       root = Actor.current
       root.trap_exit = true
