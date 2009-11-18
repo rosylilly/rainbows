@@ -32,7 +32,7 @@ module Rainbows
     # once a client is accepted, it is processed in its entirety here
     # in 3 easy steps: read request, call app, write app response
     def process_client(client)
-      buf = client.readpartial(CHUNK_SIZE)
+      buf = client.readpartial(CHUNK_SIZE) # accept filters protect us here
       hp = HttpParser.new
       env = {}
       alive = true
@@ -40,6 +40,7 @@ module Rainbows
 
       begin # loop
         while ! hp.headers(env, buf)
+          IO.select([client], nil, nil, 5) or return client.close
           buf << client.readpartial(CHUNK_SIZE)
         end
 
