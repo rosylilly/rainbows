@@ -51,6 +51,7 @@ module Rainbows
       end
 
       def app_call
+        set_comm_inactivity_timeout 0
         begin
           (@env[RACK_INPUT] = @input).rewind
           @env[REMOTE_ADDR] = @remote_addr
@@ -73,6 +74,7 @@ module Rainbows
             @state = :headers
             # keepalive requests are always body-less, so @input is unchanged
             @hp.headers(@env, @buf) and next
+            set_comm_inactivity_timeout 5
           end
           return
         end while true
