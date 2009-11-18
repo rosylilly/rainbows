@@ -23,21 +23,28 @@ module Rainbows
   module Revactor
     require 'rainbows/revactor/tee_input'
 
+    RD_ARGS = { :timeout => 5 }
+
     include Base
 
     # once a client is accepted, it is processed in its entirety here
     # in 3 easy steps: read request, call app, write app response
     def process_client(client)
-      buf = client.read or return # this probably does not happen...
+      rd_args = [ nil ]
+      remote_addr = if ::Revactor::TCP::Socket === client
+        rd_args << RD_ARGS
+        client.remote_addr
+      else
+        LOCALHOST
+      end
+      buf = client.read(*rd_args)
       hp = HttpParser.new
       env = {}
       alive = true
-      remote_addr = ::Revactor::TCP::Socket === client ?
-                    client.remote_addr : LOCALHOST
 
       begin
         while ! hp.headers(env, buf)
-          buf << client.read
+          buf << client.read(*rd_args)
         end
 
         env[Const::RACK_INPUT] = 0 == hp.content_length ?
@@ -56,6 +63,8 @@ module Rainbows
         out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if hp.headers?
         HttpResponse.write(client, response, out)
       end while alive and hp.reset.nil? and env.clear
+      client.close
+    rescue ::Revactor::TCP::ReadError
       client.close
     rescue => e
       handle_error(client, e)
