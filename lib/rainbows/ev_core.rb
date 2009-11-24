@@ -74,6 +74,7 @@ module Rainbows
         end
       when :trailers
         if @hp.trailers(@env, @buf << data)
+          @input.rewind
           app_call
           @input.close if File === @input
         end

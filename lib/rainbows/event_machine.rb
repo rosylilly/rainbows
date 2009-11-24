@@ -53,7 +53,7 @@ module Rainbows
       def app_call
         set_comm_inactivity_timeout 0
         begin
-          (@env[RACK_INPUT] = @input).rewind
+          @env[RACK_INPUT] = @input
           @env[REMOTE_ADDR] = @remote_addr
           @env[ASYNC_CALLBACK] = method(:response_write)
 

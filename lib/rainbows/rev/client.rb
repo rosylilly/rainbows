@@ -30,7 +30,7 @@ module Rainbows
       def app_call
         begin
           KATO.delete(self)
-          (@env[RACK_INPUT] = @input).rewind
+          @env[RACK_INPUT] = @input
           @env[REMOTE_ADDR] = @remote_addr
           response = APP.call(@env.update(RACK_DEFAULTS))
           alive = @hp.keepalive? && G.alive
