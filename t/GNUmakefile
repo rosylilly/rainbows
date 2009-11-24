@@ -19,9 +19,11 @@ endif
 export RUBYLIB RUBY_VERSION
 
 models := ThreadPool ThreadSpawn Rev EventMachine
-models += RevThreadSpawn
 ifeq ($(RUBY_VERSION),1.9.1) # 1.9.2-preview1 was broken
   models += Revactor
+
+  # technically this works under 1.8, too, it's just slow
+  models += RevThreadSpawn
 endif
 all_models := $(models) Base
 
