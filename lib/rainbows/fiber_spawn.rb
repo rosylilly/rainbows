@@ -4,9 +4,10 @@ require 'rainbows/fiber'
 module Rainbows
 
   # Simple Fiber-based concurrency model for 1.9.  This spawns a new
-  # Fiber for every client connection.  This exports a streaming
+  # Fiber for every incoming client connection and the root Fiber for
+  # scheduling and connection acceptance.  This exports a streaming
   # "rack.input" with lightweight concurrency.  Applications are
-  # strongly advised to wrap slow all IO objects (sockets, pipes) using
+  # strongly advised to wrap all slow IO objects (sockets, pipes) using
   # the Rainbows::Fiber::IO class whenever possible.
 
   module FiberSpawn

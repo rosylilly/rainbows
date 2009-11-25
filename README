@@ -15,22 +15,22 @@ For network concurrency, models we currently support are:
 
 * {:Revactor}[link:Rainbows/Revactor.html]
 * {:ThreadPool}[link:Rainbows/ThreadPool.html]
-* {:Rev}[link:Rainbows/Rev.html]*
+* {:Rev}[link:Rainbows/Rev.html]
 * {:ThreadSpawn}[link:Rainbows/ThreadSpawn.html]
 * {:EventMachine}[link:Rainbows/EventMachine.html]
+* {:RevThreadSpawn}[link:Rainbows/RevThreadSpawn.html]
+* {:FiberSpawn}[link:Rainbows/FiberSpawn.html]
+* {:FiberPool}[link:Rainbows/FiberPool.html]
 
 We have {more on the way}[link:TODO.html] for handling network concurrency.
 Additionally, we also use multiple processes (managed by Unicorn) for
 CPU/memory/disk concurrency.
 
-\* our \Rev concurrency model is only recommended for slow clients, not
-sleepy apps.  Additionally it does not support streaming "rack.input" to
-the application.
-
-For application concurrency, we have the Rainbows::AppPool Rack
-middleware that allows us to limit application concurrency independently
-of network concurrency.  Rack::Lock as distributed by Rack may also be
-used to limit application concurrency to one (per-worker).
+For application concurrency with Thread-based models, we have the
+Rainbows::AppPool Rack middleware that allows us to limit application
+concurrency independently of network concurrency.  Rack::Lock as
+distributed by Rack may also be used to limit application concurrency to
+one (per-worker).
 
 == Features
 
@@ -53,7 +53,7 @@ used to limit application concurrency to one (per-worker).
 
 == Applications
 
-\Rainbows is for the odd things Unicorn sucks at:
+\Rainbows is mainly designed for the odd things Unicorn sucks at:
 
 * 3rd-party APIs (to services outside your control/LAN)
 * OpenID consumers (to providers outside your control/LAN)
@@ -65,8 +65,8 @@ used to limit application concurrency to one (per-worker).
 * Long polling
 * Reverse Ajax
 
-\Rainbows may also be used to service slow clients even with fast
-applications using the \Rev concurrency model.
+\Rainbows can also be used to service slow clients directly even with
+fast applications.
 
 == License
 

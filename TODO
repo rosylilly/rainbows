@@ -7,15 +7,13 @@ care about.
   unit tests, only integration tests that exercise externally
   visible parts.
 
-* Rev + Thread - current Rev model with threading, which will give
-  us a streaming (but rewindable) "rack.input".
-
 * EventMachine.spawn - should be like Revactor, maybe?
 
-* Rev + callcc - current Rev model with callcc (should work with MBARI)
+* {Packet,Rev,EventMachine}+Fibers
 
-* Fiber support - Revactor already uses these with Ruby 1.9, also not
-  sure how TeeInput can be done with this.
+* {Packet,Rev}ThreadPool
+
+* Rev + callcc - current Rev model with callcc (should work with MBARI)
 
 * Omnibus - haven't looked into it, probably like Revactor with 1.8?
 

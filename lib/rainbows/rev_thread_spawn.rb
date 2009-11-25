@@ -1,7 +1,8 @@
 # -*- encoding: binary -*-
 require 'rainbows/rev'
 
-warn "Rainbows::RevThreadSpawn is extremely experimental"
+RUBY_VERSION =~ %r{\A1\.8} and
+  warn "Rainbows::RevThreadSpawn does not work well under Ruby 1.8"
 
 module Rainbows
 
