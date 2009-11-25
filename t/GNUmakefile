@@ -22,6 +22,7 @@ models := ThreadPool ThreadSpawn Rev EventMachine
 ifeq ($(RUBY_VERSION),1.9.1) # 1.9.2-preview1 was broken
   models += Revactor
   models += FiberSpawn
+  models += FiberPool
 
   # technically this works under 1.8, too, it's just slow
   models += RevThreadSpawn

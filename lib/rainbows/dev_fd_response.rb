@@ -38,8 +38,10 @@ module Rainbows
         end
 
         # we need to make sure our pipe output is Fiber-compatible
-        env["rainbows.model"] == :FiberSpawn and
+        case env["rainbows.model"]
+        when :FiberSpawn, :FiberPool
           return [ status, headers.to_hash, Fiber::IO.new(io,::Fiber.current) ]
+        end
       else # unlikely, char/block device file, directory, ...
         return response
       end
