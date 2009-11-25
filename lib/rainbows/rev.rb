@@ -28,6 +28,9 @@ module Rainbows
     # keep-alive timeout scoreboard
     KATO = {}
 
+    # all connected clients
+    CONN = {}
+
     include Core
   end
 end

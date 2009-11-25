@@ -8,7 +8,7 @@ module Rainbows
       G = Rainbows::G
 
       def initialize(io)
-        G.cur += 1
+        CONN[self] = false
         super(io)
         post_init
         @deferred_bodies = [] # for (fast) regular files only
@@ -71,7 +71,7 @@ module Rainbows
       end
 
       def on_close
-        G.cur -= 1
+        CONN.delete(self)
       end
 
     end # module Client

@@ -14,7 +14,7 @@ module Rainbows
           ot = Time.now - ot
           KATO.delete_if { |client, time| time < ot and client.timeout? }
         end
-        exit if (! G.tick && G.cur <= 0)
+        exit if (! G.tick && CONN.size <= 0)
       end
 
     end
