@@ -5,7 +5,7 @@ module Rainbows
 
   # global vars because class/instance variables are confusing me :<
   # this struct is only accessed inside workers and thus private to each
-  # G.cur may not be used the network concurrency model
+  # G.cur may not be used in the network concurrency model
   class State < Struct.new(:alive,:m,:cur,:kato,:server,:tmp)
     def tick
       tmp.chmod(self.m = m == 0 ? 1 : 0)
