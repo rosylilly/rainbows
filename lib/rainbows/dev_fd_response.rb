@@ -36,6 +36,10 @@ module Rainbows
         else
           headers['X-Rainbows-Autochunk'] = 'no'
         end
+
+        # we need to make sure our pipe output is Fiber-compatible
+        env["rainbows.model"] == :FiberSpawn and
+          return [ status, headers.to_hash, Fiber::IO.new(io,::Fiber.current) ]
       else # unlikely, char/block device file, directory, ...
         return response
       end
