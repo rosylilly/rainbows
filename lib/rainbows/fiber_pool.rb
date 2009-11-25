@@ -32,7 +32,7 @@ module Rainbows
       begin
         ret = begin
           G.tick
-          IO.select(rd.keys.concat(LISTENERS), wr.keys, nil, 1) or next
+          IO.select(rd.keys.concat(LISTENERS), wr.keys, nil, timer) or next
         rescue Errno::EINTR
           retry
         rescue Errno::EBADF, TypeError

@@ -23,7 +23,7 @@ module Rainbows
 
       begin
         ret = begin
-          IO.select(rd.keys.concat(LISTENERS), wr.keys, nil, 1) or next
+          IO.select(rd.keys.concat(LISTENERS), wr.keys, nil, timer) or next
         rescue Errno::EINTR
           G.tick
           retry

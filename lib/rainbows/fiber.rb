@@ -6,9 +6,32 @@ module Rainbows
   module Fiber
     RD = {}
     WR = {}
+    ZZ = {}
+
+    def self.sleep(seconds)
+      ZZ[::Fiber.current] = Time.now + seconds
+      ::Fiber.yield
+    end
 
     module Base
       include Rainbows::Base
+
+      # wakes up any sleepers that need to be woken and
+      # returns an interval to IO.select on
+      def timer
+        max = nil
+        now = Time.now
+        ZZ.delete_if { |fib, time|
+          if now >= time
+            fib.resume
+            now = Time.now
+          else
+            max = time
+            false
+          end
+        }
+        max.nil? || max > (now + 1) ? 1 : max - now
+      end
 
       def process_client(client)
         G.cur += 1
@@ -46,6 +69,7 @@ module Rainbows
         G.cur -= 1
         RD.delete(client)
         WR.delete(client)
+        ZZ.delete(client.f)
       end
 
     end

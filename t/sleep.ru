@@ -8,6 +8,8 @@ run lambda { |env|
   env["PATH_INFO"] =~ %r{/([\d\.]+)\z} and nr = $1.to_f
 
   (case env['rainbows.model']
+  when :FiberPool, :FiberSpawn
+    Rainbows::Fiber
   when :Revactor
     Actor
   else
