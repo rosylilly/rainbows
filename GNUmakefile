@@ -1,4 +1,4 @@
-# use GNU Make to run tests in parallel, and without depending on Rubygems
+# use GNU Make to run tests in parallel, and without depending on RubyGems
 all::
 RUBY = ruby
 rake = rake
@@ -150,10 +150,14 @@ $(pkgtgz): manifest fix-perms
 package: $(pkgtgz) $(pkggem)
 
 release: verify package $(release_notes) $(release_changes)
+	# make tgz release on RubyForge
 	rubyforge add_release -f -n $(release_notes) -a $(release_changes) \
 	  $(rfproject) $(rfpackage) $(VERSION) $(pkggem)
-	rubyforge add_file \
-	  $(rfproject) $(rfpackage) $(VERSION) $(pkgtgz)
+	# push gem to Gemcutter
+	gem push $(pkggem)
+	# in case of gem downloads from RubyForge releases page
+	-rubyforge add_file \
+	  $(rfproject) $(rfpackage) $(VERSION) $(pkggem)
 else
 gem install-gem: GIT-VERSION-FILE
 	$(MAKE) $@ VERSION=$(GIT_VERSION)

@@ -86,7 +86,7 @@ and run setup.rb after unpacking it:
 
 http://rubyforge.org/frs/?group_id=8977
 
-You may also install it via Rubygems on Rubyforge:
+You may also install it via RubyGems on Gemcutter:
 
   gem install rainbows
 

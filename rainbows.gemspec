@@ -59,5 +59,5 @@ Gem::Specification.new do |s|
   # We use the new EM::attach/watch API in 0.12.10
   # s.add_dependency(%q<eventmachine>, ["~> 0.12.10"])
 
-  # s.licenses = %w(GPLv2 Ruby) # accessor not compatible with older Rubygems
+  # s.licenses = %w(GPLv2 Ruby) # accessor not compatible with older RubyGems
 end
