@@ -42,11 +42,8 @@ module Rainbows
   # AppPool has no effect on the Rev or EventMachine concurrency models
   # as those are single-threaded/single-instance as far as application
   # concurrency goes.  In other words, +P+ is always +one+ when using
-  # Rev or EventMachine.  AppPool currently only works with the
-  # ThreadSpawn and ThreadPool models.  It does not yet work reliably
-  # with the Revactor model, but actors are far more lightweight and
-  # probably better suited for lightweight applications that would
-  # not benefit from AppPool.
+  # Rev or EventMachine.  As of \Rainbows! 0.7.0, it is safe to use with
+  # Revactor and the new FiberSpawn and FiberPool concurrency models.
   #
   # Since this is Rack middleware, you may load this in your Rack
   # config.ru file and even use it in threaded servers other than
@@ -60,7 +57,7 @@ module Rainbows
   # You may to load this earlier or later in your middleware chain
   # depending on the concurrency/copy-friendliness of your middleware(s).
 
-  class AppPool < Struct.new(:pool)
+  class AppPool < Struct.new(:pool, :re)
 
     # +opt+ is a hash, +:size+ is the size of the pool (default: 6)
     # meaning you can have up to 6 concurrent instances of +app+
@@ -86,6 +83,20 @@ module Rainbows
 
     # Rack application endpoint, +env+ is the Rack environment
     def call(env)
+
+      # we have to do this check at call time (and not initialize)
+      # because of preload_app=true and models being changeable with SIGHUP
+      # fortunately this is safe for all the reentrant (but not multithreaded)
+      # classes that depend on it and a safe no-op for multithreaded
+      # concurrency models
+      self.re ||= begin
+        case env["rainbows.model"]
+        when :FiberSpawn, :FiberPool, :Revactor
+          self.pool = Rainbows::Fiber::Queue.new(pool)
+        end
+        true
+      end
+
       app = pool.shift
       app.call(env)
       ensure

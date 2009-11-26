@@ -4,6 +4,8 @@ require 'rainbows/fiber/io'
 
 module Rainbows
   module Fiber
+    autoload :Queue, 'rainbows/fiber/queue'
+
     RD = {}
     WR = {}
     ZZ = {}

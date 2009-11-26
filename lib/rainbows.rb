@@ -82,6 +82,7 @@ module Rainbows
     u = model.to_s.gsub(/([a-z0-9])([A-Z0-9])/) { "#{$1}_#{$2.downcase!}" }
     autoload model, "rainbows/#{u.downcase!}"
   end
+  autoload :Fiber, 'rainbows/fiber' # core class
 
 end
 

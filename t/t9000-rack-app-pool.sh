@@ -1,7 +1,7 @@
 #!/bin/sh
 . ./test-lib.sh
 case $model in
-*Thread*) ;;
+*Thread*|*Fiber*|Revactor) ;;
 *)
 	t_info "skipping $T since it's not compatible with $model"
 	exit 0
