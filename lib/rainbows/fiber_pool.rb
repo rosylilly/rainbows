@@ -38,7 +38,7 @@ module Rainbows
           fib.resume(Fiber::IO.new(io, fib))
         end
       rescue => e
-        listen_loop_error(e)
+        Error.listen_loop(e)
       end while G.alive || G.cur > 0
     end
 

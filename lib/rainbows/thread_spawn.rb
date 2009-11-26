@@ -51,8 +51,8 @@ module Rainbows
           rescue Errno::EAGAIN, Errno::ECONNABORTED
           end
         end
-      rescue Object => e
-        listen_loop_error(e)
+      rescue => e
+        Error.listen_loop(e)
       end while true
       join_threads(threads.list)
     end

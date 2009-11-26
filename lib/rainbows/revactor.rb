@@ -63,11 +63,11 @@ module Rainbows
         out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if hp.headers?
         HttpResponse.write(client, response, out)
       end while alive and hp.reset.nil? and env.clear
-      client.close
     rescue ::Revactor::TCP::ReadError
-      client.close
     rescue => e
       handle_error(client, e)
+    ensure
+      client.close
     end
 
     # runs inside each forked worker, this sits around and waits
@@ -95,8 +95,8 @@ module Rainbows
             clients[actor.object_id] = actor
             root.link(actor)
           rescue Errno::EAGAIN, Errno::ECONNABORTED
-          rescue Object => e
-            listen_loop_error(e)
+          rescue => e
+            Error.listen_loop(e)
           end while G.alive
         end
       end
@@ -119,23 +119,10 @@ module Rainbows
     # if the socket is already closed or broken.  We'll always ensure
     # the socket is closed at the end of this function
     def handle_error(client, e)
-      msg = case e
-      when EOFError,Errno::ECONNRESET,Errno::EPIPE,Errno::EINVAL,Errno::EBADF
-        Const::ERROR_500_RESPONSE
-      when HttpParserError # try to tell the client they're bad
-        Const::ERROR_400_RESPONSE
-      else
-        logger.error "Read error: #{e.inspect}"
-        logger.error e.backtrace.join("\n")
-        Const::ERROR_500_RESPONSE
-      end
-      client.instance_eval do
-        # this is Revactor implementation dependent
-        @_io.write_nonblock(msg)
-        close
-      end
+      # this is Revactor implementation dependent
+      msg = Error.response(e) and
+        client.instance_eval { @_io.write_nonblock(msg) }
       rescue
-        nil
     end
 
     def revactorize_listeners!

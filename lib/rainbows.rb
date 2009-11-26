@@ -1,5 +1,6 @@
 # -*- encoding: binary -*-
 require 'unicorn'
+require 'rainbows/error'
 
 module Rainbows
 

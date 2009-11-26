@@ -59,8 +59,8 @@ module Rainbows
           rescue Errno::EBADF, TypeError
             break
           end
-        rescue Object => e
-          listen_loop_error(e)
+        rescue => e
+          Error.listen_loop(e)
         end while G.alive
       }
     end

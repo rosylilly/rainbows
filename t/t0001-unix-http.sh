@@ -1,6 +1,6 @@
 #!/bin/sh
 . ./test-lib.sh
-t_plan 18 "simple HTTP connection keepalive/pipelining tests for $model"
+t_plan 19 "simple HTTP connection keepalive/pipelining tests for $model"
 
 t_begin "checking for config.ru for $model" && {
 	tbase=simple-http_$model.ru
@@ -21,6 +21,17 @@ t_begin "pid file exists" && {
 
 t_begin "single TCP request" && {
 	curl -sSfv http://$listen/
+}
+
+t_begin "handles client EOF gracefully" && {
+	printf 'GET / HTTP/1.1\r\nHost: example.com\r\n\r\n' | \
+		socat - UNIX:$unix_socket > $tmp
+	dbgcat tmp
+	if grep 'HTTP.* 500' $tmp
+	then
+		die "500 error returned on client shutdown(SHUT_WR)"
+	fi
+	check_stderr
 }
 
 dbgcat r_err

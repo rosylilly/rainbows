@@ -10,10 +10,9 @@ module Rainbows
     include Rainbows::Const
     G = Rainbows::G
 
-    def listen_loop_error(e)
-      G.alive or return
-      logger.error "Unhandled listen loop exception #{e.inspect}."
-      logger.error e.backtrace.join("\n")
+    def handle_error(client, e)
+      msg = Error.response(e) and client.write_nonblock(msg)
+      rescue
     end
 
     def init_worker_process(worker)
@@ -40,7 +39,7 @@ module Rainbows
 
       begin # loop
         while ! hp.headers(env, buf)
-          IO.select([client], nil, nil, G.kato) or return client.close
+          IO.select([client], nil, nil, G.kato) or return
           buf << client.readpartial(CHUNK_SIZE)
         end
 
@@ -60,13 +59,14 @@ module Rainbows
         out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if hp.headers?
         HttpResponse.write(client, response, out)
       end while alive and hp.reset.nil? and env.clear
-      client.close
     # if we get any error, try to write something back to the client
     # assuming we haven't closed the socket, but don't get hung up
     # if the socket is already closed or broken.  We'll always ensure
     # the socket is closed at the end of this function
     rescue => e
       handle_error(client, e)
+    ensure
+      client.close
     end
 
     def join_threads(threads)

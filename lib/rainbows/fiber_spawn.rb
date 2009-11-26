@@ -30,7 +30,7 @@ module Rainbows
           ::Fiber.new { process_client(fio.new(io, ::Fiber.current)) }.resume
         end
       rescue => e
-        listen_loop_error(e)
+        Error.listen_loop(e)
       end while G.alive || G.cur > 0
     end
 

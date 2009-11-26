@@ -9,7 +9,7 @@ module Rainbows
   # A combination of the Rev and ThreadSpawn models.  This allows Ruby
   # Thread-based concurrency for application processing.  It DOES NOT
   # expose a streamable "rack.input" for upload processing within the
-  # app.  DevFdResponse may be used with this class to proxy
+  # app.  DevFdResponse should be used with this class to proxy
   # asynchronous responses.  All network I/O between the client and
   # server are handled by the main thread and outside of the core
   # application dispatch.
@@ -60,17 +60,17 @@ module Rainbows
         end
       end
 
-      def app_error(e)
-        case e
-        when EOFError,Errno::ECONNRESET,Errno::EPIPE,Errno::EINVAL,Errno::EBADF
-        else
-          begin
-            G.server.logger.error "App error: #{e.inspect}"
-            G.server.logger.error e.backtrace.join("\n")
-          rescue
-          end
+      # fails-safe application dispatch, we absolutely cannot
+      # afford to fail or raise an exception (killing the thread)
+      # here because that could cause a deadlock and we'd leak FDs
+      def app_response
+        begin
+          @env[REMOTE_ADDR] = @remote_addr
+          APP.call(@env.update(RACK_DEFAULTS))
+        rescue => e
+          Error.app(e) # we guarantee this does not raise
+          [ 500, {}, [] ]
         end
-        [ 500, {}, [] ]
       end
 
       def app_call
@@ -78,18 +78,7 @@ module Rainbows
         disable
         @env[RACK_INPUT] = @input
         @input = nil # not sure why, @input seems to get closed otherwise...
-        Thread.new do
-          @env[REMOTE_ADDR] = @remote_addr
-          begin
-            response = begin
-              APP.call(@env.update(RACK_DEFAULTS))
-            rescue => e
-              app_error(e)
-            end
-          ensure
-            MASTER << [ client, response ]
-          end
-        end
+        Thread.new { MASTER << [ client, app_response ] }
       end
     end
 

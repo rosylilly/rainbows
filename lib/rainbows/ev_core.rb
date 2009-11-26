@@ -26,17 +26,7 @@ module Rainbows
     end
 
     def handle_error(e)
-      msg = case e
-      when EOFError,Errno::ECONNRESET,Errno::EPIPE,Errno::EINVAL,Errno::EBADF
-        ERROR_500_RESPONSE
-      when HttpParserError # try to tell the client they're bad
-        ERROR_400_RESPONSE
-      else
-        G.server.logger.error "Read error: #{e.inspect}"
-        G.server.logger.error e.backtrace.join("\n")
-        ERROR_500_RESPONSE
-      end
-      write(msg)
+      msg = Error.response(e) and write(msg)
       ensure
         quit
     end
@@ -79,7 +69,7 @@ module Rainbows
           @input.close if File === @input
         end
       end
-      rescue Object => e
+      rescue => e
         handle_error(e)
     end
 
