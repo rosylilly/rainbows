@@ -65,9 +65,12 @@ NEWS: GIT-VERSION-FILE
 	mv $@+ $@
 
 SINCE = 0.5.0
-ChangeLog: log_range = $(shell test -n "$(SINCE)" && echo v$(SINCE)..)
+ChangeLog: LOG_VERSION = \
+  $(shell git rev-parse -q "$(GIT_VERSION)" >/dev/null 2>&1 && \
+          echo $(GIT_VERSION) || git describe)
+ChangeLog: log_range = v$(SINCE)..$(LOG_VERSION)
 ChangeLog: GIT-VERSION-FILE
-	@echo "ChangeLog from $(GIT_URL) ($(SINCE)..$(GIT_VERSION))" > $@+
+	@echo "ChangeLog from $(GIT_URL) ($(log_range))" > $@+
 	@echo >> $@+
 	git log $(log_range) | sed -e 's/^/    /' >> $@+
 	mv $@+ $@
