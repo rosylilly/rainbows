@@ -26,5 +26,8 @@ install-man: man
 %.1.html: %.1.txt
 	$(pandoc_html) < $< > $@+ && mv $@+ $@
 
+comparison.html: comparison.haml
+	haml -t ugly < $< > $@+ && mv $@+ $@
+
 clean::
-	$(RM) $(man1) $(html1)
+	$(RM) $(man1) $(html1) comparison.html

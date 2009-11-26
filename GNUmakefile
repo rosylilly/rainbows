@@ -96,6 +96,11 @@ doc: .document NEWS ChangeLog
 	  doc/NEWS.html doc/README.html
 	$(rake) -s news_atom > doc/NEWS.atom.xml
 	cd doc && ln README.html tmp && mv tmp index.html
+	$(MAKE) -C Documentation comparison.html
+	$(RUBY) -i -p -e \
+	  '$$_.gsub!(/INCLUDE/){File.read("Documentation/comparison.html")}' \
+	  doc/Summary.html
+	cat Documentation/comparison.css >> doc/rdoc.css
 	$(RM) $(man1_bins)
 
 ifneq ($(VERSION),)

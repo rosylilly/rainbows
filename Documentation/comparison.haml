@@ -1,0 +1,184 @@
+%h2 core features and requirements
+%br
+%table.comp
+  %tr.comp_header
+    %th.mod module
+    %th.tee rack.input streaming
+    %th.r18 Ruby 1.8
+    %th.r19 Ruby 1.9
+    %th.rbx Rubinius
+    %th.slow slow clients
+    %th.lib lib compat
+    %th.thr thread-safety
+    %th.reent reentrancy
+  %tr.comp_base
+    %td.mod Unicorn/Base
+    %td.tee Yes
+    %td.r18 Yes
+    %td.r19 Yes
+    %td.rbx Yes
+    %td.slow No
+    %td.lib Most
+    %td.thr No
+    %td.reent No
+  %tr.comp_row
+    %td.mod Revactor
+    %td.tee Yes
+    %td.r18 No
+    %td.r19 Yes
+    %td.rbx No
+    %td.slow Yes
+    %td.lib Meh
+    %td.thr No
+    %td.reent Yes
+  %tr.comp_row
+    %td.mod ThreadPool
+    %td.tee Yes
+    %td.r18 Yes
+    %td.r19 Yes
+    %td.rbx Yes
+    %td.slow OK
+    %td.lib Good
+    %td.thr Yes
+    %td.reent No
+  %tr.comp_row
+    %td.mod Rev
+    %td.tee No
+    %td.r18 Yes
+    %td.r19 Yes
+    %td.rbx No
+    %td.slow Yes
+    %td.lib Good
+    %td.thr No
+    %td.reent No
+  %tr.comp_row
+    %td.mod ThreadSpawn
+    %td.tee Yes
+    %td.r18 Yes
+    %td.r19 Yes
+    %td.rbx Yes
+    %td.slow OK
+    %td.lib Good
+    %td.thr Yes
+    %td.reent No
+  %tr.comp_row
+    %td.mod EventMachine
+    %td.tee No
+    %td.r18 Yes
+    %td.r19 Yes
+    %td.rbx No
+    %td.slow Yes
+    %td.lib Good
+    %td.thr No
+    %td.reent No
+  %tr.comp_row
+    %td.mod RevThreadSpawn
+    %td.tee No
+    %td.r18 Slow
+    %td.r19 Yes
+    %td.rbx No
+    %td.slow Yes
+    %td.lib Good
+    %td.thr Yes
+    %td.reent No
+  %tr.comp_row
+    %td.mod FiberSpawn
+    %td.tee Yes
+    %td.r18 No
+    %td.r19 Yes
+    %td.rbx Yes
+    %td.slow Yes
+    %td.lib Meh
+    %td.thr No
+    %td.reent Yes
+  %tr.comp_row
+    %td.mod FiberPool
+    %td.tee Yes
+    %td.r18 No
+    %td.r19 Yes
+    %td.rbx Yes
+    %td.slow Yes
+    %td.lib Meh
+    %td.thr No
+    %td.reent Yes
+
+%ul
+  %li waiting on Rubinius for better signal handling
+  %li
+    rack.input streaming is what makes
+    %a(href="http://upr.bogomips.org/") upload progress,
+    BOSH, and Web Sockets possible
+
+%h2 middlewares and frameworks
+%br
+
+%table.comp
+  %tr.comp_header
+    %th.mod model
+    %th.devfd
+      %a(href="Rainbows/DevFdResponse.html") DevFdResponse
+    %th.app_pool
+      %a(href="Rainbows/AppPool.html") AppPool
+    %th.lock
+      %a(href="http://rack.rubyforge.org/doc/Rack/Lock.html") Rack::Lock
+    %th.async async
+  %tr.comp_row
+    %td.mod Unicorn/Base
+    %td.devfd no-op
+    %td.app_pool no-op
+    %td.lock no-op
+    %td.async lots of RAM :P
+  %tr.comp_row
+    %td.mod Revactor
+    %td.devfd no-op
+    %td.app_pool Yes
+    %td.lock No!
+    %td.async Revactor itself
+  %tr.comp_row
+    %td.mod ThreadPool
+    %td.devfd no-op
+    %td.app_pool Yes
+    %td.lock Yes
+    %td.async standard Ruby
+  %tr.comp_row
+    %td.mod Rev
+    %td.devfd Yes
+    %td.app_pool no-op
+    %td.lock no-op
+    %td.async DevFdResponse
+  %tr.comp_row
+    %td.mod ThreadSpawn
+    %td.devfd no-op
+    %td.app_pool Yes
+    %td.lock Yes
+    %td.async standard Ruby
+  %tr.comp_row
+    %td.mod EventMachine
+    %td.devfd Yes
+    %td.app_pool no-op
+    %td.lock no-op
+    %td.async async_sinatra
+  %tr.comp_row
+    %td.mod RevThreadSpawn
+    %td.devfd Yes
+    %td.app_pool Yes
+    %td.lock Dumb
+    %td.async standard Ruby
+  %tr.comp_row
+    %td.mod FiberSpawn
+    %td.devfd Yes
+    %td.app_pool Yes
+    %td.lock No!
+    %td.async Rainbows::Fiber{::IO,.sleep}
+  %tr.comp_row
+    %td.mod FiberPool
+    %td.devfd Yes
+    %td.app_pool Yes
+    %td.lock No!
+    %td.async Rainbows::Fiber{::IO,.sleep}
+
+%ul
+  %li "No!" means it's fundamentally incompatible
+  %li
+    Everything that's DevFdResponse-compatible can use it for passing
+    async responses through
