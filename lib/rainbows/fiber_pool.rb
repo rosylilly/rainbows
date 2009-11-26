@@ -1,6 +1,5 @@
 # -*- encoding: binary -*-
 require 'rainbows/fiber'
-require 'pp'
 
 module Rainbows
 
@@ -26,26 +25,10 @@ module Rainbows
         }.resume # resume to hit ::Fiber.yield so it waits on a client
       }
       Fiber::Base.const_set(:APP, app)
-      rd = Fiber::RD
-      wr = Fiber::WR
 
       begin
-        ret = begin
-          G.tick
-          IO.select(rd.keys.concat(LISTENERS), wr.keys, nil, timer) or next
-        rescue Errno::EINTR
-          retry
-        rescue Errno::EBADF, TypeError
-          LISTENERS.compact!
-          G.cur > 0 ? retry : break
-        end
-
-        # active writers first, then _all_ readers for keepalive timeout
-        ret[1].concat(rd.keys).each { |c| c.f.resume }
-
-        # accept() is an expensive syscall
-        (ret.first & LISTENERS).each do |l|
-          fib = pool.shift or break
+        schedule do |l|
+          fib = pool.shift or break # let another worker process take it
           io = begin
             l.accept_nonblock
           rescue Errno::EAGAIN, Errno::ECONNABORTED

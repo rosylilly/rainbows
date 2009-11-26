@@ -36,13 +36,13 @@ module Rainbows
 
       # used for reading headers (respecting keepalive_timeout)
       def read_timeout
-        expire = false
+        expire = nil
         begin
           to_io.read_nonblock(16384)
         rescue Errno::EAGAIN
           return if expire && expire < Time.now
           RD[self] = false
-          expire = Time.now + G.kato
+          expire ||= Time.now + G.kato
           ::Fiber.yield
           RD.delete(self)
           retry

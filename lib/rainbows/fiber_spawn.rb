@@ -17,28 +17,10 @@ module Rainbows
       init_worker_process(worker)
       Fiber::Base.const_set(:APP, app)
       limit = worker_connections
-      rd = Rainbows::Fiber::RD
-      wr = Rainbows::Fiber::WR
       fio = Rainbows::Fiber::IO
 
       begin
-        ret = begin
-          IO.select(rd.keys.concat(LISTENERS), wr.keys, nil, timer) or next
-        rescue Errno::EINTR
-          G.tick
-          retry
-        rescue Errno::EBADF, TypeError
-          LISTENERS.compact!
-          G.cur > 0 ? retry : break
-        end
-        G.tick
-
-        # active writers first, then _all_ readers for keepalive timeout
-        ret[1].concat(rd.keys).each { |c| c.f.resume }
-        G.tick
-
-        # accept() is an expensive syscall
-        (ret.first & LISTENERS).each do |l|
+        schedule do |l|
           break if G.cur >= limit
           io = begin
             l.accept_nonblock
@@ -47,10 +29,9 @@ module Rainbows
           end
           ::Fiber.new { process_client(fio.new(io, ::Fiber.current)) }.resume
         end
-        G.tick
       rescue => e
         listen_loop_error(e)
-      end while G.tick || G.cur > 0
+      end while G.alive || G.cur > 0
     end
 
   end
