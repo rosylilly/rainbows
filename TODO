@@ -11,6 +11,8 @@ care about.
 
 * {Packet,Rev,EventMachine}+Fibers
 
+* Neverblock
+
 * {Packet,Rev}ThreadPool
 
 * Rev + callcc - current Rev model with callcc (should work with MBARI)
