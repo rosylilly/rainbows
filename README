@@ -38,8 +38,8 @@ one (per-worker).
   modern Ruby HTTP applications.
 
 * Built on {Unicorn}[http://unicorn.bogomips.org/], inheriting its
-  process/socket management features
-  such as transparent upgrades and Ruby configuration DSL.
+  process/socket management features such as transparent upgrades and
+  Ruby configuration DSL.
 
 * As with Unicorn, it is able to stream large request bodies off the
   socket to the application while the client is still uploading.  Since
@@ -47,8 +47,8 @@ one (per-worker).
   it is with Unicorn.
 
 * Combines heavyweight concurrency (worker processes) with lightweight
-  concurrency (Actors or Threads), allowing CPU/memory/disk to be scaled
-  independently of client connections.  Alternative concurrency models
+  concurrency (Events/Fibers/Actors/Threads), allowing CPU/memory/disk to
+  be scaled independently of client connections.  More concurrency models
   (listed in the TODO) will be supported as we find time for them.
 
 == Applications
