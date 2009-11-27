@@ -1,4 +1,4 @@
-%h2 core features and requirements
+%h2 core features and compatibility
 %br
 %table.comp
   %tr.comp_header
@@ -8,9 +8,6 @@
     %th.r19 Ruby 1.9
     %th.rbx Rubinius
     %th.slow slow clients
-    %th.lib lib compat
-    %th.thr thread-safety
-    %th.reent reentrancy
   %tr.comp_base
     %td.mod Unicorn/Base
     %td.tee Yes
@@ -18,9 +15,6 @@
     %td.r19 Yes
     %td.rbx Yes
     %td.slow No
-    %td.lib Most
-    %td.thr No
-    %td.reent No
   %tr.comp_row
     %td.mod Revactor
     %td.tee Yes
@@ -28,9 +22,6 @@
     %td.r19 Yes
     %td.rbx No
     %td.slow Yes
-    %td.lib Meh
-    %td.thr No
-    %td.reent Yes
   %tr.comp_row
     %td.mod ThreadPool
     %td.tee Yes
@@ -38,9 +29,6 @@
     %td.r19 Yes
     %td.rbx Yes
     %td.slow OK
-    %td.lib Good
-    %td.thr Yes
-    %td.reent No
   %tr.comp_row
     %td.mod Rev
     %td.tee No
@@ -48,9 +36,6 @@
     %td.r19 Yes
     %td.rbx No
     %td.slow Yes
-    %td.lib Good
-    %td.thr No
-    %td.reent No
   %tr.comp_row
     %td.mod ThreadSpawn
     %td.tee Yes
@@ -58,9 +43,6 @@
     %td.r19 Yes
     %td.rbx Yes
     %td.slow OK
-    %td.lib Good
-    %td.thr Yes
-    %td.reent No
   %tr.comp_row
     %td.mod EventMachine
     %td.tee No
@@ -68,9 +50,6 @@
     %td.r19 Yes
     %td.rbx No
     %td.slow Yes
-    %td.lib Good
-    %td.thr No
-    %td.reent No
   %tr.comp_row
     %td.mod RevThreadSpawn
     %td.tee No
@@ -78,9 +57,6 @@
     %td.r19 Yes
     %td.rbx No
     %td.slow Yes
-    %td.lib Good
-    %td.thr Yes
-    %td.reent No
   %tr.comp_row
     %td.mod FiberSpawn
     %td.tee Yes
@@ -88,9 +64,6 @@
     %td.r19 Yes
     %td.rbx Yes
     %td.slow Yes
-    %td.lib Meh
-    %td.thr No
-    %td.reent Yes
   %tr.comp_row
     %td.mod FiberPool
     %td.tee Yes
@@ -98,16 +71,98 @@
     %td.r19 Yes
     %td.rbx Yes
     %td.slow Yes
-    %td.lib Meh
-    %td.thr No
-    %td.reent Yes
-
 %ul
   %li waiting on Rubinius for better signal handling
   %li
     rack.input streaming is what makes
     %a(href="http://upr.bogomips.org/") upload progress,
     BOSH, and Web Sockets possible
+  %li
+    rack.input streaming is NOT compatible with current versions of nginx
+    or any proxy that fully buffers request bodies before proxying.
+    Keep in mind request body buffering in nginx is a good thing in all
+    other cases where rack.input streaming is not needed.
+
+%h2 application requirements
+%br
+%table.comp
+  %tr.comp_header
+    %th.mod module
+    %th.slowio slow I/O (backend, not client)
+    %th.thr thread safety
+    %th.reent single thread reentrant
+  %tr.comp_base
+    %td.mod Unicorn/Base
+    %td.slowio avoid
+    %td.thr No
+    %td.reent No
+  %tr.comp_row
+    %td.mod Revactor
+    %td.slowio
+      %a(href="http://rev.rubyforge.org/")Rev,
+      %a(href="http://revactor.org/")Revactor,
+      %b
+        not
+      %a(href="Rainbows/Fiber/IO.html")Fiber::IO
+    %td.thr No
+    %td.reent Yes
+  %tr.comp_row
+    %td.mod ThreadPool
+    %td.slowio thread-safe Ruby
+    %td.thr Yes
+    %td.reent No
+  %tr.comp_row
+    %td.mod Rev
+    %td.slowio
+      %a(href="http://rev.rubyforge.org/") Rev
+    %td.thr No
+    %td.reent No
+  %tr.comp_row
+    %td.mod ThreadSpawn
+    %td.slowio thread-safe Ruby
+    %td.thr Yes
+    %td.reent No
+  %tr.comp_row
+    %td.mod EventMachine
+    %td.slowio
+      %a(href="http://rubyeventmachine.com") EventMachine
+    %td.thr No
+    %td.reent No
+  %tr.comp_row
+    %td.mod RevThreadSpawn
+    %td.slowio
+      thread-safe Ruby,
+      %a(href="http://rev.rubyforge.org/") Rev
+    %td.thr Yes
+    %td.reent No
+  %tr.comp_row
+    %td.mod FiberSpawn
+    %td.slowio
+      %a(href="Rainbows/Fiber/IO.html") Rainbows::Fiber::IO
+    %td.thr No
+    %td.reent Yes
+  %tr.comp_row
+    %td.mod FiberPool
+    %td.slowio
+      %a(href="Rainbows/Fiber/IO.html") Rainbows::Fiber::IO
+    %td.thr No
+    %td.reent Yes
+
+%ul
+  %li
+    Requirements for single thread reentrancy are loose in that there is
+    no risk of race conditions and potentially mutually exclusive to
+    thread-safety.  In the case where a Fiber yields while holding a
+    resource and another Fiber attempting to acquire it may raise
+    an error or worse, deadlock the entire process.
+  %li
+    Slow I/O means anything that can block/stall on sockets including
+    3rd-party APIs (OpenID providers included) or slow database queries.
+    Properly run Memcached (within the same LAN) is fast and not a blocker.
+    Slow I/O on POSIX filesystems only includes a few operations, namely
+    on UNIX domain sockets and named pipes.  Nearly all other operations
+    on POSIX filesystems can be considered "fast", or at least
+    uninterruptible.
 
 %h2 middlewares and frameworks
 %br
