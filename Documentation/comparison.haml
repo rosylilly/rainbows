@@ -53,7 +53,7 @@
   %tr.comp_row
     %td.mod RevThreadSpawn
     %td.tee No
-    %td.r18 Slow
+    %td.r18 Slow*
     %td.r19 Yes
     %td.rbx No
     %td.slow Yes
@@ -72,7 +72,14 @@
     %td.rbx Yes
     %td.slow Yes
 %ul
-  %li waiting on Rubinius for better signal handling
+  %li
+    RevThreadSpawn + 1.8 performance is being improved, follow
+    the
+    %a(href="http://rubyforge.org/mailman/listinfo/rev-talk")
+      rev-talk mailing list
+    for details.
+  %li
+    waiting on Rubinius for better signal handling
   %li
     rack.input streaming is what makes
     %a(href="http://upr.bogomips.org/") upload progress,
