@@ -4,10 +4,12 @@
 #
 # This is depends on a bunch of GNU-isms from bash, sed, touch.
 
+RSYNC = rsync
 DLEXT := so
 gems := rack-1.0.1
 # gems += unicorn-0.95.1 # installed via setup.rb
-gems += rev-0.3.1 iobuffer-0.1.1
+gems += rev-0.3.1
+gems += iobuffer-0.1.1
 gems += eventmachine-0.12.10
 gems += async_sinatra-0.1.5 sinatra-0.9.4
 
@@ -28,7 +30,11 @@ endif
 ifdef gem_paths
   sp :=
   sp +=
-  export RUBYLIB := $(subst $(sp),:,$(addsuffix /lib,$(gem_paths)))
+  rlib := $(subst $(sp),:,$(addsuffix /lib,$(gem_paths)))
+  ifneq ($(RUBYLIB),)
+    rlib := $(RUBYLIB):$(rlib)
+  endif
+  export RUBYLIB := $(rlib)
 endif
 
 # pipefail is THE reason to use bash (v3+) or never revisions of ksh93
@@ -58,8 +64,8 @@ publish_doc:
 		TZ=UTC xargs touch -d '1970-01-01 00:00:00' doc/rdoc.css
 	$(MAKE) doc_gz
 	chmod 644 $$(find doc -type f)
-	rsync -av doc/ rubyforge.org:/var/www/gforge-projects/rainbows/
-	rsync -av doc/ dcvr:/srv/rainbows/
+	$(RSYNC) -av doc/ rubyforge.org:/var/www/gforge-projects/rainbows/
+	$(RSYNC) -av doc/ dcvr:/srv/rainbows/
 	git ls-files | xargs touch
 
 # Create gzip variants of the same timestamp as the original so nginx
