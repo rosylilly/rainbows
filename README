@@ -128,13 +128,13 @@ You can get the latest source via git from the following locations
 (these versions may not be stable):
 
   git://git.bogomips.org/rainbows.git
-  git://rubyforge.org/rainbows.git (mirror)
+  git://repo.or.cz/rainbows.git (mirror)
 
 You may browse the code from the web and download the latest snapshot
 tarballs here:
 
 * http://git.bogomips.org/cgit/rainbows.git (cgit)
-* http://rainbows.rubyforge.org/git?p=rainbows.git (gitweb)
+* http://repo.or.cz/w/rainbows.git (gitweb)
 
 Inline patches (from "git format-patch") to the mailing list are
 preferred because they allow code review and comments in the reply to
