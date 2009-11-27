@@ -15,8 +15,10 @@ module Rainbows
   # server are handled by the main thread and outside of the core
   # application dispatch.
   #
-  # WARNING: this model does not perform well under 1.8, especially
-  # if your application itself performs heavy I/O
+  # WARNING: this model does not currently perform well under 1.8.  See the
+  # {rev-talk mailing list}[http://rubyforge.org/mailman/listinfo/rev-talk]
+  # for ongoing performance work that will hopefully make it into the
+  # next release of {Rev}[http://rev.rubyforge.org/].
 
   module RevThreadSpawn
 
