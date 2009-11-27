@@ -1,8 +1,10 @@
+# -*- encoding: binary -*-
 module Rainbows
   module Fiber
 
-    # a self-sufficient Queue implmentation for Fiber-based concurrency
-    # models
+    # a self-sufficient Queue implementation for Fiber-based concurrency
+    # models.  This requires no external scheduler, so it may be used with
+    # Revactor as well as FiberSpawn and FiberPool.
     class Queue < Struct.new(:queue, :waiters)
 
       def initialize(queue = [], waiters = [])
