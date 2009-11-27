@@ -4,11 +4,15 @@ all::
 
 pid := $(shell echo $$PPID)
 
-RUBY = $(ruby)
+RUBY = ruby
 rainbows_lib := $(shell cd ../lib && pwd)
 -include ../local.mk
 ifeq ($(RUBY_VERSION),)
   RUBY_VERSION := $(shell $(RUBY) -e 'puts RUBY_VERSION')
+endif
+
+ifeq ($(RUBY_VERSION),)
+  $(error unable to detect RUBY_VERSION)
 endif
 
 ifeq ($(RUBYLIB),)
@@ -20,7 +24,7 @@ export RUBYLIB RUBY_VERSION
 
 models = ThreadPool ThreadSpawn Rev EventMachine
 rp := )
-ONENINE := $(shell case $(RUBY_VERSION) in 1.9.*$(rp); echo true;;esac)
+ONENINE := $(shell case $(RUBY_VERSION) in 1.9.*$(rp) echo true;;esac)
 ifeq ($(ONENINE),true)
   models += Revactor
   models += FiberSpawn
