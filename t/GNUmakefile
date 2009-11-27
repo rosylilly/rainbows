@@ -19,7 +19,9 @@ endif
 export RUBYLIB RUBY_VERSION
 
 models = ThreadPool ThreadSpawn Rev EventMachine
-ifeq ($(RUBY_VERSION),1.9.1) # 1.9.2-preview1 was broken
+rp := )
+ONENINE := $(shell case $(RUBY_VERSION) in 1.9.*$(rp); echo true;;esac)
+ifeq ($(ONENINE),true)
   models += Revactor
   models += FiberSpawn
   models += FiberPool
@@ -43,6 +45,9 @@ t0003-reopen-logs.sh: MODELS = $(all_models)
 
 # this test is not compatible with non-Thread models yet
 t9000-rack-app-pool.sh: MODELS = ThreadPool ThreadSpawn
+ifeq ($(ONENINE),true)
+t9000-rack-app-pool.sh: MODELS += Revactor FiberPool FiberSpawn
+endif
 
 # recursively run per-model tests
 # haven't figured out a good way to make make non-recursive here, yet...
