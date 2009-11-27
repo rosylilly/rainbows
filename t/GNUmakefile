@@ -43,12 +43,6 @@ t0002-graceful.sh: MODELS = $(all_models)
 t0002-parser-error.sh: MODELS = $(all_models)
 t0003-reopen-logs.sh: MODELS = $(all_models)
 
-# this test is not compatible with non-Thread models yet
-t9000-rack-app-pool.sh: MODELS = ThreadPool ThreadSpawn
-ifeq ($(ONENINE),true)
-t9000-rack-app-pool.sh: MODELS += Revactor FiberPool FiberSpawn
-endif
-
 # recursively run per-model tests
 # haven't figured out a good way to make make non-recursive here, yet...
 $(T):
