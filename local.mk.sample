@@ -30,11 +30,7 @@ endif
 ifdef gem_paths
   sp :=
   sp +=
-  rlib := $(subst $(sp),:,$(addsuffix /lib,$(gem_paths)))
-  ifneq ($(RUBYLIB),)
-    rlib := $(RUBYLIB):$(rlib)
-  endif
-  export RUBYLIB := $(rlib)
+  export RUBYLIB := $(subst $(sp),:,$(addsuffix /lib,$(gem_paths)))
 endif
 
 # pipefail is THE reason to use bash (v3+) or never revisions of ksh93
