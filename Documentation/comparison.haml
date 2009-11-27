@@ -240,7 +240,11 @@
     %td.async Rainbows::Fiber{::IO,.sleep}
 
 %ul
-  %li "No!" means it's fundamentally incompatible
+  %li
+    "No!" means it's fundamentally incompatible, use an
+    %a(href="Rainbows/AppPool.html") AppPool
+    %b :size
+    of one instead.
   %li
     Everything that's DevFdResponse-compatible can use it for passing
     async responses through
