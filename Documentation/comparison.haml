@@ -71,6 +71,13 @@
     %td.r19 Yes
     %td.rbx No
     %td.slow Yes
+  %tr.comp_base
+    %td.mod ActorSpawn
+    %td.tee Yes
+    %td.r18 Not yet
+    %td.r19 No
+    %td.rbx Yes
+    %td.slow Yes
 %ul
   %li
     RevThreadSpawn + 1.8 performance is being improved, follow
@@ -153,6 +160,11 @@
     %td.slowio
       %a(href="Rainbows/Fiber/IO.html") Rainbows::Fiber::IO
     %td.thr No
+    %td.reent Yes
+  %tr.comp_base
+    %td.mod ActorSpawn
+    %td.slowio thread-safe Ruby
+    %td.thr Yes
     %td.reent Yes
 
 %ul
@@ -238,6 +250,12 @@
     %td.app_pool Yes
     %td.lock No!
     %td.async Rainbows::Fiber{::IO,.sleep}
+  %tr.comp_row
+    %td.mod ActorSpawn
+    %td.devfd no-op
+    %td.app_pool Yes
+    %td.lock Yes
+    %td.async standard Ruby
 
 %ul
   %li
