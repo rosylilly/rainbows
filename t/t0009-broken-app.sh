@@ -4,8 +4,8 @@
 t_plan 9 "graceful handling of broken apps for $model"
 
 t_begin "setup and start" && {
-	rainbows_setup
-	rainbows -D t0009.ru -c $unicorn_config $model 1
+	rainbows_setup $model 1
+	rainbows -D t0009.ru -c $unicorn_config
 	rainbows_wait_start
 }
 
