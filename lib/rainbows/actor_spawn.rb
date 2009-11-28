@@ -16,6 +16,7 @@ module Rainbows
     # for connections and doesn't die until the parent dies (or is
     # given a INT, QUIT, or TERM signal)
     def worker_loop(worker)
+      Const::RACK_DEFAULTS["rack.multithread"] = true # :(
       init_worker_process(worker)
       limit = worker_connections
       nr = 0
