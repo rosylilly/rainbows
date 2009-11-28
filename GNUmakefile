@@ -1,19 +1,13 @@
 # use GNU Make to run tests in parallel, and without depending on RubyGems
 all::
 RUBY = ruby
-rake = rake
+RAKE = rake
 GIT_URL = git://git.bogomips.org/rainbows.git
 
 GIT-VERSION-FILE: .FORCE-GIT-VERSION-FILE
 	@./GIT-VERSION-GEN
 -include GIT-VERSION-FILE
 -include local.mk
-ifdef ruby
-  ifeq ($(RUBY),ruby)
-    $(warning ruby variable is deprecated, use RUBY instead)
-    RUBY = $(ruby)
-  endif
-endif
 ifeq ($(DLEXT),) # "so" for Linux
   DLEXT := $(shell $(RUBY) -rrbconfig -e 'puts Config::CONFIG["DLEXT"]')
 endif
@@ -61,7 +55,7 @@ manifest: $(pkg_extra) man
 	$(RM) $@+
 
 NEWS: GIT-VERSION-FILE
-	$(rake) -s news_rdoc > $@+
+	$(RAKE) -s news_rdoc > $@+
 	mv $@+ $@
 
 SINCE = 0.5.0
@@ -97,7 +91,7 @@ doc: .document NEWS ChangeLog
 	$(RUBY) -i -p -e \
 	  '$$_.gsub!("</title>",%q{\&$(call atom,$(news_atom))})' \
 	  doc/NEWS.html doc/README.html
-	$(rake) -s news_atom > doc/NEWS.atom.xml
+	$(RAKE) -s news_atom > doc/NEWS.atom.xml
 	cd doc && ln README.html tmp && mv tmp index.html
 	$(MAKE) -C Documentation comparison.html
 	$(RUBY) -i -p -e \
@@ -117,10 +111,10 @@ release_changes := release_changes-$(VERSION)
 release-notes: $(release_notes)
 release-changes: $(release_changes)
 $(release_changes):
-	$(rake) -s release_changes > $@+
+	$(RAKE) -s release_changes > $@+
 	$(VISUAL) $@+ && test -s $@+ && mv $@+ $@
 $(release_notes):
-	GIT_URL=$(GIT_URL) $(rake) -s release_notes > $@+
+	GIT_URL=$(GIT_URL) $(RAKE) -s release_notes > $@+
 	$(VISUAL) $@+ && test -s $@+ && mv $@+ $@
 
 # ensures we're actually on the tagged $(VERSION), only used for release
