@@ -30,6 +30,8 @@ module Rainbows
     # once a client is accepted, it is processed in its entirety here
     # in 3 easy steps: read request, call app, write app response
     def process_client(client)
+      defined?(Fcntl::FD_CLOEXEC) and
+        client.instance_eval { @_io.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC) }
       rd_args = [ nil ]
       remote_addr = if ::Revactor::TCP::Socket === client
         rd_args << RD_ARGS

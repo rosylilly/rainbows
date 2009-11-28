@@ -1,6 +1,7 @@
 # -*- encoding: binary -*-
 require 'unicorn'
 require 'rainbows/error'
+require 'fcntl'
 
 module Rainbows
 
@@ -87,9 +88,18 @@ module Rainbows
   autoload :Fiber, 'rainbows/fiber' # core class
 
   # returns nil if accept fails
-  def self.accept(sock)
-    sock.accept_nonblock
-  rescue Errno::EAGAIN, Errno::ECONNABORTED
+  if defined?(Fcntl::FD_CLOEXEC)
+    def self.accept(sock)
+      rv = sock.accept_nonblock
+      rv.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
+      rv
+    rescue Errno::EAGAIN, Errno::ECONNABORTED
+    end
+  else
+    def self.accept(sock)
+      sock.accept_nonblock
+    rescue Errno::EAGAIN, Errno::ECONNABORTED
+    end
   end
 
 end
