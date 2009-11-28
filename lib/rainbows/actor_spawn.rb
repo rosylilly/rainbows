@@ -25,17 +25,14 @@ module Rainbows
 
       begin
         ret = IO.select(LISTENERS, nil, nil, 1) and ret.first.each do |l|
-          next if lock.synchronize { nr >= limit }
-          begin
-            Actor.spawn(l.accept_nonblock) do |c|
-              lock.synchronize { nr += 1 }
-              begin
-                process_client(c)
-              ensure
-                lock.synchronize { nr -= 1 }
-              end
+          lock.synchronize { nr >= limit } and break sleep(0.01)
+          c = Rainbows.accept(l) and Actor.spawn do
+            lock.synchronize { nr += 1 }
+            begin
+              process_client(c)
+            ensure
+              lock.synchronize { nr -= 1 }
             end
-          rescue Errno::EAGAIN, Errno::ECONNABORTED
           end
         end
       rescue => e

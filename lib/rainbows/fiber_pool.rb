@@ -29,13 +29,11 @@ module Rainbows
       begin
         schedule do |l|
           fib = pool.shift or break # let another worker process take it
-          io = begin
-            l.accept_nonblock
-          rescue Errno::EAGAIN, Errno::ECONNABORTED
+          if io = Rainbows.accept(l)
+            fib.resume(Fiber::IO.new(io, fib))
+          else
             pool << fib
-            next
           end
-          fib.resume(Fiber::IO.new(io, fib))
         end
       rescue => e
         Error.listen_loop(e)

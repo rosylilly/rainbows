@@ -174,12 +174,9 @@ module Rainbows
 
       def notify_readable
         return if CUR.size >= MAX
-        begin
-          io = @io.accept_nonblock
-          sig = EM.attach_fd(io.fileno, false)
-          CUR[sig] = Client.new(sig, io)
-        rescue Errno::EAGAIN, Errno::ECONNABORTED
-        end
+        io = Rainbows.accept(@io) or return
+        sig = EM.attach_fd(io.fileno, false)
+        CUR[sig] = Client.new(sig, io)
       end
     end
 

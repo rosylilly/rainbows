@@ -49,11 +49,8 @@ module Rainbows
             # problem.  On the other hand, a thundering herd may not
             # even incur as much overhead as an extra Mutex#synchronize
             ret = IO.select(LISTENERS, nil, nil, 1) and
-                  ret.first.each do |sock|
-                    begin
-                      process_client(sock.accept_nonblock)
-                    rescue Errno::EAGAIN, Errno::ECONNABORTED
-                    end
+                  ret.first.each do |s|
+                    s = Rainbows.accept(s) and process_client(s)
                   end
           rescue Errno::EINTR
           rescue Errno::EBADF, TypeError

@@ -86,6 +86,12 @@ module Rainbows
   end
   autoload :Fiber, 'rainbows/fiber' # core class
 
+  # returns nil if accept fails
+  def self.accept(sock)
+    sock.accept_nonblock
+  rescue Errno::EAGAIN, Errno::ECONNABORTED
+  end
+
 end
 
 # inject the Rainbows! method into Unicorn::Configurator

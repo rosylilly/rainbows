@@ -37,11 +37,8 @@ module Rainbows
               sleep(0.1) # hope another process took it
               break # back to IO.select
             end
-            c = begin
-              l.accept_nonblock
-            rescue Errno::EAGAIN, Errno::ECONNABORTED
-            end or next
-            threads.add(Thread.new { process_client(c) })
+            c = Rainbows.accept(l) and
+              threads.add(Thread.new { process_client(c) })
           end
       rescue Errno::EINTR
         retry

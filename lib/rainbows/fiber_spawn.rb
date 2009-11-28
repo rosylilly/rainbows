@@ -22,11 +22,7 @@ module Rainbows
       begin
         schedule do |l|
           break if G.cur >= limit
-          io = begin
-            l.accept_nonblock
-          rescue Errno::EAGAIN, Errno::ECONNABORTED
-            next
-          end
+          io = Rainbows.accept(l) or next
           ::Fiber.new { process_client(fio.new(io, ::Fiber.current)) }.resume
         end
       rescue => e

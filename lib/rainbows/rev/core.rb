@@ -14,10 +14,7 @@ module Rainbows
 
       def on_readable
         return if CONN.size >= MAX
-        begin
-          CL.new(@_io.accept_nonblock).attach(LOOP)
-        rescue Errno::EAGAIN, Errno::ECONNABORTED
-        end
+        io = Rainbows.accept(@_io) and CL.new(io).attach(LOOP)
       end
     end # class Server
 
