@@ -80,7 +80,7 @@ check_stderr () {
 	set +u
 	_r_err=${1-${r_err}}
 	set -u
-	if grep Error $_r_err
+	if grep -i Error $_r_err
 	then
 		die "Errors found in $_r_err"
 	elif grep SIGKILL $_r_err
