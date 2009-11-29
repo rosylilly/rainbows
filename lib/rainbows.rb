@@ -21,6 +21,7 @@ module Rainbows
     end
   end
   G = State.new(true, 0, 0, 2)
+  O = {}
 
   require 'rainbows/const'
   require 'rainbows/http_server'

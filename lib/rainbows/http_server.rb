@@ -52,6 +52,14 @@ module Rainbows
       Module === mod or
         raise ArgumentError, "concurrency model #{model.inspect} not supported"
       extend(mod)
+      args.each do |opt|
+        case opt
+        when Hash; O.update(opt)
+        when Symbol; O[opt] = true
+        else; raise ArgumentError, "can't handle option: #{opt.inspect}"
+        end
+      end
+      mod.setup if mod.respond_to?(:setup)
       Const::RACK_DEFAULTS['rainbows.model'] = @use = model.to_sym
       Const::RACK_DEFAULTS['rack.multithread'] = !!(/Thread/ =~ model.to_s)
       case @use
