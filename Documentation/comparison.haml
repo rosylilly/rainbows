@@ -78,6 +78,13 @@
     %td.r19 No
     %td.rbx Yes
     %td.slow Yes
+  %tr.comp_base
+    %td.mod NeverBlock
+    %td.tee No
+    %td.r18 Yes
+    %td.r19 Yes
+    %td.rbx No
+    %td.slow Yes
 %ul
   %li
     RevThreadSpawn + 1.8 performance is being improved, follow
@@ -165,6 +172,13 @@
     %td.mod ActorSpawn
     %td.slowio thread-safe Ruby
     %td.thr Yes
+    %td.reent Yes
+  %tr.comp_base
+    %td.mod NeverBlock
+    %td.slowio
+      %a(href="http://www.espace.com.eg/neverblock") NeverBlock,
+      %a(href="http://rubyeventmachine.com") EventMachine
+    %td.thr No
     %td.reent Yes
 
 %ul
@@ -256,6 +270,12 @@
     %td.app_pool Yes
     %td.lock Yes
     %td.async standard Ruby
+  %tr.comp_row
+    %td.mod NeverBlock
+    %td.devfd Yes
+    %td.app_pool Yes*
+    %td.lock Yes*
+    %td.async NeverBlock, async_sinatra
 
 %ul
   %li
@@ -263,6 +283,15 @@
     %a(href="Rainbows/AppPool.html") AppPool
     %b :size
     of one instead.
+  %li
+    NeverBlock also supports a :pool_size option which is one less
+    layer of complexity than using AppPool.
+  %li
+    NeverBlock can neuter the Mutex class so Rack::Lock effectively
+    becomes a no-op with:
+    %br
+    %code require "never_block/frameworks/rails"
+    (before Rails is loaded)
   %li
     Everything that's DevFdResponse-compatible can use it for passing
     async responses through

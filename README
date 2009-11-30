@@ -21,6 +21,7 @@ For network concurrency, models we currently support are:
 * {RevThreadSpawn}[link:Rainbows/RevThreadSpawn.html]
 * {FiberSpawn}[link:Rainbows/FiberSpawn.html]
 * {FiberPool}[link:Rainbows/FiberPool.html]
+* {NeverBlock}[link:Rainbows/NeverBlock.html]
 
 We have {many more on the way}[link:TODO.html] for handling network
 concurrency.  Additionally, we also use multiple processes (managed by
