@@ -63,7 +63,7 @@ module Rainbows
       Const::RACK_DEFAULTS['rainbows.model'] = @use = model.to_sym
       Const::RACK_DEFAULTS['rack.multithread'] = !!(/Thread/ =~ model.to_s)
       case @use
-      when :Rev, :EventMachine
+      when :Rev, :EventMachine, :NeverBlock
         Const::RACK_DEFAULTS['rainbows.autochunk'] = true
       end
     end

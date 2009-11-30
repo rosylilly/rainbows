@@ -5,7 +5,7 @@
 n=10
 CONFIG_RU=async_sinatra.ru
 case $model in
-EventMachine) ;;
+NeverBlock|EventMachine) ;;
 *)
 	t_info "skipping $T since it's not compatible with $model"
 	exit 0

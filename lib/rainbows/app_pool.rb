@@ -91,7 +91,7 @@ module Rainbows
       # concurrency models
       self.re ||= begin
         case env["rainbows.model"]
-        when :FiberSpawn, :FiberPool, :Revactor
+        when :FiberSpawn, :FiberPool, :Revactor, :NeverBlock
           self.pool = Rainbows::Fiber::Queue.new(pool)
         end
         true

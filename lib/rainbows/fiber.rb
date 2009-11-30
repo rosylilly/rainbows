@@ -1,5 +1,9 @@
 # -*- encoding: binary -*-
-require 'fiber'
+begin
+  require 'fiber'
+rescue LoadError
+  defined?(NeverBlock) or raise
+end
 
 module Rainbows
 

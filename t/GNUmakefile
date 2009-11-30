@@ -22,7 +22,7 @@ else
 endif
 export RUBYLIB RUBY_VERSION
 
-models = ThreadPool ThreadSpawn Rev EventMachine
+models = ThreadPool ThreadSpawn Rev EventMachine NeverBlock
 rp := )
 ONENINE := $(shell case $(RUBY_VERSION) in 1.9.*$(rp) echo true;;esac)
 ifeq ($(ONENINE),true)
@@ -30,7 +30,7 @@ ifeq ($(ONENINE),true)
   models += FiberSpawn
   models += FiberPool
 
-  # technically this works under 1.8, too, it's just slow
+  # technically this works under 1.8, but wait until rev 0.3.2
   models += RevThreadSpawn
 endif
 all_models := $(models) Base
