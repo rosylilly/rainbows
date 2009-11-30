@@ -54,10 +54,16 @@ Gem::Specification.new do |s|
   # s.add_dependency(%q<revactor>, [">= 0.1.5"])
   #
   # Revactor depends on Rev, too, 0.3.0 got the ability to attach IOs
-  # s.add_dependency(%q<rev>, [">= 0.3.0"])
+  # s.add_dependency(%q<rev>, [">= 0.3.1"])
+  #
+  # Rev depends on IOBuffer, which got faster in 0.1.3
+  # s.add_dependency(%q<iobuffer>, [">= 0.1.3"])
   #
   # We use the new EM::attach/watch API in 0.12.10
   # s.add_dependency(%q<eventmachine>, ["~> 0.12.10"])
+  #
+  # NeverBlock, currently only available on http://gems.github.com/
+  # s.add_dependency(%q<espace-neverblock>, ["~> 0.1.6.1"])
 
   # s.licenses = %w(GPLv2 Ruby) # accessor not compatible with older RubyGems
 end
