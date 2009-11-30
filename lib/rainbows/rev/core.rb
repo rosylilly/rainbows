@@ -1,8 +1,6 @@
 # -*- encoding: binary -*-
 require 'rev'
 Rev::VERSION >= '0.3.0' or abort 'rev >= 0.3.0 is required'
-IO::Buffer.respond_to?(:default_node_size=) and
-  IO::Buffer.default_node_size = Rev::IO::INPUT_SIZE
 require 'rainbows/rev/heartbeat'
 
 module Rainbows
