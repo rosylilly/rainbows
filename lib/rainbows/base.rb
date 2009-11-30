@@ -74,7 +74,6 @@ module Rainbows
       until threads.empty? || Time.now >= expire
         threads.delete_if { |thr| thr.alive? ? thr.join(0.01) : true }
       end
-      exit!(0) unless threads.empty?
     end
 
     def self.included(klass)
