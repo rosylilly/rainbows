@@ -190,8 +190,7 @@ module Rainbows
       EM.epoll
       EM.kqueue
       logger.info "EventMachine: epoll=#{EM.epoll?} kqueue=#{EM.kqueue?}"
-      Server.const_set(:MAX, G.server.worker_connections +
-                             HttpServer::LISTENERS.size)
+      Server.const_set(:MAX, worker_connections + LISTENERS.size)
       EvCore.setup(Client)
       EM.run {
         conns = EM.instance_variable_get(:@conns) or
