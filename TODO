@@ -9,9 +9,10 @@ care about.
 
 * EventMachine.spawn - should be like Revactor, maybe?
 
-* {Packet,Rev,EventMachine}+Fibers
+* conditional app.deferred?(env) support
+  Merb uses it, some other servers support it
 
-* {Packet,Rev}ThreadPool
+* {Rev,EventMachine}+Fibers+streaming input
 
 * Rev + callcc - current Rev model with callcc (should work with MBARI)
 
