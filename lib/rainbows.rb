@@ -8,14 +8,16 @@ module Rainbows
   # global vars because class/instance variables are confusing me :<
   # this struct is only accessed inside workers and thus private to each
   # G.cur may not be used in the network concurrency model
-  class State < Struct.new(:alive,:m,:cur,:kato,:server,:tmp)
+  class State < Struct.new(:alive,:m,:cur,:kato,:server,:tmp,:expire)
     def tick
       tmp.chmod(self.m = m == 0 ? 1 : 0)
+      exit!(2) if expire && Time.now >= expire
       alive && server.master_pid == Process.ppid or quit!
     end
 
     def quit!
       self.alive = false
+      self.expire ||= Time.now + (server.timeout * 2.0)
       server.class.const_get(:LISTENERS).map! { |s| s.close rescue nil }
       false
     end

@@ -116,9 +116,7 @@ module Rainbows
         end
       end
 
-      Actor.sleep 1 while G.tick
-      expire = Time.now + timeout * 2.0
-      Actor.sleep 1 while nr > 0 && Time.now < expire
+      Actor.sleep 1 while G.tick || nr > 0
       rescue Errno::EMFILE => e
     end
 

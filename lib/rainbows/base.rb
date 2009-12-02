@@ -70,10 +70,11 @@ module Rainbows
     end
 
     def join_threads(threads)
-      expire = Time.now + (timeout * 2.0)
-      until threads.empty? || Time.now >= expire
-        threads.delete_if { |thr| thr.alive? ? thr.join(0.01) : true }
-      end
+      G.quit!
+      threads.delete_if do |thr|
+        G.tick
+        thr.alive? ? thr.join(0.01) : true
+      end until threads.empty?
     end
 
     def self.included(klass)
