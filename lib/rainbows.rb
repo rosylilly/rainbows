@@ -80,6 +80,7 @@ module Rainbows
     :ThreadPool => 10,
     :Rev => 50,
     :RevThreadSpawn => 50,
+    :RevThreadPool => 50,
     :EventMachine => 50,
     :FiberSpawn => 50,
     :FiberPool => 50,

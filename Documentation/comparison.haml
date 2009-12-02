@@ -85,13 +85,17 @@
     %td.r19 Yes
     %td.rbx No
     %td.slow Yes
+  %tr.comp_row
+    %td.mod RevThreadPool
+    %td.tee No
+    %td.r18 Slow*
+    %td.r19 Yes
+    %td.rbx No
+    %td.slow Yes
 %ul
   %li
-    RevThreadSpawn + 1.8 performance is being improved, follow
-    the
-    %a(href="http://rubyforge.org/mailman/listinfo/rev-talk")
-      rev-talk mailing list
-    for details.
+    RevThread* + 1.8 performance is bad with Rev &lt;= 0.3.1.
+    Rev 0.3.2 (when it is released) should be much faster under 1.8.
   %li
     waiting on Rubinius for better signal handling
   %li
@@ -180,6 +184,13 @@
       %a(href="http://rubyeventmachine.com") EventMachine
     %td.thr No
     %td.reent Yes
+  %tr.comp_row
+    %td.mod RevThreadPool
+    %td.slowio
+      thread-safe Ruby,
+      %a(href="http://rev.rubyforge.org/") Rev
+    %td.thr Yes
+    %td.reent No
 
 %ul
   %li
@@ -276,6 +287,12 @@
     %td.app_pool Yes*
     %td.lock Yes*
     %td.async NeverBlock, async_sinatra
+  %tr.comp_row
+    %td.mod RevThreadPool
+    %td.devfd Yes
+    %td.app_pool Yes
+    %td.lock Dumb
+    %td.async standard Ruby
 
 %ul
   %li

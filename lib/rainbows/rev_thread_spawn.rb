@@ -1,9 +1,5 @@
 # -*- encoding: binary -*-
-require 'rainbows/rev'
-
-RUBY_VERSION =~ %r{\A1\.8} && ::Rev::VERSION < "0.3.2" and
-  warn "Rainbows::RevThreadSpawn + Rev (< 0.3.2)" \
-       " does not work well under Ruby 1.8"
+require 'rainbows/rev/thread'
 
 module Rainbows
 
@@ -15,73 +11,19 @@ module Rainbows
   # server are handled by the main thread and outside of the core
   # application dispatch.
   #
-  # WARNING: this model does not currently perform well under 1.8.  See the
-  # {rev-talk mailing list}[http://rubyforge.org/mailman/listinfo/rev-talk]
-  # for ongoing performance work that will hopefully make it into the
-  # next release of {Rev}[http://rev.rubyforge.org/].
+  # Unlike ThreadSpawn, Rev makes this model highly suitable for
+  # slow clients and applications with medium-to-slow response times
+  # (I/O bound), but less suitable for sleepy applications.
+  #
+  # WARNING: this model does not currently perform well under 1.8 with
+  # Rev 0.3.1.  Rev 0.3.2 should include significant performance
+  # improvements under Ruby 1.8.
 
   module RevThreadSpawn
 
-    class Master < ::Rev::AsyncWatcher
-
-      def initialize
-        super
-        @queue = Queue.new
-      end
-
-      def <<(output)
-        @queue << output
-        signal
-      end
-
-      def on_signal
-        client, response = @queue.pop
-        client.response_write(response)
-      end
-    end
-
-    class Client < Rainbows::Rev::Client
-      DR = Rainbows::Rev::DeferredResponse
-      KATO = Rainbows::Rev::KATO
-
-      def response_write(response)
-        enable
-        alive = @hp.keepalive? && G.alive
-        out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if @hp.headers?
-        DR.write(self, response, out)
-        return quit unless alive && G.alive
-
-        @env.clear
-        @hp.reset
-        @state = :headers
-        # keepalive requests are always body-less, so @input is unchanged
-        if @hp.headers(@env, @buf)
-          @input = HttpRequest::NULL_IO
-          app_call
-        else
-          KATO[self] = Time.now
-        end
-      end
-
-      # fails-safe application dispatch, we absolutely cannot
-      # afford to fail or raise an exception (killing the thread)
-      # here because that could cause a deadlock and we'd leak FDs
-      def app_response
-        begin
-          @env[REMOTE_ADDR] = @remote_addr
-          APP.call(@env.update(RACK_DEFAULTS))
-        rescue => e
-          Error.app(e) # we guarantee this does not raise
-          [ 500, {}, [] ]
-        end
-      end
-
-      def app_call
-        KATO.delete(client = self)
-        disable
-        @env[RACK_INPUT] = @input
-        @input = nil # not sure why, @input seems to get closed otherwise...
-        Thread.new { MASTER << [ client, app_response ] }
+    class Client < Rainbows::Rev::ThreadClient
+      def app_dispatch
+        Thread.new(self) { |client| MASTER << [ client, app_response ] }
       end
     end
 
@@ -89,7 +31,8 @@ module Rainbows
 
     def init_worker_process(worker)
       super
-      Client.const_set(:MASTER, Master.new.attach(::Rev::Loop.default))
+      master = Rev::Master.new(Queue.new).attach(::Rev::Loop.default)
+      Client.const_set(:MASTER, master)
     end
 
   end

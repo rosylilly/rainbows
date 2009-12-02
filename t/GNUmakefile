@@ -32,6 +32,7 @@ ifeq ($(ONENINE),true)
 
   # technically this works under 1.8, but wait until rev 0.3.2
   models += RevThreadSpawn
+  models += RevThreadPool
 endif
 all_models := $(models) Base
 
