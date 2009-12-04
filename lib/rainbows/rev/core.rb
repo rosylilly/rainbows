@@ -7,7 +7,6 @@ module Rainbows
   module Rev
     class Server < ::Rev::IO
       G = Rainbows::G
-      LOOP = ::Rev::Loop.default
       # CL and MAX will be defined in the corresponding worker loop
 
       def on_readable
@@ -25,10 +24,10 @@ module Rainbows
       def worker_loop(worker)
         init_worker_process(worker)
         mod = self.class.const_get(@use)
+        rloop = Server.const_set(:LOOP, ::Rev::Loop.default)
         Server.const_set(:MAX, @worker_connections)
         Server.const_set(:CL, mod.const_get(:Client))
         EvCore.setup(EvCore)
-        rloop = ::Rev::Loop.default
         Heartbeat.new(1, true).attach(rloop)
         LISTENERS.map! { |s| Server.new(s).attach(rloop) }
         rloop.run

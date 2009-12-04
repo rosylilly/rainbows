@@ -10,10 +10,6 @@ module Rainbows
       G = Rainbows::G
       HH = Rack::Utils::HeaderHash
 
-      # we only want to attach to the Rev::Loop belonging to the
-      # main thread in Ruby 1.9
-      LOOP = ::Rev::Loop.default
-
       def self.defer!(client, response, out)
         body = response.last
         headers = HH.new(response[1])
@@ -36,7 +32,9 @@ module Rainbows
             out[0] = CONN_CLOSE
           end
 
-          io = new(io, client, do_chunk, body).attach(LOOP)
+          # we only want to attach to the Rev::Loop belonging to the
+          # main thread in Ruby 1.9
+          io = new(io, client, do_chunk, body).attach(Server::LOOP)
         elsif st.file?
           headers.delete('Transfer-Encoding')
           headers['Content-Length'] ||= st.size.to_s
