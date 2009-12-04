@@ -19,10 +19,11 @@ module Rainbows
 
       def response(e)
         case e
-        when EOFError,Errno::ECONNRESET,Errno::EPIPE,Errno::EINVAL,Errno::EBADF
+        when EOFError, Errno::ECONNRESET,Errno::EPIPE,Errno::EINVAL,Errno::EBADF
           # swallow error if client shuts down one end or disconnects
         when Unicorn::HttpParserError
           Const::ERROR_400_RESPONSE # try to tell the client they're bad
+        when IOError # HttpParserError is an IOError
         else
           app(e)
           Const::ERROR_500_RESPONSE
