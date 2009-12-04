@@ -1,6 +1,6 @@
-% rainbows(1) Unicorn User Manual
-% The Unicorn Community <mongrel-unicorn@rubyforge.org>
-% September 15, 2009
+% rainbows(1) Rainbows! User Manual
+% Rainbows! Hackers <rainbows-talk@rubyforge.org>
+% December 3, 2009
 
 # NAME
 
