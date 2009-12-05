@@ -8,6 +8,9 @@ module Rainbows
     include Rainbows::Const
     G = Rainbows::G
 
+    # Apps may return this Rack response: AsyncResponse = [ -1, {}, [] ]
+    ASYNC_CALLBACK = "async.callback".freeze
+
     def self.setup(klass)
       klass.const_set(:APP, G.server.app)
     end

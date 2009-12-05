@@ -35,9 +35,6 @@ module Rainbows
       include Rainbows::EvCore
       G = Rainbows::G
 
-      # Apps may return this Rack response: AsyncResponse = [ -1, {}, [] ]
-      ASYNC_CALLBACK = 'async.callback'.freeze
-
       def initialize(io)
         @_io = io
       end
