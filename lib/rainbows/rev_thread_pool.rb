@@ -22,7 +22,7 @@ module Rainbows
   module RevThreadPool
 
     DEFAULTS = {
-      :pool_size => 10, # same default size as ThreadPool (w/o Rev)
+      :pool_size => 20, # same default size as ThreadPool (w/o Rev)
     }
 
     def self.setup

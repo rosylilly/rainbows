@@ -77,7 +77,7 @@ module Rainbows
     :Base => 1, # this one can't change
     :Revactor => 50,
     :ThreadSpawn => 30,
-    :ThreadPool => 10,
+    :ThreadPool => 20,
     :Rev => 50,
     :RevThreadSpawn => 50,
     :RevThreadPool => 50,
