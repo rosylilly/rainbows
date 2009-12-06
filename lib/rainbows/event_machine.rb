@@ -173,7 +173,7 @@ module Rainbows
         return if CUR.size >= MAX
         io = Rainbows.accept(@io) or return
         sig = EM.attach_fd(io.fileno, false)
-        CUR[sig] = Client.new(sig, io)
+        CUR[sig] = CL.new(sig, io)
       end
     end
 
@@ -186,16 +186,18 @@ module Rainbows
       # enable them both, should be non-fatal if not supported
       EM.epoll
       EM.kqueue
-      logger.info "EventMachine: epoll=#{EM.epoll?} kqueue=#{EM.kqueue?}"
+      logger.info "#@use: epoll=#{EM.epoll?} kqueue=#{EM.kqueue?}"
+      client_class = Rainbows.const_get(@use).const_get(:Client)
       Server.const_set(:MAX, worker_connections + LISTENERS.size)
-      EvCore.setup(Client)
+      Server.const_set(:CL, client_class)
+      EvCore.setup(client_class)
       EM.run {
         conns = EM.instance_variable_get(:@conns) or
           raise RuntimeError, "EM @conns instance variable not accessible!"
         Server.const_set(:CUR, conns)
         EM.add_periodic_timer(1) do
           unless G.tick
-            conns.each_value { |client| Client === client and client.quit }
+            conns.each_value { |c| client_class === c and c.quit }
             EM.stop if conns.empty? && EM.reactor_running?
           end
         end
