@@ -69,7 +69,6 @@ module Rainbows
         if @hp.trailers(@env, @buf << data)
           @input.rewind
           app_call
-          @input.close if File === @input
         end
       end
       rescue => e
