@@ -34,12 +34,14 @@ module Rainbows
       G.server.extend(Core)
     end
 
-    module Client
-
+    module Core
       def self.setup
-        const_set(:POOL, ::NB::Pool::FiberPool.new(O[:pool_size]))
-        Rainbows.const_get(O[:backend]).const_get(:Client).module_eval do
-          include Rainbows::NeverBlock::Client
+        self.const_set(:POOL, ::NB::Pool::FiberPool.new(O[:pool_size]))
+        base = O[:backend].to_s.gsub!(/([a-z])([A-Z])/, '\1_\2').downcase!
+        require "rainbows/never_block/#{base}"
+        Rainbows::NeverBlock.const_get(:Client).class_eval do
+          self.superclass.const_set(:APP, G.server.app)
+          include Rainbows::NeverBlock::Core
           alias _app_call app_call
           undef_method :app_call
           alias app_call nb_app_call
@@ -60,7 +62,7 @@ module Rainbows
     module Core
       def init_worker_process(worker)
         super
-        Client.setup
+        Core.setup
         logger.info "NeverBlock/#{O[:backend]} pool_size=#{O[:pool_size]}"
       end
     end
