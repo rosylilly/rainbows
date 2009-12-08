@@ -1,10 +1,6 @@
 # -*- encoding: binary -*-
 require 'rainbows/rev'
 
-RUBY_VERSION =~ %r{\A1\.8} && ::Rev::VERSION < "0.3.2" and
-  warn "Rainbows::RevThreadSpawn + Rev (< 0.3.2)" \
-       " does not work well under Ruby 1.8"
-
 module Rainbows
 
   module Rev
