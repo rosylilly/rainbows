@@ -9,6 +9,8 @@ care about.
 
 * EventMachine.spawn - should be like Revactor, maybe?
 
+* EventMachine deferrables
+
 * conditional app.deferred?(env) support
   Merb uses it, some other servers support it
 
