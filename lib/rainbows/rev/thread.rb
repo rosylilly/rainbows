@@ -14,7 +14,6 @@ module Rainbows
         KATO.delete(self)
         disable
         @env[RACK_INPUT] = @input
-        @input = nil # not sure why, @input seems to get closed otherwise...
         app_dispatch # must be implemented by subclass
       end
 
