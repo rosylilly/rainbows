@@ -67,7 +67,7 @@ network concurrency.
 * HTTP server push
 * Long polling
 * Reverse AJAX
-* HTML 5 Web Sockets
+* HTML 5 Web Sockets (maybe)
 * real-time upload processing
 
 \Rainbows can also be used to service slow clients directly even with
