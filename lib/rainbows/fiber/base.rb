@@ -82,6 +82,7 @@ module Rainbows
             buf << (client.read_timeout or return)
           end
 
+          env[CLIENT_IO] = client
           env[RACK_INPUT] = 0 == hp.content_length ?
                     HttpRequest::NULL_IO : TeeInput.new(client, env, hp, buf)
           env[REMOTE_ADDR] = remote_addr

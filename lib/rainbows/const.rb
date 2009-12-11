@@ -19,5 +19,11 @@ module Rainbows
     CONN_ALIVE = "Connection: keep-alive\r\n"
     LOCALHOST = "127.0.0.1"
 
+    # client IO object that supports reading and writing directly
+    # without filtering it through the HTTP chunk parser.
+    # Maybe we can get this renamed to "rack.io" if it becomes part
+    # of the official spec, but for now it is "hack.io"
+    CLIENT_IO = "hack.io".freeze
+
   end
 end

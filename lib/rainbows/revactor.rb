@@ -49,6 +49,7 @@ module Rainbows
           buf << client.read(*rd_args)
         end
 
+        env[Const::CLIENT_IO] = client
         env[Const::RACK_INPUT] = 0 == hp.content_length ?
                  HttpRequest::NULL_IO :
                  Rainbows::Revactor::TeeInput.new(client, env, hp, buf)

@@ -43,6 +43,7 @@ module Rainbows
           buf << client.readpartial(CHUNK_SIZE)
         end
 
+        env[CLIENT_IO] = client
         env[RACK_INPUT] = 0 == hp.content_length ?
                  HttpRequest::NULL_IO :
                  Unicorn::TeeInput.new(client, env, hp, buf)
