@@ -101,7 +101,7 @@
   %li
     rack.input streaming is what makes
     %a(href="http://upr.bogomips.org/") upload progress,
-    BOSH, and Web Sockets possible
+    and BOSH possible
   %li
     rack.input streaming is NOT compatible with current versions of nginx
     or any proxy that fully buffers request bodies before proxying.
@@ -221,78 +221,91 @@
     %th.lock
       %a(href="http://rack.rubyforge.org/doc/Rack/Lock.html") Rack::Lock
     %th.async async
+    %th.ws Web Sockets
   %tr.comp_row
     %td.mod Unicorn/Base
     %td.devfd no-op
     %td.app_pool no-op
     %td.lock no-op
     %td.async lots of RAM :P
+    %td.ws no
   %tr.comp_row
     %td.mod Revactor
     %td.devfd no-op
     %td.app_pool Yes
     %td.lock No!
     %td.async Revactor itself
+    %td.ws Sunshowers
   %tr.comp_row
     %td.mod ThreadPool
     %td.devfd no-op
     %td.app_pool Yes
     %td.lock Yes
     %td.async standard Ruby
+    %td.ws Sunshowers
   %tr.comp_row
     %td.mod Rev
     %td.devfd Yes
     %td.app_pool no-op
     %td.lock no-op
     %td.async DevFdResponse
+    %td.ws no
   %tr.comp_row
     %td.mod ThreadSpawn
     %td.devfd no-op
     %td.app_pool Yes
     %td.lock Yes
     %td.async standard Ruby
+    %td.ws Sunshowers
   %tr.comp_row
     %td.mod EventMachine
     %td.devfd Yes
     %td.app_pool no-op
     %td.lock no-op
     %td.async async_sinatra
+    %td.ws no
   %tr.comp_row
     %td.mod RevThreadSpawn
     %td.devfd Yes
     %td.app_pool Yes
     %td.lock Dumb
     %td.async standard Ruby
+    %td.ws no
   %tr.comp_row
     %td.mod FiberSpawn
     %td.devfd Yes
     %td.app_pool Yes
     %td.lock No!
     %td.async Rainbows::Fiber{::IO,.sleep}
+    %td.ws Sunshowers
   %tr.comp_row
     %td.mod FiberPool
     %td.devfd Yes
     %td.app_pool Yes
     %td.lock No!
     %td.async Rainbows::Fiber{::IO,.sleep}
+    %td.ws Sunshowers
   %tr.comp_row
     %td.mod ActorSpawn
     %td.devfd no-op
     %td.app_pool Yes
     %td.lock Yes
     %td.async standard Ruby
+    %td.ws Sunshowers
   %tr.comp_row
     %td.mod NeverBlock
     %td.devfd Yes
     %td.app_pool Yes*
     %td.lock Yes*
     %td.async NeverBlock, async_sinatra
+    %td.ws no
   %tr.comp_row
     %td.mod RevThreadPool
     %td.devfd Yes
     %td.app_pool Yes
     %td.lock Dumb
     %td.async standard Ruby
+    %td.ws no
 
 %ul
   %li
