@@ -58,6 +58,7 @@ network concurrency.
 
 \Rainbows is mainly designed for the odd things Unicorn sucks at:
 
+* Web Sockets (via {Sunshowers}[http://rainbows.rubyforge.org/sunshowers/])
 * 3rd-party APIs (to services outside your control/LAN)
 * OpenID consumers (to providers outside your control/LAN)
 * Reverse proxy implementations with editing/censoring
@@ -67,8 +68,7 @@ network concurrency.
 * HTTP server push
 * Long polling
 * Reverse AJAX
-* Web Sockets (with {Sunshowers}[http://rainbows.rubyforge.org/sunshowers/))
-* real-time upload processing
+* real-time upload processing (via {upr}[http://upr.bogomips.org/])
 
 \Rainbows can also be used to service slow clients directly even with
 fast applications.
@@ -116,9 +116,10 @@ command-line switch.  \Rainbows! accepts all options found in
 as well as the "\Rainbows!" block, so you can have the following in your
 config file:
 
+    worker_processes 4 # assuming four CPU cores
     Rainbows! do
-      use :Revactor
-      worker_connections 400
+      use :FiberSpawn
+      worker_connections 100
     end
 
 See the {Rainbows! configuration documentation}[link:Rainbows.html#M000001]
