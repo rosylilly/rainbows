@@ -164,8 +164,8 @@ task :fm_update do
   require 'net/netrc'
   require 'json'
   version = ENV['VERSION'] or abort "VERSION= needed"
-  uri = URI.parse('http://freshmeat.net/projects/unicorn/releases.json')
-  rc = Net::Netrc.locate('unicorn-fm') or abort "~/.netrc not found"
+  uri = URI.parse('http://freshmeat.net/projects/rainbows/releases.json')
+  rc = Net::Netrc.locate('rainbows-fm') or abort "~/.netrc not found"
   api_token = rc.password
   changelog = tags.find { |t| t[:tag] == "v#{version}" }[:body]
   tmp = Tempfile.new('fm-changelog')
