@@ -1,6 +1,11 @@
+# -*- encoding: binary -*-
+# :stopdoc:
+# FIXME: fails many tests, experimental
 require 'rainbows/event_machine'
 
 module Rainbows
+
+  # This is currently highly experimental
   module EventMachineDefer
     include Rainbows::EventMachine
 
