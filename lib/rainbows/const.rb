@@ -7,7 +7,7 @@ module Rainbows
 
     include Unicorn::Const
 
-    RACK_DEFAULTS = ::Unicorn::HttpRequest::DEFAULTS.merge({
+    RACK_DEFAULTS = Unicorn::HttpRequest::DEFAULTS.update({
       "SERVER_SOFTWARE" => "Rainbows! #{RAINBOWS_VERSION}",
 
       # using the Rev model, we'll automatically chunk pipe and socket objects
@@ -17,7 +17,7 @@ module Rainbows
 
     CONN_CLOSE = "Connection: close\r\n"
     CONN_ALIVE = "Connection: keep-alive\r\n"
-    LOCALHOST = "127.0.0.1"
+    LOCALHOST = Unicorn::HttpRequest::LOCALHOST
 
     # client IO object that supports reading and writing directly
     # without filtering it through the HTTP chunk parser.
