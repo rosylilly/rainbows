@@ -22,14 +22,24 @@ module Rainbows
         to_io.close
       end
 
+      def wait_readable
+        RD[self] = false
+        ::Fiber.yield
+        RD.delete(self)
+      end
+
+      def wait_writable
+        WR[self] = false
+        ::Fiber.yield
+        WR.delete(self)
+      end
+
       def write(buf)
         begin
           (w = to_io.write_nonblock(buf)) == buf.size and return
           buf = buf[w..-1]
         rescue Errno::EAGAIN
-          WR[self] = false
-          ::Fiber.yield
-          WR.delete(self)
+          wait_writable
           retry
         end while true
       end
@@ -41,10 +51,8 @@ module Rainbows
           to_io.read_nonblock(16384)
         rescue Errno::EAGAIN
           return if expire && expire < Time.now
-          RD[self] = false
           expire ||= Time.now + G.kato
-          ::Fiber.yield
-          RD.delete(self)
+          wait_readable
           retry
         end
       end
@@ -53,9 +61,7 @@ module Rainbows
         begin
           to_io.read_nonblock(length, buf)
         rescue Errno::EAGAIN
-          RD[self] = false
-          ::Fiber.yield
-          RD.delete(self)
+          wait_readable
           retry
         end
       end
