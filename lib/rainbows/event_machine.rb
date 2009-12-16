@@ -190,7 +190,7 @@ module Rainbows
       client_class = Rainbows.const_get(@use).const_get(:Client)
       Server.const_set(:MAX, worker_connections + LISTENERS.size)
       Server.const_set(:CL, client_class)
-      EvCore.setup(client_class)
+      client_class.const_set(:APP, G.server.app)
       EM.run {
         conns = EM.instance_variable_get(:@conns) or
           raise RuntimeError, "EM @conns instance variable not accessible!"

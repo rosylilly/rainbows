@@ -11,10 +11,6 @@ module Rainbows
     # Apps may return this Rack response: AsyncResponse = [ -1, {}, [] ]
     ASYNC_CALLBACK = "async.callback".freeze
 
-    def self.setup(klass)
-      klass.const_set(:APP, G.server.app)
-    end
-
     def post_init
       @remote_addr = ::TCPSocket === @_io ? @_io.peeraddr.last : LOCALHOST
       @env = {}
