@@ -65,14 +65,6 @@ module Rainbows
       client.close
     end
 
-    def join_threads(threads)
-      G.quit!
-      threads.delete_if do |thr|
-        G.tick
-        thr.alive? ? thr.join(0.01) : true
-      end until threads.empty?
-    end
-
     def self.included(klass)
       klass.const_set :LISTENERS, HttpServer::LISTENERS
       klass.const_set :G, Rainbows::G

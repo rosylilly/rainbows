@@ -67,5 +67,13 @@ module Rainbows
       end while G.alive
     end
 
+    def join_threads(threads)
+      G.quit!
+      threads.delete_if do |thr|
+        G.tick
+        thr.alive? ? thr.join(0.01) : true
+      end until threads.empty?
+    end
+
   end
 end
