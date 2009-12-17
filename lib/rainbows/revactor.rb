@@ -68,7 +68,7 @@ module Rainbows
       end while alive and hp.reset.nil? and env.clear
     rescue ::Revactor::TCP::ReadError
     rescue => e
-      handle_error(client, e)
+      Error.write(client.instance_eval { @_io }, e)
     ensure
       client.close
     end
@@ -119,17 +119,6 @@ module Rainbows
 
       Actor.sleep 1 while G.tick || nr > 0
       rescue Errno::EMFILE => e
-    end
-
-    # if we get any error, try to write something back to the client
-    # assuming we haven't closed the socket, but don't get hung up
-    # if the socket is already closed or broken.  We'll always ensure
-    # the socket is closed at the end of this function
-    def handle_error(client, e)
-      # this is Revactor implementation dependent
-      msg = Error.response(e) and
-        client.instance_eval { @_io.write_nonblock(msg) }
-      rescue
     end
 
     def revactorize_listeners

@@ -99,7 +99,7 @@ module Rainbows
           HttpResponse.write(client, response, out)
         end while alive and hp.reset.nil? and env.clear
       rescue => e
-        handle_error(io, e)
+        Error.write(io, e)
       ensure
         G.cur -= 1
         RD.delete(client)

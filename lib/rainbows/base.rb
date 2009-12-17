@@ -10,11 +10,6 @@ module Rainbows
     include Rainbows::Const
     G = Rainbows::G
 
-    def handle_error(client, e)
-      msg = Error.response(e) and client.write_nonblock(msg)
-      rescue
-    end
-
     def init_worker_process(worker)
       super(worker)
       G.tmp = worker.tmp
@@ -65,7 +60,7 @@ module Rainbows
     # if the socket is already closed or broken.  We'll always ensure
     # the socket is closed at the end of this function
     rescue => e
-      handle_error(client, e)
+      Error.write(client, e)
     ensure
       client.close
     end
