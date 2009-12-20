@@ -62,7 +62,7 @@ module Rainbows
     rescue => e
       Error.write(client, e)
     ensure
-      client.close
+      client.close unless client.closed?
     end
 
     def self.included(klass)
