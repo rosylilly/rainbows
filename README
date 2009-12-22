@@ -156,7 +156,7 @@ and we'll try our best to fix it.
 
 == Contact
 
-All feedback (bug reports, user/development dicussion, patches, pull
+All feedback (bug reports, user/development discussion, patches, pull
 requests) go to the mailing list/newsgroup.  Patches must be sent inline
 (git format-patch -M + git send-email).  No subscription is necessary
 to post on the mailing list.  No top posting.  Address replies +To:+
