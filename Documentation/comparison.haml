@@ -92,6 +92,13 @@
     %td.r19 Yes
     %td.rbx No
     %td.slow Yes
+  %tr.comp_row
+    %td.mod RevFiberSpawn
+    %td.tee Yes
+    %td.r18 No
+    %td.r19 Yes
+    %td.rbx No
+    %td.slow Yes
 %ul
   %li
     RevThread* + 1.8 performance is bad with Rev &lt;= 0.3.1.
@@ -191,6 +198,12 @@
       %a(href="http://rev.rubyforge.org/") Rev
     %td.thr Yes
     %td.reent No
+  %tr.comp_row
+    %td.mod RevFiberSpawn
+    %td.slowio
+      %a(href="Rainbows/Fiber/IO.html") Rainbows::Fiber::IO
+    %td.thr No
+    %td.reent Yes
 
 %ul
   %li
@@ -306,6 +319,12 @@
     %td.lock Dumb
     %td.async standard Ruby
     %td.ws no
+  %tr.comp_row
+    %td.mod RevFiberSpawn
+    %td.devfd Yes
+    %td.app_pool Yes
+    %td.lock No!
+    %td.async Rainbows::Fiber::IO, Rainbows::Fiber::Rev.sleep
 
 %ul
   %li
