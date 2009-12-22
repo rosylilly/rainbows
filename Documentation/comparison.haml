@@ -289,14 +289,14 @@
     %td.devfd Yes
     %td.app_pool Yes
     %td.lock No!
-    %td.async Rainbows::Fiber{::IO,.sleep}
+    %td.async Rainbows::Fiber::IO, Rainbows.sleep
     %td.ws Sunshowers
   %tr.comp_row
     %td.mod FiberPool
     %td.devfd Yes
     %td.app_pool Yes
     %td.lock No!
-    %td.async Rainbows::Fiber{::IO,.sleep}
+    %td.async Rainbows::Fiber::IO, Rainbows.sleep
     %td.ws Sunshowers
   %tr.comp_row
     %td.mod ActorSpawn
@@ -324,7 +324,7 @@
     %td.devfd Yes
     %td.app_pool Yes
     %td.lock No!
-    %td.async Rainbows::Fiber::IO, Rainbows::Fiber::Rev.sleep
+    %td.async Rainbows::Fiber::IO, Rainbows.sleep
 
 %ul
   %li

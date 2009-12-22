@@ -16,7 +16,8 @@ module Rainbows
     # puts the current Fiber into uninterruptible sleep for at least
     # +seconds+.  Unlike Kernel#sleep, this it is not possible to sleep
     # indefinitely to be woken up (nobody wants that in a web server,
-    # right?).
+    # right?).  Calling this directly is deprecated, use
+    # Rainbows.sleep(seconds) instead.
     def self.sleep(seconds)
       ZZ[::Fiber.current] = Time.now + seconds
       ::Fiber.yield

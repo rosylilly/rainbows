@@ -108,12 +108,6 @@ module Rainbows::Fiber
         client.close
       end
     end
-
-    # TODO: env["rainbows.sleep"]
-    def self.sleep(seconds)
-      Sleeper.new(seconds)
-    end
-
   end
 
   class IO # see rainbows/fiber/io for original definition

@@ -6,12 +6,7 @@ run lambda { |env|
 
   case env["PATH_INFO"]
   when %r{/sleep/(\d+)}
-    (case env['rainbows.model']
-    when :Revactor
-      Actor
-    else
-      Kernel
-    end).sleep($1.to_i)
+    Rainbows.sleep($1.to_i)
   end
   [ 200, headers, [ "#$$\n" ] ]
 }
