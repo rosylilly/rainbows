@@ -14,6 +14,12 @@ module Rainbows
       super(worker)
       G.tmp = worker.tmp
 
+      # avoid spurious wakeups and blocking-accept() with 1.8 green threads
+      if RUBY_VERSION.to_f < 1.8
+        require "io/nonblock"
+        LISTENERS.each { |l| l.nonblock = true }
+      end
+
       # we're don't use the self-pipe mechanism in the Rainbows! worker
       # since we don't defer reopening logs
       HttpServer::SELF_PIPE.each { |x| x.close }.clear
