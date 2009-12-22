@@ -9,7 +9,7 @@ module Rainbows
   # concurrency provided by Rev.  A "rack.input" is exposed as well
   # being Sunshowers-compatible.  Applications are strongly advised to
   # wrap all slow IO objects (sockets, pipes) using the
-  # Rainbows::Fiber::IO or similar class whenever possible.
+  # Rainbows::Fiber::IO or a Rev-compatible class whenever possible.
   module RevFiberSpawn
 
     include Base
