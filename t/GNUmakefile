@@ -28,6 +28,7 @@ ONENINE := $(shell case $(RUBY_VERSION) in 1.9.*$(rp) echo true;;esac)
 ifeq ($(ONENINE),true)
   models += Revactor
   models += FiberSpawn
+  models += RevFiberSpawn
   models += FiberPool
 
   # technically this works under 1.8, but wait until rev 0.3.2
