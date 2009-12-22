@@ -12,6 +12,8 @@ run lambda { |env|
     Rainbows::Fiber
   when :Revactor
     Actor
+  when :RevFiberSpawn
+    Rainbows::Fiber::Rev
   else
     Kernel
   end).sleep(nr)

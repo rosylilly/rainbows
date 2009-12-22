@@ -8,6 +8,8 @@ class Sleeper
       Rainbows::Fiber
     when :Revactor
       Actor
+    when :RevFiberSpawn
+      Rainbows::Fiber::Rev
     else
       Kernel
     end).sleep(1)

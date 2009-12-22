@@ -39,7 +39,7 @@ module Rainbows
 
         # we need to make sure our pipe output is Fiber-compatible
         case env["rainbows.model"]
-        when :FiberSpawn, :FiberPool
+        when :FiberSpawn, :FiberPool, :RevFiberSpawn
           return [ status, headers.to_hash, Fiber::IO.new(io,::Fiber.current) ]
         end
       else # unlikely, char/block device file, directory, ...
