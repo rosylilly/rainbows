@@ -39,6 +39,21 @@ module Rainbows
     def run(app, options = {})
       HttpServer.new(app, options).start.join
     end
+
+    # returns nil if accept fails
+    if defined?(Fcntl::FD_CLOEXEC)
+      def accept(sock)
+        rv = sock.accept_nonblock
+        rv.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
+        rv
+      rescue Errno::EAGAIN, Errno::ECONNABORTED
+      end
+    else
+      def accept(sock)
+        sock.accept_nonblock
+      rescue Errno::EAGAIN, Errno::ECONNABORTED
+      end
+    end
   end
 
   # configures \Rainbows! with a given concurrency model to +use+ and
@@ -93,21 +108,6 @@ module Rainbows
     autoload model, "rainbows/#{u.downcase!}"
   end
   autoload :Fiber, 'rainbows/fiber' # core class
-
-  # returns nil if accept fails
-  if defined?(Fcntl::FD_CLOEXEC)
-    def self.accept(sock)
-      rv = sock.accept_nonblock
-      rv.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
-      rv
-    rescue Errno::EAGAIN, Errno::ECONNABORTED
-    end
-  else
-    def self.accept(sock)
-      sock.accept_nonblock
-    rescue Errno::EAGAIN, Errno::ECONNABORTED
-    end
-  end
 
 end
 
