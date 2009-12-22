@@ -14,7 +14,11 @@ care about.
 * conditional app.deferred?(env) support
   Merb uses it, some other servers support it
 
-* {Rev,EventMachine}+Fibers+streaming input
+* EventMachine+Fibers+streaming input
+
+* RevFiberPool
+
+* ThreadPoolRevFiber{Spawn,Pool}: just because
 
 * Rev + callcc - current Rev model with callcc (should work with MBARI)
 
