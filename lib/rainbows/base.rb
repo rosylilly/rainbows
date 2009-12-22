@@ -15,7 +15,7 @@ module Rainbows
       G.tmp = worker.tmp
 
       # avoid spurious wakeups and blocking-accept() with 1.8 green threads
-      if RUBY_VERSION.to_f < 1.8
+      if RUBY_VERSION.to_f < 1.9
         require "io/nonblock"
         LISTENERS.each { |l| l.nonblock = true }
       end
