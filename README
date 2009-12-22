@@ -13,6 +13,7 @@ suck; differently.
 
 For network concurrency, models we currently support are:
 
+* {RevFiberSpawn}[link:Rainbows/RevFiberSpawn.html]
 * {Revactor}[link:Rainbows/Revactor.html]
 * {ThreadPool}[link:Rainbows/ThreadPool.html]
 * {Rev}[link:Rainbows/Rev.html]
