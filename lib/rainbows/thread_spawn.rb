@@ -34,8 +34,8 @@ module Rainbows
               # unlikely one.  Since this case is (or should be) uncommon,
               # just busy wait when we have to.
               sleep(0.01)
-            else
-              klass.new(l.accept) do |c|
+            elsif c = Rainbows.sync_accept(l)
+              klass.new(c) do |c|
                 begin
                   lock.synchronize { G.cur += 1 }
                   process_client(c)
@@ -44,7 +44,6 @@ module Rainbows
                 end
               end
             end
-          rescue Errno::EINTR, Errno::ECONNABORTED
           rescue => e
             Error.listen_loop(e)
           end while G.alive

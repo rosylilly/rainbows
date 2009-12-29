@@ -44,8 +44,7 @@ module Rainbows
     def sync_worker
       s = LISTENERS.first
       begin
-        process_client(s.accept)
-      rescue Errno::EINTR, Errno::ECONNABORTED
+        c = Rainbows.sync_accept(s) and process_client(c)
       rescue => e
         Error.listen_loop(e)
       end while G.alive

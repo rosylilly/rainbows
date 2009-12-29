@@ -60,6 +60,13 @@ module Rainbows
 
     # returns nil if accept fails
     if defined?(Fcntl::FD_CLOEXEC)
+      def sync_accept(sock)
+        rv = sock.accept
+        rv.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
+        rv
+      rescue Errno::EAGAIN, Errno::ECONNABORTED, Errno::EINTR
+      end
+
       def accept(sock)
         rv = sock.accept_nonblock
         rv.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
@@ -67,6 +74,11 @@ module Rainbows
       rescue Errno::EAGAIN, Errno::ECONNABORTED
       end
     else
+      def sync_accept(sock)
+        sock.accept
+      rescue Errno::EAGAIN, Errno::ECONNABORTED, Errno::EINTR
+      end
+
       def accept(sock)
         sock.accept_nonblock
       rescue Errno::EAGAIN, Errno::ECONNABORTED
