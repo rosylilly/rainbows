@@ -3,13 +3,14 @@
 We're lazy and pick the easy items to do first, then the ones people
 care about.
 
+* Split out NeverBlock into NeverBlockEventMachine and NeverBlockReactor
+  NeverBlock will default to one of them (depending on NB upstream).
+
 * Improve test suite coverage.  We won't waste cycles with puny
   unit tests, only integration tests that exercise externally
   visible parts.
 
 * EventMachine.spawn - should be like Revactor, maybe?
-
-* EventMachine deferrables
 
 * conditional app.deferred?(env) support
   Merb uses it, some other servers support it
