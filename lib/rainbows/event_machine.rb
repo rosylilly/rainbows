@@ -37,6 +37,7 @@ module Rainbows
 
       def initialize(io)
         @_io = io
+        @body = nil
       end
 
       alias write send_data
@@ -53,6 +54,9 @@ module Rainbows
           @env[RACK_INPUT] = @input
           @env[REMOTE_ADDR] = @remote_addr
           @env[ASYNC_CALLBACK] = method(:response_write)
+
+          # we're not sure if anybody uses this, but Thin sets it, too
+          @env[ASYNC_CLOSE] = EM::DefaultDeferrable.new
 
           response = catch(:async) { APP.call(@env.update(RACK_DEFAULTS)) }
 
@@ -77,9 +81,14 @@ module Rainbows
         end while true
       end
 
-      def response_write(response, out = [], alive = false)
-        body = response.last
-        unless body.respond_to?(:to_path)
+      def response_write(response, out = [ CONN_CLOSE ], alive = false)
+        @body = body = response.last
+        if body.respond_to?(:errback) && body.respond_to?(:callback)
+          body.callback { quit }
+          body.errback { quit }
+          HttpResponse.write(self, response, out)
+          return
+        elsif ! body.respond_to?(:to_path)
           HttpResponse.write(self, response, out)
           quit unless alive
           return
@@ -120,6 +129,8 @@ module Rainbows
       end
 
       def unbind
+        async_close = @env[ASYNC_CLOSE] and async_close.succeed
+        @body.respond_to?(:fail) and @body.fail
         @_io.close
       end
     end
