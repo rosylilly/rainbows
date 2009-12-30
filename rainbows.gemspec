@@ -41,7 +41,7 @@ Gem::Specification.new do |s|
   s.test_files = test_files
 
   # we need Unicorn for the HTTP parser and process management
-  s.add_dependency(%q<unicorn>, ["~> 0.95.0", "<= 1.0.0"])
+  s.add_dependency(%q<unicorn>, ["~> 0.95.0", "< 0.97.0"])
 
   # Unicorn already depends on Rack
   # s.add_dependency(%q<rack>)
