@@ -41,7 +41,7 @@ opts = OptionParser.new("", 24, '  ') do |opts|
     require library
   end
 
-  opts.separator "Unicorn options:"
+  opts.separator "Rainbows!/Unicorn options:"
 
   # some of these switches exist for rackup command-line compatibility,
 
@@ -57,8 +57,8 @@ opts = OptionParser.new("", 24, '  ') do |opts|
     set_listener = true
   end
 
-  opts.on("-E", "--env ENVIRONMENT",
-          "use ENVIRONMENT for defaults (default: development)") do |e|
+  opts.on("-E", "--env RACK_ENV",
+          "use RACK_ENV for defaults (default: development)") do |e|
     ENV["RACK_ENV"] = e
   end
 
@@ -67,8 +67,8 @@ opts = OptionParser.new("", 24, '  ') do |opts|
   end
 
   opts.on("-P", "--pid FILE", "DEPRECATED") do |f|
-    warn %q{Use of --pid/-P is strongly discouraged}
-    warn %q{Use the 'pid' directive in the Unicorn config file instead}
+    warn "Use of --pid/-P is strongly discouraged"
+    warn "Use the 'pid' directive in the Rainbows!/Unicorn config file instead"
     options[:pid] = f
   end
 
@@ -77,7 +77,7 @@ opts = OptionParser.new("", 24, '  ') do |opts|
     warn "-s/--server only exists for compatibility with rackup"
   end
 
-  # Unicorn-specific stuff
+  # Rainbows!/Unicorn-specific stuff
   opts.on("-l", "--listen {HOST:PORT|PATH}",
           "listen on HOST:PORT or PATH",
           "this may be specified multiple times",
@@ -85,7 +85,8 @@ opts = OptionParser.new("", 24, '  ') do |opts|
     listeners << address
   end
 
-  opts.on("-c", "--config-file FILE", "Unicorn-specific config file") do |f|
+  opts.on("-c", "--config-file FILE",
+          "Rainbows!/Unicorn-specific config file") do |f|
     options[:config_file] = f
   end
 
@@ -102,7 +103,7 @@ opts = OptionParser.new("", 24, '  ') do |opts|
   end
 
   opts.on_tail("-v", "--version", "Show version") do
-    puts "unicorn v#{Unicorn::Const::UNICORN_VERSION}"
+    puts "Rainbows! v#{Rainbows::Const::RAINBOWS_VERSION}"
     exit
   end
 
