@@ -53,7 +53,7 @@ Gem::Specification.new do |s|
   # s.add_dependency(%q<revactor>, [">= 0.1.5"])
   #
   # Revactor depends on Rev, too, 0.3.0 got the ability to attach IOs
-  # s.add_dependency(%q<rev>, [">= 0.3.1"])
+  # s.add_dependency(%q<rev>, [">= 0.3.2"])
   #
   # Rev depends on IOBuffer, which got faster in 0.1.3
   # s.add_dependency(%q<iobuffer>, [">= 0.1.3"])

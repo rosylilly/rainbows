@@ -53,7 +53,7 @@
   %tr.comp_row
     %td.mod RevThreadSpawn
     %td.tee No
-    %td.r18 Slow*
+    %td.r18 Yes
     %td.r19 Yes
     %td.rbx No
     %td.slow Yes
@@ -88,7 +88,7 @@
   %tr.comp_row
     %td.mod RevThreadPool
     %td.tee No
-    %td.r18 Slow*
+    %td.r18 Yes
     %td.r19 Yes
     %td.rbx No
     %td.slow Yes
@@ -101,8 +101,7 @@
     %td.slow Yes
 %ul
   %li
-    RevThread* + 1.8 performance is bad with Rev &lt;= 0.3.1.
-    Rev 0.3.2 (when it is released) should be much faster under 1.8.
+    RevThread* + 1.8 requires Rev &gt;= 0.3.2 for reasonable performance
   %li
     waiting on Rubinius for better signal handling
   %li
