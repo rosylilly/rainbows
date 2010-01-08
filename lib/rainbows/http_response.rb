@@ -16,7 +16,8 @@ module Rainbows
           next if %r{\AX-Rainbows-}i =~ key
           next if SKIP.include?(key.downcase)
           if value =~ /\n/
-            out.concat(value.split(/\n/).map! { |v| "#{key}: #{v}\r\n" })
+            # avoiding blank, key-only cookies with /\n+/
+            out.concat(value.split(/\n+/).map! { |v| "#{key}: #{v}\r\n" })
           else
             out << "#{key}: #{value}\r\n"
           end
