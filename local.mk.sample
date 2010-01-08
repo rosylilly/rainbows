@@ -6,7 +6,7 @@
 
 RSYNC = rsync
 DLEXT := so
-gems := rack-1.0.1
+gems := rack-1.1.0
 # gems += unicorn-0.96.0 # installed via setup.rb
 gems += rev-0.3.2
 gems += iobuffer-0.1.3
