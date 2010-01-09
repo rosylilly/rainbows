@@ -14,6 +14,17 @@ gems += eventmachine-0.12.10
 gems += async_sinatra-0.1.5 sinatra-0.9.4
 gems += espace-neverblock-0.1.6.1
 
+# Cramp isn't enabled by default since it depends on several prerelease gems
+ifdef CRAMP
+  gems += cramp-0.7
+  gems += activesupport-3.0.pre
+  gems += activemodel-3.0.pre
+  gems += arel-0.2.pre
+  gems += usher-0.6.2
+  gems += fuzzyhash-0.0.11
+  gems += mysqlplus-0.1.1
+endif
+
 # Avoid loading rubygems to speed up tests because gmake is
 # fork+exec heavy with Ruby.
 prefix = $(HOME)
