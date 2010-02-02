@@ -1,4 +1,5 @@
 # -*- encoding: binary -*-
+autoload :Gem, 'rubygems'
 
 # most tasks are in the GNUmakefile which offers better parallelism
 
@@ -89,8 +90,6 @@ end
 
 desc "print release notes for Rubyforge"
 task :release_notes do
-  require 'rubygems'
-
   spec = Gem::Specification.load('rainbows.gemspec')
   puts spec.description.strip
   puts ""
@@ -121,7 +120,6 @@ end
 
 desc "post to RAA"
 task :raa_update do
-  require 'rubygems'
   require 'net/http'
   require 'net/netrc'
   rc = Net::Netrc.locate('rainbows-raa') or abort "~/.netrc not found"
