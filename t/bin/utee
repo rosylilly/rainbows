@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
+# -*- encoding: binary -*-
 # tee(1) as distributed on most(all?) systems is buffered in luserspace
 # this only does unbuffered writes (with line-buffered input) to make
 # test output appear in real-time
-# -*- encoding: binary -*-
 $stdin.binmode
 $stdout.binmode
 fp = File.open(ARGV.shift, "wb")

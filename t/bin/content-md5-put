@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
+# -*- encoding: binary -*-
 # simple chunked HTTP PUT request generator (and just that),
 # it reads stdin and writes to stdout so socat can write to a
 # UNIX or TCP socket (or to another filter or file) along with
 # a Content-MD5 trailer.
-# -*- encoding: binary -*-
 require 'digest/md5'
 $stdout.sync = $stderr.sync = true
 $stdout.binmode
