@@ -31,6 +31,11 @@ module Rainbows
     # all connected clients
     CONN = {}
 
+    if {}.respond_to?(:compare_by_identity)
+      CONN.compare_by_identity
+      KATO.compare_by_identity
+    end
+
     include Core
   end
 end

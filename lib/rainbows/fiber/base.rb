@@ -5,13 +5,13 @@ module Rainbows
   module Fiber
 
     # blocked readers (key: Rainbows::Fiber::IO object, value is irrelevant)
-    RD = {}
+    RD = {}.compare_by_identity
 
     # blocked writers (key: Rainbows::Fiber::IO object, value is irrelevant)
-    WR = {}
+    WR = {}.compare_by_identity
 
     # sleeping fibers go here (key: Fiber object, value: wakeup time)
-    ZZ = {}
+    ZZ = {}.compare_by_identity
 
     # puts the current Fiber into uninterruptible sleep for at least
     # +seconds+.  Unlike Kernel#sleep, this it is not possible to sleep
