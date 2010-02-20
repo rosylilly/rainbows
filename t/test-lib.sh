@@ -99,7 +99,7 @@ pid "$pid"
 stderr_path "$r_err"
 stdout_path "$r_out"
 
-before_fork do |server, worker|
+after_fork do |server, worker|
   # test script will block while reading from $fifo,
   # so notify the script on the first worker we spawn
   # by opening the FIFO
