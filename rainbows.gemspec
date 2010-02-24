@@ -43,7 +43,7 @@ Gem::Specification.new do |s|
   # we need Unicorn for the HTTP parser and process management
   # The HTTP parser in Unicorn < 0.96.1 did not use the Ruby
   # API correctly and resulted in a memory leak
-  s.add_dependency(%q<unicorn>, ["~> 0.96.1", "< 0.97.0"])
+  s.add_dependency(%q<unicorn>, ["~> 0.97.0"])
 
   # Unicorn already depends on Rack
   # s.add_dependency(%q<rack>)

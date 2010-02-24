@@ -122,37 +122,7 @@ end
 
 require 'pp' if $DEBUG
 
-app = lambda do ||
-  # require Rack as late as possible in case $LOAD_PATH is modified
-  # in config.ru or command-line
-  inner_app = case config
-  when /\.ru$/
-    raw = File.open(config, "rb") { |fp| fp.sysread(fp.stat.size) }
-    raw.sub!(/^__END__\n.*/, '')
-    eval("Rack::Builder.new {(#{raw}\n)}.to_app", nil, config)
-  else
-    require config
-    Object.const_get(File.basename(config, '.rb').capitalize)
-  end
-  pp({ :inner_app => inner_app }) if $DEBUG
-  case ENV["RACK_ENV"]
-  when "development"
-    Rack::Builder.new do
-      use Rack::CommonLogger, $stderr
-      use Rack::ShowExceptions
-      use Rack::Lint
-      run inner_app
-    end.to_app
-  when "deployment"
-    Rack::Builder.new do
-      use Rack::CommonLogger, $stderr
-      run inner_app
-    end.to_app
-  else
-    inner_app
-  end
-end
-
+app = Unicorn.builder(config)
 listeners << "#{host}:#{port}" if set_listener
 
 if $DEBUG
@@ -163,5 +133,5 @@ if $DEBUG
   })
 end
 
-Unicorn::Launcher.daemonize! if daemonize
+Unicorn::Launcher.daemonize!(options) if daemonize
 Rainbows.run(app, options)
