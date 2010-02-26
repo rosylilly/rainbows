@@ -19,7 +19,9 @@ module Rainbows
       end
 
       def close
-        to_io.close
+        RD.delete(self)
+        WR.delete(self)
+        to_io.close unless to_io.closed?
       end
 
       def wait_readable

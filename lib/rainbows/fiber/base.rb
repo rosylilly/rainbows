@@ -103,10 +103,8 @@ module Rainbows
         Error.write(io, e)
       ensure
         G.cur -= 1
-        RD.delete(client)
-        WR.delete(client)
         ZZ.delete(client.f)
-        io.close unless io.closed?
+        client.close
       end
 
     end
