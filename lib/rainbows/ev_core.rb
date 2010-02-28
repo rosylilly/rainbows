@@ -50,7 +50,7 @@ module Rainbows
             @env.delete(HTTP_EXPECT)
           end
           @input = len && len <= MAX_BODY ? StringIO.new("") : Util.tmpio
-          @hp.filter_body(@buf2 = @buf.dup, @buf)
+          @hp.filter_body(@buf2 = "", @buf)
           @input << @buf2
           on_read("")
         end
