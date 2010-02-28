@@ -31,8 +31,7 @@ module Rainbows
     # in 3 easy steps: read request, call app, write app response
     def process_client(client)
       io = client.instance_variable_get(:@_io)
-      defined?(Fcntl::FD_CLOEXEC) and
-        io.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
+      io.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
       rd_args = [ nil ]
       remote_addr = if ::Revactor::TCP::Socket === client
         rd_args << RD_ARGS
