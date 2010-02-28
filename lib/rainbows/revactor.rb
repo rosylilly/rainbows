@@ -30,8 +30,9 @@ module Rainbows
     # once a client is accepted, it is processed in its entirety here
     # in 3 easy steps: read request, call app, write app response
     def process_client(client)
+      io = client.instance_variable_get(:@_io)
       defined?(Fcntl::FD_CLOEXEC) and
-        client.instance_eval { @_io.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC) }
+        io.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
       rd_args = [ nil ]
       remote_addr = if ::Revactor::TCP::Socket === client
         rd_args << RD_ARGS
@@ -68,7 +69,7 @@ module Rainbows
       end while alive and hp.reset.nil? and env.clear
     rescue ::Revactor::TCP::ReadError
     rescue => e
-      Error.write(client.instance_eval { @_io }, e)
+      Error.write(io, e)
     ensure
       client.close
     end
@@ -86,7 +87,7 @@ module Rainbows
       revactorize_listeners.each do |l, close, accept|
         Actor.spawn(l, close, accept) do |l, close, accept|
           Actor.current.trap_exit = true
-          l.controller = l.instance_eval { @receiver = Actor.current }
+          l.controller = l.instance_variable_set(:@receiver, Actor.current)
           begin
             while nr >= limit
               l.disable if l.enabled?
