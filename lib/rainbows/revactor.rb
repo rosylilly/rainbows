@@ -118,7 +118,8 @@ module Rainbows
       end
 
       Actor.sleep 1 while G.tick || nr > 0
-      rescue Errno::EMFILE => e
+      rescue Errno::EMFILE
+        # ignore, let another worker process take it
     end
 
     def revactorize_listeners
