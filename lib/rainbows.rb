@@ -22,7 +22,7 @@ module Rainbows
       false
     end
   end
-  G = State.new(true, 0, 0, 2)
+  G = State.new(true, 0, 0, 5)
   O = {}
 
   require 'rainbows/const'
