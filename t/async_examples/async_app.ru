@@ -89,16 +89,16 @@ class AsyncApp
     # Get the headers out there asap, let the client know we're alive...
     EventMachine::next_tick { env['async.callback'].call [200, {'Content-Type' => 'text/plain'}, body] }
 
-    # Semi-emulate a long db request, instead of a timer, in reality we'd be
-    # waiting for the response data. Whilst this happens, other connections
+    # Semi-emulate a long db request, instead of a timer, in reality we'd be
+    # waiting for the response data. Whilst this happens, other connections
     # can be serviced.
     # This could be any callback based thing though, a deferrable waiting on
-    # IO data, a db request, an http request, an smtp send, whatever.
+    # IO data, a db request, an http request, an smtp send, whatever.
     EventMachine::add_timer(1) {
       body.call ["Woah, async!\n"]
 
       EventMachine::next_tick {
-        # This could actually happen any time, you could spawn off to new
+        # This could actually happen any time, you could spawn off to new
         # threads, pause as a good looking lady walks by, whatever.
         # Just shows off how we can defer chunks of data in the body, you can
         # even call this many times.
@@ -116,11 +116,11 @@ end
 
 # The additions to env for async.connection and async.callback absolutely
 # destroy the speed of the request if Lint is doing it's checks on env.
-# It is also important to note that an async response will not pass through
-# any further middleware, as the async response notification has been passed
-# right up to the webserver, and the callback goes directly there too.
+# It is also important to note that an async response will not pass through
+# any further middleware, as the async response notification has been passed
+# right up to the webserver, and the callback goes directly there too.
 # Middleware could possibly catch :async, and also provide a different
-# async.connection and async.callback.
+# async.connection and async.callback.
 
 # use Rack::Lint
 run AsyncApp.new
