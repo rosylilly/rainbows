@@ -12,7 +12,7 @@ gems += rev-0.3.2
 gems += iobuffer-0.1.3
 gems += eventmachine-0.12.10
 gems += async_sinatra-0.1.5 sinatra-0.9.4
-gems += espace-neverblock-0.1.6.1
+gems += neverblock-0.1.6.2
 
 # Cramp isn't enabled by default since it depends on several prerelease gems
 ifdef CRAMP
