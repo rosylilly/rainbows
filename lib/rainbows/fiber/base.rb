@@ -57,15 +57,17 @@ module Rainbows
       def schedule_sleepers
         max = nil
         now = Time.now
+        fibs = []
         ZZ.delete_if { |fib, time|
           if now >= time
-            fib.resume
+            fibs << fib
             now = Time.now
           else
             max = time
             false
           end
         }
+        fibs.each { |fib| fib.resume }
         max.nil? || max > (now + 1) ? 1 : max - now
       end
 
@@ -76,7 +78,7 @@ module Rainbows
         hp = HttpParser.new
         env = {}
         alive = true
-        remote_addr = TCPSocket === io ? io.peeraddr.last : LOCALHOST
+        remote_addr = Rainbows.addr(io)
 
         begin # loop
           while ! hp.headers(env, buf)
