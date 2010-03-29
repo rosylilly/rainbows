@@ -80,7 +80,7 @@ module Rainbows::Fiber
         hp = HttpParser.new
         env = {}
         alive = true
-        remote_addr = TCPSocket === io ? io.peeraddr.last : LOCALHOST
+        remote_addr = Rainbows.addr(io)
 
         begin # loop
           buf << (client.read_timeout or return) until hp.headers(env, buf)

@@ -17,7 +17,6 @@ module Rainbows
 
     CONN_CLOSE = "Connection: close\r\n"
     CONN_ALIVE = "Connection: keep-alive\r\n"
-    LOCALHOST = Unicorn::HttpRequest::LOCALHOST
 
     # client IO object that supports reading and writing directly
     # without filtering it through the HTTP chunk parser.

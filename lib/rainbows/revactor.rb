@@ -37,7 +37,7 @@ module Rainbows
         rd_args << RD_ARGS
         client.remote_addr
       else
-        LOCALHOST
+        Unicorn::HttpRequest::LOCALHOST
       end
       buf = client.read(*rd_args)
       hp = HttpParser.new

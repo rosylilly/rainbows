@@ -36,7 +36,7 @@ module Rainbows
       hp = HttpParser.new
       env = {}
       alive = true
-      remote_addr = TCPSocket === client ? client.peeraddr.last : LOCALHOST
+      remote_addr = Rainbows.addr(client)
 
       begin # loop
         while ! hp.headers(env, buf)

@@ -14,7 +14,7 @@ module Rainbows
     ASYNC_CLOSE = "async.close".freeze
 
     def post_init
-      @remote_addr = ::TCPSocket === @_io ? @_io.peeraddr.last : LOCALHOST
+      @remote_addr = Rainbows.addr(@_io)
       @env = {}
       @hp = HttpParser.new
       @state = :headers # [ :body [ :trailers ] ] :app_call :close

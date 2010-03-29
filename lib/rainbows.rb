@@ -73,6 +73,13 @@ module Rainbows
       rv
     rescue Errno::EAGAIN, Errno::ECONNABORTED
     end
+
+    # returns a string representing the address of the given client +io+
+    # For local UNIX domain sockets, this will return a string referred
+    # to by the (non-frozen) Unicorn::HttpRequest::LOCALHOST constant.
+    def addr(io)
+      TCPSocket == io ? io.peeraddr.last : Unicorn::HttpRequest::LOCALHOST
+    end
   end
 
   # configures \Rainbows! with a given concurrency model to +use+ and
