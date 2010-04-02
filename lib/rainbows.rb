@@ -78,7 +78,8 @@ module Rainbows
     # For local UNIX domain sockets, this will return a string referred
     # to by the (non-frozen) Unicorn::HttpRequest::LOCALHOST constant.
     def addr(io)
-      TCPSocket == io ? io.peeraddr.last : Unicorn::HttpRequest::LOCALHOST
+      io.respond_to?(:peeraddr) ?
+                        io.peeraddr.last : Unicorn::HttpRequest::LOCALHOST
     end
   end
 
