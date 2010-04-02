@@ -1,5 +1,4 @@
 # -*- encoding: binary -*-
-require 'rainbows'
 module Rainbows
 
   class HttpServer < ::Unicorn::HttpServer

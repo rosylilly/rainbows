@@ -1,6 +1,5 @@
 # -*- encoding: binary -*-
 require 'time'
-require 'rainbows'
 
 module Rainbows
 
