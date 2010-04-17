@@ -29,8 +29,29 @@ module Rainbows
       logger.info "Rainbows! #@use worker_connections=#@worker_connections"
     end
 
+    if IO.respond_to?(:copy_stream)
+      def write_body(client, body)
+        if body.respond_to?(:to_path)
+          io = body.respond_to?(:to_io) ? body.to_io : body.to_path
+          IO.copy_stream(io, client)
+        else
+          body.each { |chunk| client.write(chunk) }
+        end
+        ensure
+          body.respond_to?(:close) and body.close
+      end
+    else
+      def write_body(client, body)
+        body.each { |chunk| client.write(chunk) }
+        ensure
+          body.respond_to?(:close) and body.close
+      end
+    end
+
     # once a client is accepted, it is processed in its entirety here
     # in 3 easy steps: read request, call app, write app response
+    # this is used by synchronous concurrency models
+    #   Base, ThreadSpawn, ThreadPool
     def process_client(client)
       buf = client.readpartial(CHUNK_SIZE) # accept filters protect us here
       hp = HttpParser.new
@@ -49,17 +70,20 @@ module Rainbows
                  HttpRequest::NULL_IO :
                  Unicorn::TeeInput.new(client, env, hp, buf)
         env[REMOTE_ADDR] = remote_addr
-        response = app.call(env.update(RACK_DEFAULTS))
+        status, headers, body = app.call(env.update(RACK_DEFAULTS))
 
-        if 100 == response.first.to_i
+        if 100 == status
           client.write(EXPECT_100_RESPONSE)
           env.delete(HTTP_EXPECT)
-          response = app.call(env)
+          status, headers, body = app.call(env)
         end
 
         alive = hp.keepalive? && G.alive
-        out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if hp.headers?
-        HttpResponse.write(client, response, out)
+        if hp.headers?
+          out = [ alive ? CONN_ALIVE : CONN_CLOSE ]
+          client.write(HttpResponse.header_string(status, headers, out))
+        end
+        write_body(client, body)
       end while alive and hp.reset.nil? and env.clear
     # if we get any error, try to write something back to the client
     # assuming we haven't closed the socket, but don't get hung up
