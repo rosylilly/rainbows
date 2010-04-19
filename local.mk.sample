@@ -6,38 +6,27 @@
 
 RSYNC = rsync
 DLEXT := so
-gems := rack-1.1.0
-# gems += unicorn-0.96.0 # installed via setup.rb
-gems += rev-0.3.2
-gems += iobuffer-0.1.3
-gems += eventmachine-0.12.10
-gems += async_sinatra-0.1.5 sinatra-0.9.4
-gems += neverblock-0.1.6.2
-
-# Cramp isn't enabled by default since it depends on several prerelease gems
-ifdef CRAMP
-  gems += cramp-0.7
-  gems += activesupport-3.0.pre
-  gems += activemodel-3.0.pre
-  gems += arel-0.2.pre
-  gems += usher-0.6.2
-  gems += fuzzyhash-0.0.11
-  gems += mysqlplus-0.1.1
-endif
 
 # Avoid loading rubygems to speed up tests because gmake is
 # fork+exec heavy with Ruby.
 prefix = $(HOME)
+
 ifeq ($(r19),)
   RUBY := $(prefix)/bin/ruby
-  gem_paths := $(addprefix $(prefix)/lib/ruby/gems/1.8/gems/,$(gems))
 else
   prefix := $(prefix)/ruby-1.9
   export PATH := $(prefix)/bin:$(PATH)
   RUBY := $(prefix)/bin/ruby --disable-gems
-  gems += case-0.5 revactor-0.1.5
-  gem_paths := $(addprefix $(prefix)/lib/ruby/gems/1.9.1/gems/,$(gems))
 endif
+
+ifndef NO_ISOLATE
+  x := $(shell test -d t/ && NO_ISOLATE=T $(MAKE) -s isolate RUBY:="$(RUBY)")
+endif
+
+RUBY_VERSION := $(shell $(RUBY) -e 'puts RUBY_VERSION')
+
+updir := $(shell git rev-parse --show-cdup)
+gem_paths := $(wildcard $(updir)tmp/gems/$(RUBY_VERSION)/gems/*-*)
 
 ifdef gem_paths
   sp :=
@@ -55,9 +44,9 @@ TRACER = /usr/bin/time -v -o $(t_pfx).time
 
 full-test: test-18 test-19
 test-18:
-	$(MAKE) test 2>&1 | sed -u -e 's!^!1.8 !'
+	$(MAKE) test 2>&1 | sed -e 's!^!1.8 !'
 test-19:
-	$(MAKE) test r19=t 2>&1 | sed -u -e 's!^!1.9 !'
+	$(MAKE) test r19=T 2>&1 | sed -e 's!^!1.9 !'
 
 latest: NEWS
 	@awk 'BEGIN{RS="=== ";ORS=""}NR==2{sub(/\n$$/,"");print RS""$$0 }' < $<

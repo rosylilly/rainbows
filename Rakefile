@@ -183,3 +183,10 @@ task :fm_update do
     p http.post(uri.path, req, {'Content-Type'=>'application/json'})
   end
 end
+
+desc 'isolate gems for development'
+task :isolate do
+  require 'isolate'
+  Isolate.gems "tmp/gems/#{RUBY_VERSION}",
+               :file => ENV['ISOLATE_CONFIG']
+end
