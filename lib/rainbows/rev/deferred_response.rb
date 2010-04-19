@@ -10,9 +10,13 @@ module Rainbows
       G = Rainbows::G
       HH = Rack::Utils::HeaderHash
 
-      def self.defer!(client, response, out)
-        body = response.last
-        headers = HH.new(response[1])
+      def self.write(client, response, out)
+        status, headers, body = response
+
+        body.respond_to?(:to_path) or
+            return HttpResponse.write(client, response, out)
+
+        headers = HH.new(headers)
 
         # to_io is not part of the Rack spec, but make an exception
         # here since we can't get here without checking to_path first
@@ -39,16 +43,11 @@ module Rainbows
           headers.delete('Transfer-Encoding')
           headers['Content-Length'] ||= st.size.to_s
         else # char/block device, directory, whatever... nobody cares
-          return response
+          return HttpResponse.write(client, response, out)
         end
         client.defer_body(io, out)
-        [ response.first, headers.to_hash, [] ]
-      end
-
-      def self.write(client, response, out)
-        response.last.respond_to?(:to_path) and
-          response = defer!(client, response, out)
-        HttpResponse.write(client, response, out)
+        out.nil? or
+          client.write(HttpResponse.header_string(status, headers.to_hash, out))
       end
 
       def initialize(io, client, do_chunk, body)
