@@ -41,9 +41,9 @@ Gem::Specification.new do |s|
   s.test_files = test_files
 
   # we need Unicorn for the HTTP parser and process management
-  # The HTTP parser in Unicorn < 0.96.1 did not use the Ruby
-  # API correctly and resulted in a memory leak
-  s.add_dependency(%q<unicorn>, ["~> 0.97.0"])
+  # The HTTP parser in Unicorn <= 0.97.0 was vulnerable to a remote DoS
+  # when exposed directly to untrusted clients.
+  s.add_dependency(%q<unicorn>, ["~> 0.97.1"])
 
   # Unicorn already depends on Rack
   # s.add_dependency(%q<rack>)
