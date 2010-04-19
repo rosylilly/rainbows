@@ -19,6 +19,7 @@ gem 'neverblock', '0.1.6.2'
 if defined?(::Fiber)
   gem 'case', '0.5'
   gem 'revactor', '0.1.5'
+  gem 'rack-fiber_pool', '0.9.0'
 end
 
 gem 'cramp', '0.10'
