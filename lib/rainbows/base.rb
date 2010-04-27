@@ -72,7 +72,7 @@ module Rainbows
         env[REMOTE_ADDR] = remote_addr
         status, headers, body = app.call(env.update(RACK_DEFAULTS))
 
-        if 100 == status
+        if 100 == status.to_i
           client.write(EXPECT_100_RESPONSE)
           env.delete(HTTP_EXPECT)
           status, headers, body = app.call(env)
