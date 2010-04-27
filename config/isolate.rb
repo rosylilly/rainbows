@@ -4,7 +4,7 @@
 # `rake isolate' or (faster in the unmodified case, `make isolate')
 
 gem 'rack', '1.1.0'
-gem 'unicorn', '0.97.0'
+gem 'unicorn', '0.97.1'
 
 gem 'iobuffer', '0.1.3'
 gem 'rev', '0.3.2'
