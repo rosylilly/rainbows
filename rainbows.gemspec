@@ -49,7 +49,7 @@ Gem::Specification.new do |s|
   # s.add_dependency(%q<rack>)
 
   # optional runtime dependencies depending on configuration
-  # see local.mk.sample for the exact versions we've tested with
+  # see config/isolate.rb for the exact versions we've tested with
   #
   # Revactor >= 0.1.5 includes UNIX domain socket support
   # s.add_dependency(%q<revactor>, [">= 0.1.5"])
