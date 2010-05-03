@@ -113,6 +113,7 @@ EOF
 		# boxes and sometimes sleep 1s in tests
 		kato=5
 		echo 'Rainbows! do'
+		echo "  client_max_body_size nil"
 		if test $# -ge 1
 		then
 			echo "  use :$1"

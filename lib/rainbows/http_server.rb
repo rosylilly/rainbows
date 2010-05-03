@@ -85,6 +85,18 @@ module Rainbows
         raise ArgumentError, "keepalive must be a non-negative Integer"
       G.kato = nr
     end
+
+    def client_max_body_size(nr)
+      err = "client_max_body_size must be nil or a non-negative Integer"
+      case nr
+      when nil
+      when Integer
+        nr >= 0 or raise ArgumentError, err
+      else
+        raise ArgumentError, err
+      end
+      Rainbows.max_bytes = nr
+    end
   end
 
 end

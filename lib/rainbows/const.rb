@@ -24,5 +24,7 @@ module Rainbows
     # of the official spec, but for now it is "hack.io"
     CLIENT_IO = "hack.io".freeze
 
+    ERROR_413_RESPONSE = "HTTP/1.1 413 Request Entity Too Large\r\n\r\n"
+
   end
 end

@@ -12,6 +12,7 @@ module Rainbows
 
     def init_worker_process(worker)
       super(worker)
+      MaxBody.setup
       G.tmp = worker.tmp
 
       # avoid spurious wakeups and blocking-accept() with 1.8 green threads

@@ -31,6 +31,7 @@ module Rainbows
   require 'rainbows/base'
   autoload :AppPool, 'rainbows/app_pool'
   autoload :DevFdResponse, 'rainbows/dev_fd_response'
+  autoload :MaxBody, 'rainbows/max_body'
 
   class << self
 
@@ -81,6 +82,12 @@ module Rainbows
       io.respond_to?(:peeraddr) ?
                         io.peeraddr.last : Unicorn::HttpRequest::LOCALHOST
     end
+
+    # the default max body size is 1 megabyte (1024 * 1024 bytes)
+    @@max_bytes = 1024 * 1024
+
+    def max_bytes; @@max_bytes; end
+    def max_bytes=(nr); @@max_bytes = nr; end
   end
 
   # configures \Rainbows! with a given concurrency model to +use+ and
@@ -91,6 +98,7 @@ module Rainbows
   #     use :Revactor # this may also be :ThreadSpawn or :ThreadPool
   #     worker_connections 400
   #     keepalive_timeout 0 # zero disables keepalives entirely
+  #     client_max_body_size 5*1024*1024 # 5 megabytes
   #   end
   #
   #   # the rest of the Unicorn configuration
@@ -107,6 +115,10 @@ module Rainbows
   # start retrieving extra elements for.  Increasing this beyond 5
   # seconds is not recommended.  Zero disables keepalive entirely
   # (but pipelining fully-formed requests is still works).
+  #
+  # The default +client_max_body_size+ is 1 megabyte (1024 * 1024 bytes),
+  # setting this to +nil+ will disable body size checks and allow any
+  # size to be specified.
   def Rainbows!(&block)
     block_given? or raise ArgumentError, "Rainbows! requires a block"
     HttpServer.setup(block)

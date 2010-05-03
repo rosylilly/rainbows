@@ -49,7 +49,7 @@ module Rainbows
             write(EXPECT_100_RESPONSE)
             @env.delete(HTTP_EXPECT)
           end
-          @input = len && len <= MAX_BODY ? StringIO.new("") : Util.tmpio
+          @input = CapInput.new(len, self)
           @hp.filter_body(@buf2 = "", @buf)
           @input << @buf2
           on_read("")
@@ -71,6 +71,46 @@ module Rainbows
       end
       rescue => e
         handle_error(e)
+    end
+
+    class CapInput < Struct.new(:io, :client, :bytes_left)
+      MAX_BODY = Unicorn::Const::MAX_BODY
+      Util = Unicorn::Util
+
+      def self.err(client, msg)
+        client.write(Const::ERROR_413_RESPONSE)
+        client.quit
+
+        # zip back up the stack
+        raise IOError, msg, []
+      end
+
+      def self.new(len, client)
+        max = Rainbows.max_bytes
+        if len
+          if max && (len > max)
+            err(client, "Content-Length too big: #{len} > #{max}")
+          end
+          len <= MAX_BODY ? StringIO.new("") : Util.tmpio
+        else
+          max ? super(Util.tmpio, client, max) : Util.tmpio
+        end
+      end
+
+      def <<(buf)
+        if (self.bytes_left -= buf.size) < 0
+          io.close
+          CapInput.err(client, "chunked request body too big")
+        end
+        io << buf
+      end
+
+      def gets; io.gets; end
+      def each(&block); io.each(&block); end
+      def size; io.size; end
+      def rewind; io.rewind; end
+      def read(*args); io.read(*args); end
+
     end
 
   end
