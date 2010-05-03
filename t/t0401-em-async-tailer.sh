@@ -55,7 +55,7 @@ t_begin "kill curls and wait for termination" && {
 }
 
 t_begin "termination signal sent" && {
-	kill $rainbows_pid
+	kill -QUIT $rainbows_pid
 }
 
 t_begin "no errors from curl" && {
