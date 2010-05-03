@@ -7,7 +7,7 @@ test -r random_blob || die "random_blob required, run with 'make $0'"
 # So we try to use things like curl and sha1sum that are implemented
 # without the Ruby interpreter to validate our own Ruby internals.
 
-t_plan 7 "concurrent rack.input hammer stress test"
+t_plan 7 "concurrent rack.input hammer stress test (content-length)"
 
 t_begin "setup and startup" && {
 	rtmpfiles curl_out curl_err
@@ -21,8 +21,8 @@ t_begin "send $nr_client concurrent requests" && {
 	for i in $(awk "BEGIN{for(i=0;i<$nr_client;++i) print i}" </dev/null)
 	do
 		(
-			curl -sSf -T- http://$listen/$i \
-			  < random_blob >> $curl_out 2>> $curl_err
+			curl -sSf -T random_blob http://$listen/$i \
+			  >> $curl_out 2>> $curl_err
 		) &
 	done
 	wait
