@@ -34,6 +34,11 @@ module Rainbows
   # which allows each request to run inside its own \Fiber after
   # all request processing is complete.
   #
+  # Merb (and other frameworks/apps) supporting +deferred?+ execution as
+  # documented at http://brainspl.at/articles/2008/04/18/deferred-requests-with-merb-ebb-and-thin
+  # will also get the ability to conditionally defer request processing
+  # to a separate thread.
+  #
   # This model does not implement as streaming "rack.input" which allows
   # the Rack application to process data as it arrives.  This means
   # "rack.input" will be fully buffered in memory or to a temporary file
@@ -200,11 +205,29 @@ module Rainbows
       end
     end
 
+    # Middleware that will run the app dispatch in a separate thread.
+    # This middleware is automatically loaded by Rainbows! when using
+    # EventMachine and if the app responds to the +deferred?+ method.
+    class TryDefer < Struct.new(:app)
+      def call(env)
+        if app.deferred?(env)
+          EM.defer(proc { catch(:async) { app.call(env) } },
+                   env[EvCore::ASYNC_CALLBACK])
+          # all of the async/deferred stuff breaks Rack::Lint :<
+          nil
+        else
+          app.call(env)
+        end
+      end
+    end
+
     # runs inside each forked worker, this sits around and waits
     # for connections and doesn't die until the parent dies (or is
     # given a INT, QUIT, or TERM signal)
     def worker_loop(worker)
       init_worker_process(worker)
+      G.server.app.respond_to?(:deferred?) and
+        G.server.app = TryDefer[G.server.app]
 
       # enable them both, should be non-fatal if not supported
       EM.epoll
