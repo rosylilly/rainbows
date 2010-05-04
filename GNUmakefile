@@ -24,6 +24,7 @@ tmp/gems/$(RUBY_VERSION)/.isolate: $(ISOLATE_CONFIG)
 
 base_bins := rainbows
 bins := $(addprefix bin/, $(base_bins))
+man1_rdoc := $(addsuffix _1, $(base_bins))
 man1_bins := $(addsuffix .1, $(base_bins))
 man1_paths := $(addprefix man/man1/, $(man1_bins))
 
@@ -81,18 +82,21 @@ cgit_atom := http://git.bogomips.org/cgit/rainbows.git/atom/?h=master
 atom = <link rel="alternate" title="Atom feed" href="$(1)" \
              type="application/atom+xml"/>
 
-# using rdoc 2.4.1+
+# using rdoc 2.5.x+
 doc: .document NEWS ChangeLog
-	for i in $(man1_bins); do > $$i; done
+	for i in $(man1_rdoc); do echo > $$i; done
 	find bin lib -type f -name '*.rbc' -exec rm -f '{}' ';'
-	rdoc -Na -t "$(shell sed -ne '1s/^= //p' README)"
+	rdoc -a -t "$(shell sed -ne '1s/^= //p' README)"
 	install -m644 COPYING doc/COPYING
 	install -m644 $(shell grep '^[A-Z]' .document)  doc/
 	$(MAKE) -C Documentation install-html install-man
 	install -m644 $(man1_paths) doc/
 	cd doc && for i in $(base_bins); do \
+	  $(RM) 1.html $${i}.1.html; \
 	  sed -e '/"documentation">/r man1/'$$i'.1.html' \
-		< $${i}_1.html > tmp && mv tmp $${i}_1.html; done
+		< $${i}_1.html > tmp && mv tmp $${i}_1.html; \
+	  ln $${i}_1.html $${i}.1.html; \
+	  done
 	$(RUBY) -i -p -e \
 	  '$$_.gsub!("</title>",%q{\&$(call atom,$(cgit_atom))})' \
 	  doc/ChangeLog.html
@@ -106,7 +110,7 @@ doc: .document NEWS ChangeLog
 	  '$$_.gsub!(/INCLUDE/){File.read("Documentation/comparison.html")}' \
 	  doc/Summary.html
 	cat Documentation/comparison.css >> doc/rdoc.css
-	$(RM) $(man1_bins)
+	$(RM) $(man1_rdoc)
 
 ifneq ($(VERSION),)
 rfproject := rainbows

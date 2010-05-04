@@ -123,7 +123,8 @@ config file:
       worker_connections 100
     end
 
-See the {Rainbows! configuration documentation}[link:Rainbows.html#M000001]
+See the {Rainbows! configuration}[link:Rainbows.html#method-i-Rainbows!]
+{documentation}[link:Rainbows.html#method-i-Rainbows!]
 for more details.
 
 == Development
