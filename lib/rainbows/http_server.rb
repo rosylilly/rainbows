@@ -60,11 +60,7 @@ module Rainbows
       end
       mod.setup if mod.respond_to?(:setup)
       Const::RACK_DEFAULTS['rainbows.model'] = @use = model.to_sym
-
-      Const::RACK_DEFAULTS['rack.multithread'] = case model.to_s
-      when /Thread/, "EventMachineDefer"; true
-      else false
-      end
+      Const::RACK_DEFAULTS['rack.multithread'] = !!(model.to_s =~ /Thread/)
 
       case @use
       when :Rev, :EventMachine, :NeverBlock
