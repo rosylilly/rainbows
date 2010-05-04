@@ -43,7 +43,7 @@ Gem::Specification.new do |s|
   # we need Unicorn for the HTTP parser and process management
   # The HTTP parser in Unicorn <= 0.97.0 was vulnerable to a remote DoS
   # when exposed directly to untrusted clients.
-  s.add_dependency(%q<unicorn>, ["~> 0.97.1"])
+  s.add_dependency(%q<unicorn>, [">= 0.97.1", "< 1.0.0"])
 
   # Unicorn already depends on Rack
   # s.add_dependency(%q<rack>)
