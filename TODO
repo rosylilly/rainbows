@@ -10,12 +10,9 @@ care about.
   unit tests, only integration tests that exercise externally
   visible parts.
 
-* EventMachine.spawn - should be like Revactor, maybe?
-
-* conditional app.deferred?(env) support
-  Merb uses it, some other servers support it
-
 * EventMachine+Fibers+streaming input
+  (those who do not require streaming input can use
+   {rack-fiber_pool}[http://github.com/mperham/rack-fiber_pool])
 
 * RevFiberPool
 
