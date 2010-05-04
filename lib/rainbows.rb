@@ -22,8 +22,10 @@ module Rainbows
       false
     end
   end
+  # :stopdoc:
   G = State.new(true, 0, 0, 5)
   O = {}
+  # :startdoc:
 
   require 'rainbows/const'
   require 'rainbows/http_server'
@@ -111,7 +113,7 @@ module Rainbows
   # +worker_processes+ * +worker_connections+, so in the above example
   # we can serve 8 * 400 = 3200 clients concurrently.
   #
-  # The default is +keepalive_timeout+ is 2 seconds, which should be
+  # The default is +keepalive_timeout+ is 5 seconds, which should be
   # enough under most conditions for browsers to render the page and
   # start retrieving extra elements for.  Increasing this beyond 5
   # seconds is not recommended.  Zero disables keepalive entirely
@@ -125,6 +127,7 @@ module Rainbows
     HttpServer.setup(block)
   end
 
+  # :stopdoc:
   # maps models to default worker counts, default worker count numbers are
   # pretty arbitrary and tuning them to your application and hardware is
   # highly recommended
@@ -147,6 +150,7 @@ module Rainbows
     u = model.to_s.gsub(/([a-z0-9])([A-Z0-9])/) { "#{$1}_#{$2.downcase!}" }
     autoload model, "rainbows/#{u.downcase!}"
   end
+  # :startdoc:
   autoload :Fiber, 'rainbows/fiber' # core class
 
 end
