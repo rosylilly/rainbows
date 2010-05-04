@@ -20,7 +20,8 @@ else
 endif
 
 ifndef NO_ISOLATE
-  x := $(shell test -d t/ && NO_ISOLATE=T $(MAKE) -s isolate RUBY:="$(RUBY)")
+  x := $(shell test -d t/ && \
+         PATH=$(PATH) NO_ISOLATE=T $(MAKE) -s isolate RUBY:="$(RUBY)")
 endif
 
 RUBY_VERSION := $(shell $(RUBY) -e 'puts RUBY_VERSION')
