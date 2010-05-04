@@ -8,11 +8,14 @@ module Rainbows
   # Implements a basic single-threaded event model with
   # {EventMachine}[http://rubyeventmachine.com/].  It is capable of
   # handling thousands of simultaneous client connections, but with only
-  # a single-threaded app dispatch.  It is suited for slow clients and
-  # fast applications (applications that do not have slow network
-  # dependencies) or applications that use DevFdResponse for deferrable
-  # response bodies.  It does not require your Rack application to be
-  # thread-safe, reentrancy is only required for the DevFdResponse body
+  # a single-threaded app dispatch.  It is suited for slow clients,
+  # and can work with slow applications via asynchronous libraries such as
+  # {async_sinatra}[http://github.com/raggi/async_sinatra],
+  # {Cramp}[http://m.onkey.org/2010/1/7/introducing-cramp],
+  # and {rack-fiber_pool}[http://github.com/mperham/rack-fiber_pool].
+  #
+  # It does not require your Rack application to be thread-safe,
+  # reentrancy is only required for the DevFdResponse body
   # generator.
   #
   # Compatibility: Whatever \EventMachine ~> 0.12.10 and Unicorn both
@@ -21,6 +24,15 @@ module Rainbows
   # This model is compatible with users of "async.callback" in the Rack
   # environment such as
   # {async_sinatra}[http://github.com/raggi/async_sinatra].
+  #
+  # For a complete asynchronous framework,
+  # {Cramp}[http://m.onkey.org/2010/1/7/introducing-cramp] is fully
+  # supported when using this concurrency model.
+  #
+  # This model is fully-compatible with
+  # {rack-fiber_pool}[http://github.com/mperham/rack-fiber_pool]
+  # which allows each request to run inside its own \Fiber after
+  # all request processing is complete.
   #
   # This model does not implement as streaming "rack.input" which allows
   # the Rack application to process data as it arrives.  This means
