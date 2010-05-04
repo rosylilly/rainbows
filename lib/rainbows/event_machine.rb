@@ -209,6 +209,14 @@ module Rainbows
     # This middleware is automatically loaded by Rainbows! when using
     # EventMachine and if the app responds to the +deferred?+ method.
     class TryDefer < Struct.new(:app)
+
+      def initialize(app)
+        # the entire app becomes multithreaded, even the root (non-deferred)
+        # thread since any thread can share processes with others
+        Const::RACK_DEFAULTS['rack.multithread'] = true
+        super
+      end
+
       def call(env)
         if app.deferred?(env)
           EM.defer(proc { catch(:async) { app.call(env) } },

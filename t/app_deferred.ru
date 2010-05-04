@@ -10,6 +10,7 @@ class DeferredApp < Struct.new(:app)
   end
 
   def call(env)
+    env["rack.multithread"] or raise RuntimeError, "rack.multithread not true"
     body = "#{Thread.current.inspect}\n"
     headers = {
       "Content-Type" => "text/plain",
