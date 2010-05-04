@@ -12,7 +12,7 @@ care about.
 
 * EventMachine+Fibers+streaming input
   (those who do not require streaming input can use
-   {rack-fiber_pool}[http://github.com/mperham/rack-fiber_pool])
+  {rack-fiber_pool}[http://github.com/mperham/rack-fiber_pool])
 
 * RevFiberPool
 
