@@ -7,7 +7,7 @@ module Rainbows
 # setting
 class MaxBody < Struct.new(:app)
 
-  # this is meant to be included in Unicorn::TeeInput (and derived
+  # this is meant to be included in Rainbows::TeeInput (and derived
   # classes) to limit body sizes
   module Limit
     Util = Unicorn::Util
@@ -41,7 +41,7 @@ class MaxBody < Struct.new(:app)
     end
 
     def tee(length, dst)
-      rv = _tee(length, dst)
+      rv = super
       if rv && ((@max_body -= rv.size) < 0)
         # make HttpParser#keepalive? => false to force an immediate disconnect
         # after we write
@@ -60,16 +60,9 @@ class MaxBody < Struct.new(:app)
     case G.server.use
     when :Rev, :EventMachine, :NeverBlock
       return
-    when :Revactor
-      Rainbows::Revactor::TeeInput
-    else
-      Unicorn::TeeInput
-    end.class_eval do
-      alias _tee tee # can't use super here :<
-      remove_method :tee
-      remove_method :initialize if G.server.use != :Revactor # FIXME CODE SMELL
-      include Limit
     end
+
+    TeeInput.class_eval { include Limit }
 
     # force ourselves to the outermost middleware layer
     G.server.app = MaxBody.new(G.server.app)

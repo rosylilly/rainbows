@@ -68,8 +68,7 @@ module Rainbows
 
         env[CLIENT_IO] = client
         env[RACK_INPUT] = 0 == hp.content_length ?
-                 HttpRequest::NULL_IO :
-                 Unicorn::TeeInput.new(client, env, hp, buf)
+                 HttpRequest::NULL_IO : TeeInput.new(client, env, hp, buf)
         env[REMOTE_ADDR] = remote_addr
         status, headers, body = app.call(env.update(RACK_DEFAULTS))
 

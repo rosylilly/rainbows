@@ -21,8 +21,6 @@ module Rainbows
   # concurrency features this model provides.
 
   module Revactor
-    require 'rainbows/revactor/tee_input'
-
     RD_ARGS = {}
 
     include Base
@@ -52,7 +50,7 @@ module Rainbows
         env[Const::CLIENT_IO] = client
         env[Const::RACK_INPUT] = 0 == hp.content_length ?
                  HttpRequest::NULL_IO :
-                 Rainbows::Revactor::TeeInput.new(client, env, hp, buf)
+                 TeeInput.new(PartialSocket.new(client), env, hp, buf)
         env[Const::REMOTE_ADDR] = remote_addr
         response = app.call(env.update(RACK_DEFAULTS))
 
@@ -134,6 +132,41 @@ module Rainbows
           [ l, T[:unix_closed, ::Revactor::UNIX::Socket ],
             T[:unix_connection, l, ::Revactor::UNIX::Socket] ]
         end
+      end
+    end
+
+    # Revactor Sockets do not implement readpartial, so we emulate just
+    # enough to avoid mucking with TeeInput internals.  Fortunately
+    # this code is not heavily used so we can usually avoid the overhead
+    # of adding a userspace buffer.
+    class PartialSocket < Struct.new(:socket, :rbuf)
+      def initialize(socket)
+        # IO::Buffer is used internally by Rev which Revactor is based on
+        # so we'll always have it available
+        super(socket, IO::Buffer.new)
+      end
+
+      # Revactor socket reads always return an unspecified amount,
+      # sometimes too much
+      def readpartial(length, dst = "")
+        # always check and return from the userspace buffer first
+        rbuf.size > 0 and return dst.replace(rbuf.read(length))
+
+        # read off the socket since there was nothing in rbuf
+        tmp = socket.read
+
+        # we didn't read too much, good, just return it straight back
+        # to avoid needlessly wasting memory bandwidth
+        tmp.size <= length and return dst.replace(tmp)
+
+        # ugh, read returned too much, copy + reread to avoid slicing
+        rbuf << tmp[length, tmp.size]
+        dst.replace(tmp[0, length])
+      end
+
+      # just proxy any remaining methods TeeInput may use
+      def close
+        socket.close
       end
     end
 
