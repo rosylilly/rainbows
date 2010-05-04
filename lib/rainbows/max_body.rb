@@ -43,7 +43,6 @@ class MaxBody < Struct.new(:app)
     def tee(length, dst)
       rv = _tee(length, dst)
       if rv && ((@max_body -= rv.size) < 0)
-        $stderr.puts "#@max_body  TOO SMALL"
         # make HttpParser#keepalive? => false to force an immediate disconnect
         # after we write
         parser.reset
