@@ -17,8 +17,8 @@ ifeq ($(RUBY_VERSION),)
 endif
 
 # rake takes forever to start
-isolate: tmp/gems/$(RUBY_VERSION)/.isolate
-tmp/gems/$(RUBY_VERSION)/.isolate: $(ISOLATE_CONFIG)
+isolate: tmp/isolate/ruby-$(RUBY_VERSION)/.isolate
+tmp/isolate/ruby-$(RUBY_VERSION)/.isolate: $(ISOLATE_CONFIG)
 	ISOLATE_CONFIG=$(ISOLATE_CONFIG) $(RAKE) isolate
 	> $@
 

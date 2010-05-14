@@ -187,6 +187,20 @@ end
 desc 'isolate gems for development'
 task :isolate do
   require 'isolate'
-  Isolate.gems "tmp/gems/#{RUBY_VERSION}",
-               :file => ENV['ISOLATE_CONFIG']
+  require 'rbconfig'
+
+  Isolate.now! :file => ENV['ISOLATE_CONFIG'], :system => false
+
+  # for Ruby 1.8 isolate uses "1.8" instead of "1.8.7" for paths,
+  # but we'll still try to support 1.8.6 for now even though isolate
+  # does not.
+  if Gem.ruby_engine == "ruby" &&
+     RbConfig::CONFIG["ruby_version"] != RUBY_VERSION
+    require 'fileutils'
+    Dir.chdir('tmp/isolate') do
+      FileUtils.rm_rf("ruby-#{RUBY_VERSION}")
+      File.symlink "ruby-#{RbConfig::CONFIG["ruby_version"]}",
+                   "ruby-#{RUBY_VERSION}"
+    end
+  end
 end
