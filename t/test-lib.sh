@@ -42,6 +42,19 @@ require_check () {
 	fi
 }
 
+skip_models () {
+	for i in "$@"
+	do
+		if test x"$model" != x"$i"
+		then
+			continue
+		fi
+		t_info "skipping $T since it is not compatible with $model"
+		exit 0
+	done
+}
+
+
 # given a list of variable names, create temporary files and assign
 # the pathnames to those variables
 rtmpfiles () {

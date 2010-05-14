@@ -2,6 +2,8 @@
 CONFIG_RU=${CONFIG_RU-'async-response.ru'}
 . ./test-lib.sh
 
+skip_models Base
+
 case $CONFIG_RU in
 *no-autochunk.ru)
 	t_plan 7 "async response w/o autochunk for $model"
