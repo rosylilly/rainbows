@@ -22,6 +22,7 @@ else
 endif
 export RUBYLIB RUBY_VERSION
 
+models += WriterThreadPool
 models += ThreadPool
 models += ThreadSpawn
 models += Rev

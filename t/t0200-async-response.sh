@@ -2,7 +2,7 @@
 CONFIG_RU=${CONFIG_RU-'async-response.ru'}
 . ./test-lib.sh
 
-skip_models Base
+skip_models Base WriterThreadPool
 
 case $CONFIG_RU in
 *no-autochunk.ru)
