@@ -12,7 +12,7 @@ t_plan 10 "large file response slurp avoidance for $model"
 
 t_begin "setup and startup" && {
 	rtmpfiles curl_out
-	rainbows_setup $model
+	rainbows_setup $model 1
 	# can't load Rack::Lint here since it'll cause Rev to slurp
 	rainbows -E none -D large-file-response.ru -c $unicorn_config
 	rainbows_wait_start
