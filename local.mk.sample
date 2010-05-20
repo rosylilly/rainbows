@@ -27,7 +27,7 @@ endif
 RUBY_VERSION := $(shell $(RUBY) -e 'puts RUBY_VERSION')
 
 updir := $(shell git rev-parse --show-cdup)
-gem_paths := $(wildcard $(updir)tmp/gems/$(RUBY_VERSION)/gems/*-*)
+gem_paths := $(wildcard $(updir)tmp/isolate/ruby-$(RUBY_VERSION)/gems/*-*)
 
 ifdef gem_paths
   sp :=
