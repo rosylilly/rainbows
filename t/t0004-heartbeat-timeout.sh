@@ -31,9 +31,8 @@ t_begin "block the worker process to force it to die" && {
 	test x"$err" != x"$worker_pid"
 }
 
-t_begin "ensure timeout took 3-6 seconds" && {
+t_begin "ensure timeout took at least 3 seconds" && {
 	test $elapsed -ge 3
-	test $elapsed -le 6 # give it some slack in case box is bogged down
 }
 
 t_begin "wait for new worker to start up" && {
