@@ -8,7 +8,7 @@ t_begin "setup and startup" && {
 	rtmpfiles curl_out curl_err
 	rainbows_setup $model
 	rainbows -D sha1-random-size.ru -c $unicorn_config
-        blob_sha1=$(rsha1 random_blob)
+        blob_sha1=$(rsha1 < random_blob)
         t_info "blob_sha1=$blob_sha1"
 	rainbows_wait_start
 }
