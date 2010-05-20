@@ -162,6 +162,21 @@ rsha1 () {
 	expr "$($_cmd)" : '\([a-f0-9]\{40\}\)'
 }
 
+req_curl_chunked_upload_err_check () {
+	set +e
+	curl --version 2>/dev/null | awk '$1 == "curl" {
+		split($2, v, /\./)
+		if ((v[1] < 7) || (v[1] == 7 && v[2] < 18))
+			code = 1
+	}
+	END { exit(code) }'
+	if test $? -ne 0
+	then
+		t_info "curl >= 7.18.0 required for $T"
+		exit 0
+	fi
+}
+
 case $model in
 Rev) require_check rev Rev::VERSION ;;
 Revactor) require_check revactor Revactor::VERSION ;;
