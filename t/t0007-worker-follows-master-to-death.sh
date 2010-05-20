@@ -32,7 +32,12 @@ t_begin "nuke the master once we're connected" && {
 }
 
 t_begin "worker is no longer running" && {
-	sleep 6
+	nr=30
+	while kill -0 $worker_pid 2>/dev/null && test $nr -gt 0
+	do
+		nr=$(( $nr - 1))
+		sleep 1
+	done
 	kill -0 $worker_pid 2> $tmp && false
 	test -s $tmp
 }
