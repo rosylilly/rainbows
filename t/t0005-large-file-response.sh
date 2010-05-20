@@ -50,11 +50,11 @@ t_begin "HTTP/1.0 test" && {
 t_begin "HTTP/0.9 test" && {
 	(
 		printf 'GET /random_blob\r\n'
-		cat $fifo > $tmp &
+		rsha1 < $fifo > $tmp &
 		wait
 		echo ok > $ok
 	) | socat - TCP:$listen > $fifo
-	cmp $tmp random_blob
+	test $(cat $tmp) = $(rsha1 < random_blob)
 	test xok = x$(cat $ok)
 }
 
