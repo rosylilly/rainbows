@@ -33,6 +33,9 @@ module Rainbows
               # synchronization primitives for _every_ case, not just this
               # unlikely one.  Since this case is (or should be) uncommon,
               # just busy wait when we have to.
+              # We don't use Thread.pass because it needlessly spins the
+              # CPU during I/O wait, CPU cycles that can be better used
+              # by other worker _processes_.
               sleep(0.01)
             elsif c = Rainbows.sync_accept(l)
               klass.new(c) do |c|
