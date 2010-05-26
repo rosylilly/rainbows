@@ -37,6 +37,14 @@ module Rainbows
       end
 
       def queue_writer
+        # not using Thread.pass here because that spins the CPU during
+        # I/O wait and will eat cycles from other worker processes.
+        until CUR.size < MAX
+          CUR.delete_if { |t,_|
+            t.alive? ? t.join(0) : true
+          }.size >= MAX and sleep(0.01)
+        end
+
         q = Queue.new
         self.thr = Thread.new(to_io, q) do |io, q|
           while response = q.shift
@@ -93,6 +101,7 @@ module Rainbows
     end
 
     def worker_loop(worker)
+      MySocket.const_set(:MAX, worker_connections)
       super(worker) # accept loop from Unicorn
       CUR.delete_if do |t,q|
         q << nil
