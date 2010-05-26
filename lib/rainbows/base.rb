@@ -49,6 +49,8 @@ module Rainbows
       end
     end
 
+    module_function :write_body
+
     # once a client is accepted, it is processed in its entirety here
     # in 3 easy steps: read request, call app, write app response
     # this is used by synchronous concurrency models
