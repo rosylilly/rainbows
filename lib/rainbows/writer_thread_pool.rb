@@ -3,9 +3,7 @@
 module Rainbows
 
   # This concurrency model implements a single-threaded app dispatch
-  # with a separate thread pool for writing responses.  By default, this
-  # thread pool is only a single thread: ideal for typical applications
-  # that do not serve large or streaming responses.
+  # with a separate thread pool for writing responses.
   #
   # Unlike most \Rainbows! concurrency models, WriterThreadPool is
   # designed to run behind nginx just like Unicorn is.  This concurrency
