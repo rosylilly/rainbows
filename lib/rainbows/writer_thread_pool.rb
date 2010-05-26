@@ -60,6 +60,11 @@ module Rainbows
     @@nr = 0
     @@q = nil
 
+    def process_client(client)
+      @@nr += 1
+      super(QueueSocket[client, @@q[@@nr %= @@q.size]])
+    end
+
     def worker_loop(worker)
       # we have multiple, single-thread queues since we don't want to
       # interleave writes from the same client
@@ -79,25 +84,7 @@ module Rainbows
         end
       end
 
-      if qp.size == 1
-        # avoid unnecessary calculations when there's only one queue,
-        # most users should only need one queue...
-        WriterThreadPool.module_eval do
-          def process_client(client)
-            super(QueueSocket[client, @@q])
-          end
-        end
-        @@q = qp.first.queue
-      else
-        WriterThreadPool.module_eval do
-          def process_client(client)
-            @@nr += 1
-            super(QueueSocket[client, @@q[@@nr %= @@q.size]])
-          end
-        end
-        @@q = qp.map { |q| q.queue }
-      end
-
+      @@q = qp.map { |q| q.queue }
       super(worker) # accept loop from Unicorn
       qp.map { |q| q.quit! }
     end
