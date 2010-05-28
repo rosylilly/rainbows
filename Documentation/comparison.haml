@@ -99,6 +99,20 @@
     %td.r19 Yes
     %td.rbx No
     %td.slow Yes
+  %tr.comp_row
+    %td.mod WriterThreadPool
+    %td.tee Yes
+    %td.r18 Yes
+    %td.r19 Yes
+    %td.rbx Yes
+    %td.slow no
+  %tr.comp_row
+    %td.mod WriterThreadSpawn
+    %td.tee Yes
+    %td.r18 Yes
+    %td.r19 Yes
+    %td.rbx Yes
+    %td.slow no
 %ul
   %li
     RevThread* + 1.8 requires Rev &gt;= 0.3.2 for reasonable performance
@@ -203,7 +217,16 @@
       %a(href="Rainbows/Fiber/IO.html") Rainbows::Fiber::IO
     %td.thr No
     %td.reent Yes
-
+  %tr.comp_base
+    %td.mod WriterThreadPool
+    %td.slowio avoid
+    %td.thr Maybe
+    %td.reent Maybe
+  %tr.comp_base
+    %td.mod WriterThreadSpawn
+    %td.slowio avoid
+    %td.thr Maybe
+    %td.reent Maybe
 %ul
   %li
     Requirements for single thread reentrancy are loose in that there is
@@ -219,6 +242,9 @@
     on UNIX domain sockets and named pipes.  Nearly all other operations
     on POSIX filesystems can be considered "fast", or at least
     uninterruptible.
+  %li
+    WriterThread{Pool,Spawn} will require thread safety if your response
+    body is dynamically generated during the body#each call.
 
 %h2 middlewares and frameworks
 %br
@@ -250,7 +276,7 @@
     %td.ws Sunshowers
   %tr.comp_row
     %td.mod ThreadPool
-    %td.devfd no-op
+    %td.devfd Yes
     %td.app_pool Yes
     %td.lock Yes
     %td.async standard Ruby
@@ -264,7 +290,7 @@
     %td.ws no
   %tr.comp_row
     %td.mod ThreadSpawn
-    %td.devfd no-op
+    %td.devfd Yes
     %td.app_pool Yes
     %td.lock Yes
     %td.async standard Ruby
@@ -316,15 +342,28 @@
     %td.devfd Yes
     %td.app_pool Yes
     %td.lock Dumb
-    %td.async standard Ruby
+    %td.async Rev, standard Ruby
     %td.ws no
   %tr.comp_row
     %td.mod RevFiberSpawn
     %td.devfd Yes
     %td.app_pool Yes
     %td.lock No!
-    %td.async Rainbows::Fiber::IO, Rainbows.sleep
-
+    %td.async Rev, Rainbows::Fiber::IO, Rainbows.sleep
+  %tr.comp_row
+    %td.mod WriterThreadPool
+    %td.devfd Yes
+    %td.app_pool no-op
+    %td.lock no-op
+    %td.async Standard Ruby in response body only
+    %td.ws response body only
+  %tr.comp_row
+    %td.mod WriterThreadSpawn
+    %td.devfd Yes
+    %td.app_pool no-op
+    %td.lock no-op
+    %td.async Standard Ruby in response body only
+    %td.ws response body only
 %ul
   %li
     "No!" means it's fundamentally incompatible, use an
