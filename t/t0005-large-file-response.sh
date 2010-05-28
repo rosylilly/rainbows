@@ -72,8 +72,12 @@ t_begin "shutdown server" && {
 
 t_begin "compare RSS before and after" && {
 	diff=$(( $rss_after - $rss_before ))
+
+	# default GC malloc limit in MRI:
+	fudge=$(( 8 * 1024 * 1024 ))
+
 	t_info "test diff=$diff < orig=$random_blob_size"
-	test $diff -le $random_blob_size
+	test $diff -le $(( $random_blob_size + $fudge ))
 }
 
 dbgcat r_err
