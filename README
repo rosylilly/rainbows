@@ -24,6 +24,8 @@ For network concurrency, models we currently support are:
 * {FiberPool}[link:Rainbows/FiberPool.html]
 * {NeverBlock}[link:Rainbows/NeverBlock.html]
 * {RevThreadPool}[link:Rainbows/RevThreadPool.html]
+* {WriterThreadPool}[link:Rainbows/WriterThreadPool.html]
+* {WriterThreadSpawn}[link:Rainbows/WriterThreadSpawn.html]
 
 We have {many more on the way}[link:TODO.html] for handling network
 concurrency.  Additionally, we also use multiple processes (managed by
