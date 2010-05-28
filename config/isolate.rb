@@ -22,4 +22,4 @@ if defined?(::Fiber)
   gem 'rack-fiber_pool', '0.9.0'
 end
 
-gem 'cramp', '0.10'
+gem 'cramp', '0.11'
