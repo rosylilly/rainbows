@@ -106,7 +106,7 @@ module Rainbows
       CUR.delete_if do |t,q|
         q << nil
         G.tick
-        t.alive? ? thr.join(0.01) : true
+        t.alive? ? t.join(0.01) : true
       end until CUR.empty?
     end
   end
