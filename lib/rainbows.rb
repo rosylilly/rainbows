@@ -32,6 +32,7 @@ module Rainbows
   require 'rainbows/http_response'
   require 'rainbows/base'
   require 'rainbows/tee_input'
+  autoload :Sendfile, 'rainbows/sendfile'
   autoload :AppPool, 'rainbows/app_pool'
   autoload :DevFdResponse, 'rainbows/dev_fd_response'
   autoload :MaxBody, 'rainbows/max_body'
