@@ -88,12 +88,8 @@ module Rainbows
       end
     end
 
-    if IO.respond_to?(:copy_stream)
-      undef_method :write_body
-
-      def write_body(my_sock, body)
-        my_sock.write_body(body)
-      end
+    def write_body(my_sock, body)
+      my_sock.write_body(body)
     end
 
     def process_client(client)

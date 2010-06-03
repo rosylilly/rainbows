@@ -18,7 +18,8 @@ t_begin "setup and startup" && {
 	rainbows_wait_start
 }
 
-t_begin "read random blob size" && {
+t_begin "read random blob sha1 and size" && {
+	random_blob_sha1=$(rsha1 < random_blob)
 	random_blob_size=$(wc -c < random_blob)
 }
 
@@ -32,18 +33,18 @@ t_begin "read current RSS" && {
 t_begin "send a series HTTP/1.1 requests sequentially" && {
 	for i in a b c
 	do
-		size=$( (curl -sSfv http://$listen/random_blob &&
-			 echo ok >$ok) |wc -c)
-		test $size -eq $random_blob_size
+		sha1=$( (curl -sSfv http://$listen/random_blob &&
+			 echo ok >$ok) | rsha1)
+		test $sha1 = $random_blob_sha1
 		test xok = x$(cat $ok)
 	done
 }
 
 # this was a problem during development
 t_begin "HTTP/1.0 test" && {
-	size=$( (curl -0 -sSfv http://$listen/random_blob &&
-	         echo ok >$ok) |wc -c)
-	test $size -eq $random_blob_size
+	sha1=$( (curl -0 -sSfv http://$listen/random_blob &&
+	         echo ok >$ok) | rsha1)
+	test $sha1 = $random_blob_sha1
 	test xok = x$(cat $ok)
 }
 
@@ -54,7 +55,7 @@ t_begin "HTTP/0.9 test" && {
 		wait
 		echo ok > $ok
 	) | socat - TCP:$listen > $fifo
-	test $(cat $tmp) = $(rsha1 < random_blob)
+	test $(cat $tmp) = $random_blob_sha1
 	test xok = x$(cat $ok)
 }
 

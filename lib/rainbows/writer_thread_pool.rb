@@ -46,13 +46,8 @@ module Rainbows
       end
     end
 
-    alias base_write_body write_body
-    if IO.respond_to?(:copy_stream)
-      undef_method :write_body
-
-      def write_body(qclient, body)
-        qclient.q << [ qclient.to_io, :body, body ]
-      end
+    def write_body(qclient, body)
+      qclient.q << [ qclient.to_io, :body, body ]
     end
 
     @@nr = 0
@@ -71,7 +66,7 @@ module Rainbows
           begin
             io, arg1, arg2 = response
             case arg1
-            when :body then base_write_body(io, arg2)
+            when :body then Base.write_body(io, arg2)
             when :close then io.close unless io.closed?
             else
               io.write(arg1)
