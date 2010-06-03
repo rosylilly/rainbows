@@ -21,16 +21,6 @@ export PATH
 
 test -x $PWD/bin/unused_listen || die "must be run in 't' directory"
 
-wait_for_pid () {
-	path="$1"
-	nr=30
-	while ! test -s "$path" && test $nr -gt 0
-	do
-		nr=$(($nr - 1))
-		sleep 1
-	done
-}
-
 # requires $1 and prints out the value of $2
 require_check () {
 	lib=$1
