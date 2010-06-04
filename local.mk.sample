@@ -11,12 +11,19 @@ DLEXT := so
 # fork+exec heavy with Ruby.
 prefix = $(HOME)
 
-ifeq ($(r19),)
-  RUBY := $(prefix)/bin/ruby
+ifeq ($(r192),)
+  ifeq ($(r19),)
+    RUBY := $(prefix)/bin/ruby
+  else
+    prefix := $(prefix)/ruby-1.9
+    export PATH := $(prefix)/bin:$(PATH)
+    RUBY := $(prefix)/bin/ruby --disable-gems
+  endif
 else
-  prefix := $(prefix)/ruby-1.9
+  prefix := $(prefix)/ruby-1.9.2
   export PATH := $(prefix)/bin:$(PATH)
   RUBY := $(prefix)/bin/ruby --disable-gems
+  gem_paths := $(addprefix $(prefix)/lib/ruby/gems/1.9.1/gems/,$(gems))
 endif
 
 ifndef NO_ISOLATE
@@ -43,11 +50,13 @@ SHELL := /bin/ksh93 -e -o pipefail
 # TRACER = strace -f -o $(t_pfx).strace -s 100000
 TRACER = /usr/bin/time -v -o $(t_pfx).time
 
-full-test: test-18 test-19
+full-test: test-18 test-191 test-192
 test-18:
 	$(MAKE) test 2>&1 | sed -e 's!^!1.8 !'
-test-19:
-	$(MAKE) test r19=T 2>&1 | sed -e 's!^!1.9 !'
+test-191:
+	$(MAKE) test r19=T 2>&1 | sed -e 's!^!1.9.1 !'
+test-192:
+	$(MAKE) test r192=T 2>&1 | sed -e 's!^!1.9.2 !'
 
 latest: NEWS
 	@awk 'BEGIN{RS="=== ";ORS=""}NR==2{sub(/\n$$/,"");print RS""$$0 }' < $<
