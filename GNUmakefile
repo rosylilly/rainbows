@@ -3,7 +3,6 @@ all::
 RUBY = ruby
 RAKE = rake
 GIT_URL = git://git.bogomips.org/rainbows.git
-ISOLATE_CONFIG = config/isolate.rb
 
 GIT-VERSION-FILE: .FORCE-GIT-VERSION-FILE
 	@./GIT-VERSION-GEN
@@ -18,8 +17,8 @@ endif
 
 # rake takes forever to start
 isolate: tmp/isolate/ruby-$(RUBY_VERSION)/.isolate
-tmp/isolate/ruby-$(RUBY_VERSION)/.isolate: $(ISOLATE_CONFIG)
-	ISOLATE_CONFIG=$(ISOLATE_CONFIG) $(RAKE) isolate
+tmp/isolate/ruby-$(RUBY_VERSION)/.isolate: config/isolate.rb
+	$(RAKE) isolate
 	> $@
 
 base_bins := rainbows

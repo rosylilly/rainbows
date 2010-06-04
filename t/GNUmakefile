@@ -100,6 +100,7 @@ $(deps):
 	  { echo >&2 "E '$(dep_bin)' not found in PATH=$(PATH)"; exit 1; }
 	@mv $@.$(pid) $@
 dep: $(deps)
+	$(MAKE) -C .. isolate
 
 $(MODEL_T): export model = $(firstword $(subst ., ,$@))
 $(MODEL_T): script = $(subst $(model).,,$@)
