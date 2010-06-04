@@ -3,6 +3,12 @@
 . ./my-tap-lib.sh
 
 set +u
+
+# sometimes we rely on http_proxy to avoid wasting bandwidth with Isolate
+# and multiple Ruby versions
+NO_PROXY=${UNICORN_TEST_ADDR-127.0.0.1}
+export NO_PROXY
+
 if test -z "$model"
 then
 	# defaulting to Base would unfortunately fail some concurrency tests
