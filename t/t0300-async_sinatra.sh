@@ -1,5 +1,11 @@
 #!/bin/sh
 . ./test-lib.sh
+case $RUBY_VERSION in
+1.9.2)
+	t_info "RUBY_VERSION=$RUBY_VERSION not supported with async_sinatra"
+	exit 0
+	;;
+esac
 
 # n - number of seconds to sleep
 n=10
