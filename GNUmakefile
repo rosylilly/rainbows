@@ -2,6 +2,7 @@
 all::
 RUBY = ruby
 RAKE = rake
+RSYNC = rsync
 GIT_URL = git://git.bogomips.org/rainbows.git
 
 GIT-VERSION-FILE: .FORCE-GIT-VERSION-FILE
@@ -14,12 +15,6 @@ endif
 ifeq ($(RUBY_VERSION),)
   RUBY_VERSION := $(shell $(RUBY) -e 'puts RUBY_VERSION')
 endif
-
-# rake takes forever to start
-isolate: tmp/isolate/ruby-$(RUBY_VERSION)/.isolate
-tmp/isolate/ruby-$(RUBY_VERSION)/.isolate: config/isolate.rb
-	$(RAKE) isolate
-	> $@
 
 base_bins := rainbows
 bins := $(addprefix bin/, $(base_bins))
@@ -111,6 +106,19 @@ doc: .document NEWS ChangeLog
 	cat Documentation/comparison.css >> doc/rdoc.css
 	$(RM) $(man1_rdoc)
 
+# publishes docs to http://rainbows.rubyforge.org
+publish_doc: NEWS
+	-git set-file-times
+	$(RM) -r doc ChangeLog NEWS
+	$(MAKE) doc LOG_VERSION=$(shell git tag -l | tail -1)
+	awk 'BEGIN{RS="=== ";ORS=""}NR==2{sub(/\n$$/,"");print RS""$$0 }' \
+	 < NEWS > doc/LATEST
+	-find doc/images doc/js -type f | \
+		TZ=UTC xargs touch -d '1970-01-01 00:00:01' doc/rdoc.css
+	chmod 644 $$(find doc -type f)
+	$(RSYNC) -av doc/ rubyforge.org:/var/www/gforge-projects/rainbows/
+	git ls-files | xargs touch
+
 ifneq ($(VERSION),)
 rfproject := rainbows
 rfpackage := rainbows
@@ -171,6 +179,8 @@ release: verify package $(release_notes) $(release_changes)
 	# in case of gem downloads from RubyForge releases page
 	-rubyforge add_file \
 	  $(rfproject) $(rfpackage) $(VERSION) $(pkggem)
+	$(RAKE) raa_update VERSION=$(VERSION)
+	$(RAKE) fm_update VERSION=$(VERSION)
 else
 gem install-gem: GIT-VERSION-FILE
 	$(MAKE) $@ VERSION=$(GIT_VERSION)
