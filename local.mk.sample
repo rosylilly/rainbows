@@ -7,6 +7,12 @@
 RSYNC = rsync
 DLEXT := so
 
+# if you have a decent amount of RAM, setting TMPDIR to be on tmpfs
+# can significantly improve performance because uploads take a lot
+# of disk I/O due to the rewindability requirement in Rack.
+# TMPDIR := /dev/shm
+# export TMPDIR
+
 # Avoid loading rubygems to speed up tests because gmake is
 # fork+exec heavy with Ruby.
 prefix = $(HOME)
