@@ -190,6 +190,7 @@ task :isolate do
 
   Isolate.now!(
     :system => false,
+    # we want "ruby-1.8.7" and not "ruby-1.8", so disable multiruby
     :multiruby => false,
     :path => "tmp/isolate/ruby-#{RUBY_VERSION}")
 end
