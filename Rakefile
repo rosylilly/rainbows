@@ -183,14 +183,3 @@ task :fm_update do
     p http.post(uri.path, req, {'Content-Type'=>'application/json'})
   end
 end
-
-desc 'isolate gems for development'
-task :isolate do
-  require 'isolate'
-
-  Isolate.now!(
-    :system => false,
-    # we want "ruby-1.8.7" and not "ruby-1.8", so disable multiruby
-    :multiruby => false,
-    :path => "tmp/isolate/ruby-#{RUBY_VERSION}")
-end

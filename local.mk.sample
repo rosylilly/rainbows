@@ -29,23 +29,6 @@ else
   prefix := $(prefix)/ruby-1.9.2
   export PATH := $(prefix)/bin:$(PATH)
   RUBY := $(prefix)/bin/ruby --disable-gems
-  gem_paths := $(addprefix $(prefix)/lib/ruby/gems/1.9.1/gems/,$(gems))
-endif
-
-ifndef NO_ISOLATE
-  x := $(shell test -d t/ && \
-         PATH=$(PATH) NO_ISOLATE=T $(MAKE) -s isolate RUBY:="$(RUBY)")
-endif
-
-RUBY_VERSION := $(shell $(RUBY) -e 'puts RUBY_VERSION')
-
-updir := $(shell git rev-parse --show-cdup)
-gem_paths := $(wildcard $(updir)tmp/isolate/ruby-$(RUBY_VERSION)/gems/*-*)
-
-ifdef gem_paths
-  sp :=
-  sp +=
-  export RUBYLIB := $(subst $(sp),:,$(addsuffix /lib,$(gem_paths)))
 endif
 
 # pipefail is THE reason to use bash (v3+) or never revisions of ksh93

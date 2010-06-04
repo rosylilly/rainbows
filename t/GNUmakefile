@@ -15,12 +15,7 @@ ifeq ($(RUBY_VERSION),)
   $(error unable to detect RUBY_VERSION)
 endif
 
-ifeq ($(RUBYLIB),)
-  RUBYLIB := $(rainbows_lib)
-else
-  RUBYLIB := $(rainbows_lib):$(RUBYLIB)
-endif
-export RUBYLIB RUBY_VERSION
+export RUBY_VERSION
 
 models += WriterThreadPool
 models += WriterThreadSpawn
@@ -99,16 +94,21 @@ $(deps):
 	@test -s $@.$(pid) || \
 	  { echo >&2 "E '$(dep_bin)' not found in PATH=$(PATH)"; exit 1; }
 	@mv $@.$(pid) $@
-dep: $(deps)
-	$(MAKE) -C .. isolate
+
+libs := tmp/isolate/ruby-$(RUBY_VERSION)/.libs
+$(libs): test_isolate.rb
+	mkdir -p $(@D)
+	$(RUBY) $< > $@+
+	mv $@+ $@
+$(T): $(libs) $(deps) test-bin-$(RUBY_VERSION)/rainbows trash/.gitignore
 
 $(MODEL_T): export model = $(firstword $(subst ., ,$@))
 $(MODEL_T): script = $(subst $(model).,,$@)
-$(MODEL_T): trash/.gitignore
 $(MODEL_T): export RUBY := $(RUBY)
 $(MODEL_T): export PATH := $(CURDIR)/test-bin-$(RUBY_VERSION):$(PATH)
-$(MODEL_T): test-bin-$(RUBY_VERSION)/rainbows dep
-	$(TRACER) $(SHELL) $(SH_TEST_OPTS) $(script) $(TEST_OPTS)
+$(MODEL_T):
+	RUBYLIB=$(rainbows_lib):$$(cat $(libs)) \
+	   $(TRACER) $(SHELL) $(SH_TEST_OPTS) $(script) $(TEST_OPTS)
 
 trash/.gitignore:
 	mkdir -p $(@D)
