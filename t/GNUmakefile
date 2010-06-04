@@ -100,13 +100,14 @@ $(libs): test_isolate.rb
 	mkdir -p $(@D)
 	$(RUBY) $< > $@+
 	mv $@+ $@
-$(T): $(libs) $(deps) test-bin-$(RUBY_VERSION)/rainbows trash/.gitignore
+t_deps := $(libs) $(deps) test-bin-$(RUBY_VERSION)/rainbows trash/.gitignore
+$(T): $(t_deps)
 
 $(MODEL_T): export model = $(firstword $(subst ., ,$@))
 $(MODEL_T): script = $(subst $(model).,,$@)
 $(MODEL_T): export RUBY := $(RUBY)
 $(MODEL_T): export PATH := $(CURDIR)/test-bin-$(RUBY_VERSION):$(PATH)
-$(MODEL_T):
+$(MODEL_T): $(t_deps)
 	RUBYLIB=$(rainbows_lib):$$(cat $(libs)) \
 	   $(TRACER) $(SHELL) $(SH_TEST_OPTS) $(script) $(TEST_OPTS)
 
