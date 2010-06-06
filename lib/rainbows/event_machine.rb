@@ -112,18 +112,15 @@ module Rainbows
         end
 
         headers = Rack::Utils::HeaderHash.new(response[1])
-        path = body.to_path
-        io = body.to_io if body.respond_to?(:to_io)
-        io ||= IO.new($1.to_i) if path =~ %r{\A/dev/fd/(\d+)\z}
-        io ||= File.open(path, 'rb') # could be a named pipe
-
+        io = Rainbows.body_to_io(body)
         st = io.stat
+
         if st.file?
           headers.delete('Transfer-Encoding')
           headers['Content-Length'] ||= st.size.to_s
           response = [ response.first, headers.to_hash, [] ]
           HttpResponse.write(self, response, out)
-          stream = stream_file_data(path)
+          stream = stream_file_data(body.to_path)
           stream.callback { quit } unless alive
         elsif st.socket? || st.pipe?
           do_chunk = !!(headers['Transfer-Encoding'] =~ %r{\Achunked\z}i)

@@ -17,12 +17,7 @@ module Rainbows
             return HttpResponse.write(client, response, out)
 
         headers = HH.new(headers)
-
-        # to_io is not part of the Rack spec, but make an exception
-        # here since we can't get here without checking to_path first
-        io = body.to_io if body.respond_to?(:to_io)
-        io ||= ::IO.new($1.to_i) if body.to_path =~ %r{\A/dev/fd/(\d+)\z}
-        io ||= File.open(body.to_path, 'rb')
+        io = Rainbows.body_to_io(body)
         st = io.stat
 
         if st.socket? || st.pipe?

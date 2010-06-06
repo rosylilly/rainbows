@@ -33,8 +33,7 @@ module Rainbows
     if IO.respond_to?(:copy_stream)
       def write_body(client, body)
         if body.respond_to?(:to_path)
-          io = body.respond_to?(:to_io) ? body.to_io : body.to_path
-          IO.copy_stream(io, client)
+          IO.copy_stream(Rainbows.body_to_io(body), client)
         else
           body.each { |chunk| client.write(chunk) }
         end
