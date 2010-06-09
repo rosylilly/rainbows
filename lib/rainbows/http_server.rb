@@ -33,10 +33,8 @@ module Rainbows
     # connection we accept without wasting cycles.  That added to the
     # fact that we let clients keep idle connections open for long
     # periods of time means we have to chmod at a fixed interval.
-    alias_method :set_timeout, :timeout=
-    undef_method :timeout=
     def timeout=(nr)
-      set_timeout(nr + 1)
+      super(nr + 1)
     end
     #:startdoc:
 
