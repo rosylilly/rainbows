@@ -110,10 +110,7 @@ opts = OptionParser.new("", 24, '  ') do |opts|
   opts.parse! ARGV
 end
 
-config = ARGV[0] || "config.ru"
-abort "configuration file #{config} not found" unless File.exist?(config)
-
-app = Unicorn.builder(config, opts)
+app = Unicorn.builder(ARGV[0] || 'config.ru', opts)
 listeners << "#{host}:#{port}" if set_listener
 
 if $DEBUG
