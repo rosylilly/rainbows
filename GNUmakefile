@@ -1,5 +1,6 @@
 # use GNU Make to run tests in parallel, and without depending on RubyGems
 all::
+MRI = ruby
 RUBY = ruby
 RAKE = rake
 RSYNC = rsync
@@ -15,6 +16,7 @@ endif
 ifeq ($(RUBY_VERSION),)
   RUBY_VERSION := $(shell $(RUBY) -e 'puts RUBY_VERSION')
 endif
+RUBY_ENGINE := $(shell $(RUBY) -e 'puts((RUBY_ENGINE rescue "ruby"))')
 
 base_bins := rainbows
 bins := $(addprefix bin/, $(base_bins))
@@ -91,16 +93,16 @@ doc: .document NEWS ChangeLog
 		< $${i}_1.html > tmp && mv tmp $${i}_1.html; \
 	  ln $${i}_1.html $${i}.1.html; \
 	  done
-	$(RUBY) -i -p -e \
+	$(MRI) -i -p -e \
 	  '$$_.gsub!("</title>",%q{\&$(call atom,$(cgit_atom))})' \
 	  doc/ChangeLog.html
-	$(RUBY) -i -p -e \
+	$(MRI) -i -p -e \
 	  '$$_.gsub!("</title>",%q{\&$(call atom,$(news_atom))})' \
 	  doc/NEWS.html doc/README.html
 	$(RAKE) -s news_atom > doc/NEWS.atom.xml
 	cd doc && ln README.html tmp && mv tmp index.html
 	$(MAKE) -C Documentation comparison.html
-	$(RUBY) -i -p -e \
+	$(MRI) -i -p -e \
 	  '$$_.gsub!(/INCLUDE/){File.read("Documentation/comparison.html")}' \
 	  doc/Summary.html
 	cat Documentation/comparison.css >> doc/rdoc.css

@@ -1,7 +1,8 @@
 require 'rubygems'
 require 'isolate'
+engine = defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby'
 
-path = "tmp/isolate/ruby-#{RUBY_VERSION}"
+path = "tmp/isolate/#{engine}-#{RUBY_VERSION}"
 opts = {
   :system => false,
   # we want "ruby-1.8.7" and not "ruby-1.8", so disable multiruby
@@ -16,23 +17,24 @@ Isolate.now!(opts) do
   gem 'rack', '1.1.0'
   gem 'unicorn', '0.991.0'
 
-  gem 'iobuffer', '0.1.3'
-  gem 'rev', '0.3.2'
+  if ! defined?(RUBY_ENGINE)
+    gem 'iobuffer', '0.1.3'
+    gem 'rev', '0.3.2'
 
-  gem 'eventmachine', '0.12.10'
+    gem 'eventmachine', '0.12.10'
 
-  gem 'sinatra', '0.9.4'
-  gem 'async_sinatra', '0.1.5'
+    gem 'sinatra', '0.9.4'
+    gem 'async_sinatra', '0.1.5'
 
-  gem 'neverblock', '0.1.6.2'
+    gem 'neverblock', '0.1.6.2'
+    gem 'cramp', '0.11'
+  end
 
-  if defined?(::Fiber)
+  if defined?(::Fiber) && ! defined?(RUBY_ENGINE)
     gem 'case', '0.5'
     gem 'revactor', '0.1.5'
     gem 'rack-fiber_pool', '0.9.0'
   end
-
-  gem 'cramp', '0.11'
 end
 
 $stdout.reopen(old_out)

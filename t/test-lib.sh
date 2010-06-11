@@ -19,7 +19,7 @@ fi
 set -e
 RUBY="${RUBY-ruby}"
 RUBY_VERSION=${RUBY_VERSION-$($RUBY -e 'puts RUBY_VERSION')}
-t_pfx=$PWD/trash/$model.$T-$RUBY_VERSION
+t_pfx=$PWD/trash/$model.$T-$RUBY_ENGINE-$RUBY_VERSION
 set -u
 
 PATH=$PWD/bin:$PATH
