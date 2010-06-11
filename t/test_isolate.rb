@@ -14,7 +14,7 @@ $stdout.reopen($stderr)
 
 Isolate.now!(opts) do
   gem 'rack', '1.1.0'
-  gem 'unicorn', '0.99.0'
+  gem 'unicorn', '0.991.0'
 
   gem 'iobuffer', '0.1.3'
   gem 'rev', '0.3.2'
