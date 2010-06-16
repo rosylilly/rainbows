@@ -17,7 +17,7 @@ Isolate.now!(opts) do
   gem 'rack', '1.1.0'
   gem 'unicorn', '0.991.0'
 
-  if ! defined?(RUBY_ENGINE)
+  if engine == "ruby"
     gem 'iobuffer', '0.1.3'
     gem 'rev', '0.3.2'
 
@@ -30,7 +30,7 @@ Isolate.now!(opts) do
     gem 'cramp', '0.11'
   end
 
-  if defined?(::Fiber) && ! defined?(RUBY_ENGINE)
+  if defined?(::Fiber) && engine == "ruby"
     gem 'case', '0.5'
     gem 'revactor', '0.1.5'
     gem 'rack-fiber_pool', '0.9.0'
