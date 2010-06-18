@@ -40,7 +40,7 @@ module Rainbows
         # we need to make sure our pipe output is Fiber-compatible
         case env["rainbows.model"]
         when :FiberSpawn, :FiberPool, :RevFiberSpawn
-          return [ status, headers.to_hash, Fiber::IO.new(io,::Fiber.current) ]
+          return [ status, headers, Fiber::IO.new(io,::Fiber.current) ]
         end
       else # unlikely, char/block device file, directory, ...
         return response
@@ -48,7 +48,7 @@ module Rainbows
       resp = dup # be reentrant here
       resp.to_path = "/dev/fd/#{io.fileno}"
       resp.to_io = io
-      [ status, headers.to_hash, resp ]
+      [ status, headers, resp ]
     end
 
     # called by the webserver or other middlewares if they can't

@@ -118,7 +118,7 @@ module Rainbows
         if st.file?
           headers.delete('Transfer-Encoding')
           headers['Content-Length'] ||= st.size.to_s
-          response = [ response[0], headers.to_hash, [] ]
+          response = [ response[0], headers, [] ]
           HttpResponse.write(self, response, out)
           stream = stream_file_data(body.to_path)
           stream.callback { quit } unless alive
@@ -130,7 +130,7 @@ module Rainbows
           else
             out[0] = CONN_CLOSE
           end
-          response = [ response[0], headers.to_hash, [] ]
+          response = [ response[0], headers, [] ]
           HttpResponse.write(self, response, out)
           if do_chunk
             EM.watch(io, ResponseChunkPipe, self).notify_readable = true

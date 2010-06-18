@@ -42,7 +42,7 @@ module Rainbows
         end
         client.defer_body(io, out)
         out.nil? or
-          client.write(HttpResponse.header_string(status, headers.to_hash, out))
+          client.write(HttpResponse.header_string(status, headers, out))
       end
 
       def initialize(io, client, do_chunk, body)

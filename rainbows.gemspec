@@ -40,14 +40,14 @@ Gem::Specification.new do |s|
 
   s.test_files = test_files
 
+  # we want a newer Rack for a valid HeaderHash#each
+  s.add_dependency(%q<rack>, ['~> 1.1'])
+
   # we need Unicorn for the HTTP parser and process management
   # Unicorn 0.991.0 handles config.ru when started outside of
   # the prespecified working_directory
   s.add_dependency(%q<unicorn>, [">= 0.991.0", "< 2.0.0"])
   s.add_development_dependency(%q<isolate>, "~> 2.0.2")
-
-  # Unicorn already depends on Rack
-  # s.add_dependency(%q<rack>)
 
   # optional runtime dependencies depending on configuration
   # see config/isolate.rb for the exact versions we've tested with
