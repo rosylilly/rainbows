@@ -4,11 +4,11 @@ require 'rainbows/fiber/io'
 module Rainbows
   module Fiber
 
-    # blocked readers (key: Rainbows::Fiber::IO object, value is irrelevant)
-    RD = {}.compare_by_identity
+    # blocked readers (key: fileno, value: Rainbows::Fiber::IO object)
+    RD = []
 
-    # blocked writers (key: Rainbows::Fiber::IO object, value is irrelevant)
-    WR = {}.compare_by_identity
+    # blocked writers (key: fileno, value: Rainbows::Fiber::IO object)
+    WR = []
 
     # sleeping fibers go here (key: Fiber object, value: wakeup time)
     ZZ = {}.compare_by_identity
@@ -35,9 +35,10 @@ module Rainbows
       def schedule(&block)
         ret = begin
           G.tick
-          RD.keys.each { |c| c.f.resume } # attempt to time out idle clients
+          RD.compact.each { |c| c.f.resume } # attempt to time out idle clients
           t = schedule_sleepers
-          Kernel.select(RD.keys.concat(LISTENERS), WR.keys, nil, t) or return
+          Kernel.select(RD.compact.concat(LISTENERS),
+                        WR.compact, nil, t) or return
         rescue Errno::EINTR
           retry
         rescue Errno::EBADF, TypeError
@@ -46,7 +47,7 @@ module Rainbows
         end or return
 
         # active writers first, then _all_ readers for keepalive timeout
-        ret[1].concat(RD.keys).each { |c| c.f.resume }
+        ret[1].concat(RD.compact).each { |c| c.f.resume }
 
         # accept is an expensive syscall, filter out listeners we don't want
         (ret[0] & LISTENERS).each(&block)

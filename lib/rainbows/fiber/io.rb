@@ -19,21 +19,23 @@ module Rainbows
       end
 
       def close
-        RD.delete(self)
-        WR.delete(self)
+        fileno = to_io.fileno
+        RD[fileno] = WR[fileno] = nil
         to_io.close unless to_io.closed?
       end
 
       def wait_readable
-        RD[self] = false
+        fileno = to_io.fileno
+        RD[fileno] = self
         ::Fiber.yield
-        RD.delete(self)
+        RD[fileno] = nil
       end
 
       def wait_writable
-        WR[self] = false
+        fileno = to_io.fileno
+        WR[fileno] = self
         ::Fiber.yield
-        WR.delete(self)
+        WR[fileno] = nil
       end
 
       def write(buf)
