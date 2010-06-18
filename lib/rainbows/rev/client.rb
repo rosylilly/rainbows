@@ -14,6 +14,33 @@ module Rainbows
         @deferred_bodies = [] # for (fast) regular files only
       end
 
+      def quit
+        super
+        close if @deferred_bodies.empty? && @_write_buffer.empty?
+      end
+
+      def write(buf)
+        if @_write_buffer.empty?
+          rv = buf.size
+          # try to write directly to the kernel socket buffers to avoid an
+          # extra userspace copy if possible.
+          begin
+            w = @_io.write_nonblock(buf)
+            if w == buf.size
+              on_write_complete
+              return rv
+            end
+            buf = buf[w..-1]
+          rescue Errno::EAGAIN
+            break # copy what's left into the IO::Buffer
+          rescue
+            close
+            return
+          end while true
+        end
+        super(buf)
+      end
+
       # queued, optional response bodies, it should only be unpollable "fast"
       # devices where read(2) is uninterruptable.  Unfortunately, NFS and ilk
       # are also part of this.  We'll also stick DeferredResponse bodies in
