@@ -85,7 +85,7 @@ module Rainbows
     # to by the (non-frozen) Unicorn::HttpRequest::LOCALHOST constant.
     def addr(io)
       io.respond_to?(:peeraddr) ?
-                        io.peeraddr.last : Unicorn::HttpRequest::LOCALHOST
+                        io.peeraddr[-1] : Unicorn::HttpRequest::LOCALHOST
     end
 
     # the default max body size is 1 megabyte (1024 * 1024 bytes)

@@ -68,7 +68,7 @@ module Rainbows
 
     def worker_connections(*args)
       return @worker_connections if args.empty?
-      nr = args.first
+      nr = args[0]
       (Integer === nr && nr > 0) or
         raise ArgumentError, "worker_connections must be a positive Integer"
       @worker_connections = nr

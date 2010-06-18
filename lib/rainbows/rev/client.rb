@@ -52,7 +52,7 @@ module Rainbows
       end
 
       def on_write_complete
-        if body = @deferred_bodies.first
+        if body = @deferred_bodies[0]
           return if DeferredResponse === body
           begin
             begin

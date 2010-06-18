@@ -91,7 +91,7 @@ module Rainbows::Fiber
           env[REMOTE_ADDR] = remote_addr
           response = APP.call(env.update(RACK_DEFAULTS))
 
-          if 100 == response.first.to_i
+          if 100 == response[0].to_i
             client.write(EXPECT_100_RESPONSE)
             env.delete(HTTP_EXPECT)
             response = APP.call(env)

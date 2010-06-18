@@ -54,7 +54,7 @@ module Rainbows
         env[Const::REMOTE_ADDR] = remote_addr
         response = app.call(env.update(RACK_DEFAULTS))
 
-        if 100 == response.first.to_i
+        if 100 == response[0].to_i
           client.write(Const::EXPECT_100_RESPONSE)
           env.delete(Const::HTTP_EXPECT)
           response = app.call(env)

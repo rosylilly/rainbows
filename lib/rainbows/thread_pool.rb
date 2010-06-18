@@ -42,7 +42,7 @@ module Rainbows
     end
 
     def sync_worker
-      s = LISTENERS.first
+      s = LISTENERS[0]
       begin
         c = Rainbows.sync_accept(s) and process_client(c)
       rescue => e
@@ -57,7 +57,7 @@ module Rainbows
         # all working off the same socket could be a thundering herd
         # problem.  On the other hand, a thundering herd may not
         # even incur as much overhead as an extra Mutex#synchronize
-        ret = IO.select(LISTENERS, nil, nil, 1) and ret.first.each do |s|
+        ret = IO.select(LISTENERS, nil, nil, 1) and ret[0].each do |s|
           s = Rainbows.accept(s) and process_client(s)
         end
       rescue Errno::EINTR

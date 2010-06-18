@@ -80,7 +80,7 @@ module Rainbows
           # too tricky to support pipelining with :async since the
           # second (pipelined) request could be a stuck behind a
           # long-running async response
-          (response.nil? || -1 == response.first) and return @state = :close
+          (response.nil? || -1 == response[0]) and return @state = :close
 
           alive = @hp.keepalive? && G.alive
           out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if @hp.headers?
@@ -99,7 +99,7 @@ module Rainbows
       end
 
       def response_write(response, out = [ CONN_CLOSE ], alive = false)
-        @body = body = response.last
+        @body = body = response[2]
         if body.respond_to?(:errback) && body.respond_to?(:callback)
           body.callback { quit }
           body.errback { quit }
@@ -118,7 +118,7 @@ module Rainbows
         if st.file?
           headers.delete('Transfer-Encoding')
           headers['Content-Length'] ||= st.size.to_s
-          response = [ response.first, headers.to_hash, [] ]
+          response = [ response[0], headers.to_hash, [] ]
           HttpResponse.write(self, response, out)
           stream = stream_file_data(body.to_path)
           stream.callback { quit } unless alive
@@ -130,7 +130,7 @@ module Rainbows
           else
             out[0] = CONN_CLOSE
           end
-          response = [ response.first, headers.to_hash, [] ]
+          response = [ response[0], headers.to_hash, [] ]
           HttpResponse.write(self, response, out)
           if do_chunk
             EM.watch(io, ResponseChunkPipe, self).notify_readable = true
