@@ -21,22 +21,20 @@ module Rainbows
 
       def write(buf)
         if @_write_buffer.empty?
-          rv = buf.size
           # try to write directly to the kernel socket buffers to avoid an
           # extra userspace copy if possible.
           begin
             w = @_io.write_nonblock(buf)
-            if w == buf.size
+            if w == buf.bytesize
               on_write_complete
-              return rv
+              return w
             end
             buf = buf[w..-1]
           rescue Errno::EAGAIN
-            break # copy what's left into the IO::Buffer
           rescue
             close
             return
-          end while true
+          end
         end
         super(buf)
       end
