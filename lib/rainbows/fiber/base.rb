@@ -61,13 +61,13 @@ module Rainbows
         ZZ.delete_if { |fib, time|
           if now >= time
             fibs << fib
-            now = Time.now
           else
             max = time
             false
           end
         }
         fibs.each { |fib| fib.resume }
+        now = Time.now
         max.nil? || max > (now + 1) ? 1 : max - now
       end
 
