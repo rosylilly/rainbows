@@ -133,8 +133,8 @@ config file:
       worker_connections 100
     end
 
-See the {Rainbows! configuration}[link:Rainbows.html#method-i-Rainbows!]
-{documentation}[link:Rainbows.html#method-i-Rainbows!]
+See the {Rainbows! configuration}[link:Rainbows/Configurator.html]
+{documentation}[link:Rainbows/Configurator.html]
 for more details.
 
 == Development
