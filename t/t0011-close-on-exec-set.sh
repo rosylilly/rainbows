@@ -6,7 +6,7 @@ t_plan 7 "ensure close-on-exec flag is set for $model"
 
 t_begin "setup and start" && {
 	rainbows_setup $model 1 1
-	nr=$nr rainbows -D fork-sleep.ru -c $unicorn_config
+	nr=$nr rainbows -E none -D fork-sleep.ru -c $unicorn_config
 	rainbows_wait_start
 }
 

@@ -1,4 +1,3 @@
-#\-E none
 # we do not want Rack::Lint or anything to protect us
 use Rack::ContentLength
 use Rack::ContentType, "text/plain"
