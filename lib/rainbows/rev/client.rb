@@ -19,18 +19,22 @@ module Rainbows
         close if @deferred_bodies.empty? && @_write_buffer.empty?
       end
 
+      # override the ::Rev::IO#write method try to write directly to the
+      # kernel socket buffers to avoid an extra userspace copy if
+      # possible.
       def write(buf)
         if @_write_buffer.empty?
-          # try to write directly to the kernel socket buffers to avoid an
-          # extra userspace copy if possible.
           begin
             w = @_io.write_nonblock(buf)
             if w == Rack::Utils.bytesize(buf)
               on_write_complete
               return w
             end
+            # we never care for the return value, but yes, we may return
+            # a "fake" short write from super(buf) if anybody cares.
             buf = buf[w..-1]
           rescue Errno::EAGAIN
+            # fall through to super(buf)
           rescue
             close
             return
