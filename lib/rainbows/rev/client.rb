@@ -25,7 +25,7 @@ module Rainbows
           # extra userspace copy if possible.
           begin
             w = @_io.write_nonblock(buf)
-            if w == buf.bytesize
+            if w == Rack::Utils.bytesize(buf)
               on_write_complete
               return w
             end
