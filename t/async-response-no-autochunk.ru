@@ -12,7 +12,6 @@ EOF
 run lambda { |env|
   env['rainbows.autochunk'] = false
   io = IO.popen(script, 'rb')
-  io.sync = true
   [
     200,
     {
