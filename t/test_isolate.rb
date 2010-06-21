@@ -15,7 +15,7 @@ $stdout.reopen($stderr)
 
 Isolate.now!(opts) do
   gem 'rack', '1.1.0'
-  gem 'unicorn', '0.991.0'
+  gem 'unicorn', '1.0.0'
 
   if engine == "ruby"
     gem 'iobuffer', '0.1.3'
