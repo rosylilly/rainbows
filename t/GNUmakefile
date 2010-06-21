@@ -39,6 +39,10 @@ ifeq ($(RUBY_ENGINE),ruby)
     models += FiberPool
   endif
 endif
+
+ifeq ($(RUBY_ENGINE),rbx)
+  models += ActorSpawn
+endif
 all_models := $(models) Base
 
 T = $(wildcard t[0-9][0-9][0-9][0-9]-*.sh)
