@@ -11,8 +11,8 @@ module Rainbows
 # efficiently using sendfile() or similar.  With multithreaded models
 # under Ruby 1.9, IO.copy_stream will be used.
 #
-# This middleware is the opposite of Rack::Contrib::Sendfile as it
-# reverses the effect of Rack::Contrib::Sendfile.  Unlike many Ruby
+# This middleware is the opposite of Rack::Sendfile as it
+# reverses the effect of Rack:::Sendfile.  Unlike many Ruby
 # web servers, some configurations of \Rainbows! are capable of
 # serving static files efficiently.
 #
