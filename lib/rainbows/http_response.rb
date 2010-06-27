@@ -8,8 +8,7 @@ class Rainbows::HttpResponse < ::Unicorn::HttpResponse
     status = CODES[status.to_i] || status
 
     headers.each do |key, value|
-      next if %r{\AX-Rainbows-}i =~ key
-      next if SKIP.include?(key.downcase)
+      next if %r{\A(?:X-Rainbows-|Connection\z|Date\z|Status\z)}i =~ key
       if value =~ /\n/
         # avoiding blank, key-only cookies with /\n+/
         out.concat(value.split(/\n+/).map! { |v| "#{key}: #{v}\r\n" })
@@ -26,8 +25,7 @@ class Rainbows::HttpResponse < ::Unicorn::HttpResponse
 
   def self.write(socket, rack_response, out = [])
     status, headers, body = rack_response
-    out.instance_of?(Array) and
-      socket.write(header_string(status, headers, out))
+    out and socket.write(header_string(status, headers, out))
 
     body.each { |chunk| socket.write(chunk) }
     ensure
