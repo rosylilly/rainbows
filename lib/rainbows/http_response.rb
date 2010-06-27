@@ -2,7 +2,9 @@
 require 'time' # for Time#httpdate
 
 # :stopdoc:
-class Rainbows::HttpResponse < ::Unicorn::HttpResponse
+module Rainbows::HttpResponse
+
+  CODES = Unicorn::HttpResponse::CODES
 
   def self.header_string(status, headers, out)
     status = CODES[status.to_i] || status
