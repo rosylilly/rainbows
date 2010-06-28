@@ -72,42 +72,31 @@ module Rainbows
         max.nil? || max > (now + 1) ? 1 : max - now
       end
 
+      def write_body(client, body)
+        body.each { |chunk| client.write(chunk) }
+        ensure
+          body.respond_to?(:close) and body.close
+      end
+
+      def wait_headers_readable(client)
+        io = client.to_io
+        expire = nil
+        begin
+          return io.recv_nonblock(1, Socket::MSG_PEEK)
+        rescue Errno::EAGAIN
+          return if expire && expire < Time.now
+          expire ||= Time.now + G.kato
+          client.wait_readable
+          retry
+        end
+      end
+
       def process_client(client)
         G.cur += 1
-        io = client.to_io
-        buf = client.read_timeout or return
-        hp = HttpParser.new
-        env = {}
-        alive = true
-        remote_addr = Rainbows.addr(io)
-
-        begin # loop
-          until hp.headers(env, buf)
-            buf << (client.read_timeout or return)
-          end
-
-          env[CLIENT_IO] = client
-          env[RACK_INPUT] = 0 == hp.content_length ?
-                    NULL_IO : TeeInput.new(client, env, hp, buf)
-          env[REMOTE_ADDR] = remote_addr
-          response = APP.call(env.update(RACK_DEFAULTS))
-
-          if 100 == response[0].to_i
-            client.write(EXPECT_100_RESPONSE)
-            env.delete(HTTP_EXPECT)
-            response = APP.call(env)
-          end
-
-          alive = hp.keepalive? && G.alive
-          out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if hp.headers?
-          HttpResponse.write(client, response, out)
-        end while alive and hp.reset.nil? and env.clear
-      rescue => e
-        Error.write(io, e)
+        super(client) # see Rainbows::Base
       ensure
         G.cur -= 1
         ZZ.delete(client.f)
-        client.close
       end
 
     end

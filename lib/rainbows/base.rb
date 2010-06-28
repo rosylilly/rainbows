@@ -59,6 +59,10 @@ module Rainbows::Base
 
   module_function :write_body
 
+  def wait_headers_readable(client)
+    IO.select([client], nil, nil, G.kato)
+  end
+
   # once a client is accepted, it is processed in its entirety here
   # in 3 easy steps: read request, call app, write app response
   # this is used by synchronous concurrency models
@@ -72,7 +76,7 @@ module Rainbows::Base
 
     begin # loop
       until hp.headers(env, buf)
-        IO.select([client], nil, nil, G.kato) or return
+        wait_headers_readable(client) or return
         buf << client.readpartial(CHUNK_SIZE)
       end
 

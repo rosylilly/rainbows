@@ -8,6 +8,20 @@ module Rainbows
     # the underlying IO object cannot read or write
     class IO < Struct.new(:to_io, :f)
 
+      # :stopdoc:
+      LOCALHOST = Unicorn::HttpRequest::LOCALHOST
+
+      # needed to write errors with
+      def write_nonblock(buf)
+        to_io.write_nonblock(buf)
+      end
+
+      # enough for Rainbows.addr
+      def peeraddr
+        to_io.respond_to?(:peeraddr) ? to_io.peeraddr : [ LOCALHOST ]
+      end
+      # :stopdoc:
+
       # for wrapping output response bodies
       def each(&block)
         begin
@@ -22,6 +36,10 @@ module Rainbows
         fileno = to_io.fileno
         RD[fileno] = WR[fileno] = nil
         to_io.close unless to_io.closed?
+      end
+
+      def closed?
+        to_io.closed?
       end
 
       def wait_readable
