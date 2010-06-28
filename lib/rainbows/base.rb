@@ -39,25 +39,56 @@ module Rainbows::Base
     logger.info "Rainbows! #@use worker_connections=#@worker_connections"
   end
 
-  if IO.respond_to?(:copy_stream)
-    def write_body(client, body)
-      if body.respond_to?(:to_path)
-        IO.copy_stream(Rainbows.body_to_io(body), client)
-      else
-        body.each { |chunk| client.write(chunk) }
-      end
-      ensure
-        body.respond_to?(:close) and body.close
-    end
-  else
-    def write_body(client, body)
-      body.each { |chunk| client.write(chunk) }
-      ensure
-        body.respond_to?(:close) and body.close
+  # TODO: move write_body_* stuff out of Base
+  def write_body_each(client, body)
+    body.each { |chunk| client.write(chunk) }
+    ensure
+      body.respond_to?(:close) and body.close
+  end
+
+  # The sendfile 1.0.0 RubyGem includes IO#sendfile and
+  # IO#sendfile_nonblock, previous versions didn't have
+  # IO#sendfile_nonblock, and IO#sendfile in previous versions
+  # could other threads under 1.8 with large files
+  #
+  # IO#sendfile currently (June 2010) beats 1.9 IO.copy_stream with
+  # non-Linux support and large files on 32-bit.  We still fall back to
+  # IO.copy_stream (if available) if we're dealing with DevFdResponse
+  # objects, though.
+  if IO.method_defined?(:sendfile_nonblock)
+    def write_body_path(client, body)
+      file = Rainbows.body_to_io(body)
+      file.stat.file? ? client.sendfile(file, 0) :
+                        write_body_stream(client, file)
     end
   end
 
-  module_function :write_body
+  if IO.respond_to?(:copy_stream)
+    unless method_defined?(:write_body_path)
+      def write_body_path(client, body)
+        IO.copy_stream(Rainbows.body_to_io(body), client)
+      end
+    end
+
+    def write_body_stream(client, body)
+      IO.copy_stream(body, client)
+    end
+  else
+    alias write_body_stream write_body_each
+  end
+
+  if method_defined?(:write_body_path)
+    def write_body(client, body)
+      body.respond_to?(:to_path) ?
+        write_body_path(client, body) :
+        write_body_each(client, body)
+    end
+  else
+    alias write_body write_body_each
+  end
+
+  module_function :write_body, :write_body_each, :write_body_stream
+  method_defined?(:write_body_path) and module_function(:write_body_path)
 
   def wait_headers_readable(client)
     IO.select([client], nil, nil, G.kato)

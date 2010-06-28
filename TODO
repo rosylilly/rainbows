@@ -6,6 +6,14 @@ care about.
 * Split out NeverBlock into NeverBlockEventMachine and NeverBlockReactor
   NeverBlock will default to one of them (depending on NB upstream).
 
+* allow _OPTIONAL_ splice(2) with DevFdResponse under Linux
+  (splice is very broken under some older kernels)
+
+* use IO#sendfile_nonblock for EventMachine/Rev/Revactor/NeverBlock
+
+* Open file cache (idea from nginx), since sendfile (and IO.copy_stream)
+  allows pread(2)-style offsets
+
 * Improve test suite coverage.  We won't waste cycles with puny
   unit tests, only integration tests that exercise externally
   visible parts.

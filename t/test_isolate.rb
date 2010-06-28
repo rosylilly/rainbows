@@ -18,6 +18,8 @@ Isolate.now!(opts) do
   gem 'unicorn', '1.0.0'
 
   if engine == "ruby"
+    gem 'sendfile', '1.0.0' # next Rubinius should support this
+
     gem 'iobuffer', '0.1.3'
     gem 'rev', '0.3.2'
 
