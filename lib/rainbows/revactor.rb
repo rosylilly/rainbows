@@ -44,9 +44,7 @@ module Rainbows::Revactor
     alive = true
 
     begin
-      while ! hp.headers(env, buf)
-        buf << client.read(*rd_args)
-      end
+      buf << client.read(*rd_args) until hp.headers(env, buf)
 
       env[CLIENT_IO] = client
       env[RACK_INPUT] = 0 == hp.content_length ?

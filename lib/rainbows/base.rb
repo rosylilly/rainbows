@@ -71,7 +71,7 @@ module Rainbows::Base
     remote_addr = Rainbows.addr(client)
 
     begin # loop
-      while ! hp.headers(env, buf)
+      until hp.headers(env, buf)
         IO.select([client], nil, nil, G.kato) or return
         buf << client.readpartial(CHUNK_SIZE)
       end

@@ -82,7 +82,7 @@ module Rainbows
         remote_addr = Rainbows.addr(io)
 
         begin # loop
-          while ! hp.headers(env, buf)
+          until hp.headers(env, buf)
             buf << (client.read_timeout or return)
           end
 
