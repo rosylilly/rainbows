@@ -14,6 +14,8 @@ care about.
 * Open file cache (idea from nginx), since sendfile (and IO.copy_stream)
   allows pread(2)-style offsets
 
+* Byte range responses for static files + sendfile
+
 * Improve test suite coverage.  We won't waste cycles with puny
   unit tests, only integration tests that exercise externally
   visible parts.
