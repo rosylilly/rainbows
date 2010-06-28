@@ -7,6 +7,7 @@ module Rainbows
     include Unicorn
     include Rainbows::Const
     G = Rainbows::G
+    NULL_IO = Unicorn::HttpRequest::NULL_IO
 
     # Apps may return this Rack response: AsyncResponse = [ -1, {}, [] ]
     ASYNC_CALLBACK = "async.callback".freeze
@@ -40,7 +41,7 @@ module Rainbows
         @state = :body
         len = @hp.content_length
         if len == 0
-          @input = HttpRequest::NULL_IO
+          @input = NULL_IO
           app_call # common case
         else # nil or len > 0
           # since we don't do streaming input, we have no choice but

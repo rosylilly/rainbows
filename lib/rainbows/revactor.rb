@@ -49,7 +49,7 @@ module Rainbows
 
         env[Const::CLIENT_IO] = client
         env[Const::RACK_INPUT] = 0 == hp.content_length ?
-                 HttpRequest::NULL_IO :
+                 NULL_IO :
                  TeeInput.new(PartialSocket.new(client), env, hp, buf)
         env[Const::REMOTE_ADDR] = remote_addr
         response = app.call(env.update(RACK_DEFAULTS))
