@@ -5,7 +5,6 @@ module Rainbows
     # this is class is specific to Rev for writing large static files
     # or proxying IO-derived objects
     class DeferredResponse < ::Rev::IO
-      include Unicorn
       include Rainbows::Const
       G = Rainbows::G
       HH = Rack::Utils::HeaderHash
