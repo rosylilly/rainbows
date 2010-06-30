@@ -80,12 +80,27 @@ module Rainbows
         end while true
       end
 
+      if IO.method_defined?(:sendfile_nonblock)
+        def sendfile(body)
+          body.pos += @_io.sendfile_nonblock(body, body.pos, 0x10000)
+          rescue Errno::EAGAIN
+          ensure
+            enable_write_watcher
+        end
+      else
+        def sendfile(body)
+          write(body.sysread(CHUNK_SIZE))
+        end
+      end
+
       def on_write_complete
         if body = @deferred_bodies[0]
+          # no socket or pipes, body must be a regular file to continue here
           return if DeferredResponse === body
+
           begin
             begin
-              write(body.sysread(CHUNK_SIZE))
+              sendfile(body)
             rescue EOFError # expected at file EOF
               @deferred_bodies.shift
               body.close
