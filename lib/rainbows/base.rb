@@ -10,17 +10,18 @@ module Rainbows::Base
 
   # :stopdoc:
   include Rainbows::Const
+  include Rainbows::HttpResponse
 
   # shortcuts...
   G = Rainbows::G
   NULL_IO = Unicorn::HttpRequest::NULL_IO
   TeeInput = Rainbows::TeeInput
-  HttpResponse = Rainbows::HttpResponse
   HttpParser = Unicorn::HttpParser
 
   # this method is called by all current concurrency models
   def init_worker_process(worker)
     super(worker)
+    Rainbows::HttpResponse.setup(self.class)
     Rainbows::MaxBody.setup
     G.tmp = worker.tmp
 
@@ -38,57 +39,6 @@ module Rainbows::Base
     [:TERM, :INT].each { |sig| trap(sig) { exit!(0) } } # instant shutdown
     logger.info "Rainbows! #@use worker_connections=#@worker_connections"
   end
-
-  # TODO: move write_body_* stuff out of Base
-  def write_body_each(client, body)
-    body.each { |chunk| client.write(chunk) }
-    ensure
-      body.respond_to?(:close) and body.close
-  end
-
-  # The sendfile 1.0.0 RubyGem includes IO#sendfile and
-  # IO#sendfile_nonblock, previous versions didn't have
-  # IO#sendfile_nonblock, and IO#sendfile in previous versions
-  # could other threads under 1.8 with large files
-  #
-  # IO#sendfile currently (June 2010) beats 1.9 IO.copy_stream with
-  # non-Linux support and large files on 32-bit.  We still fall back to
-  # IO.copy_stream (if available) if we're dealing with DevFdResponse
-  # objects, though.
-  if IO.method_defined?(:sendfile_nonblock)
-    def write_body_path(client, body)
-      file = Rainbows.body_to_io(body)
-      file.stat.file? ? client.sendfile(file, 0) :
-                        write_body_stream(client, file)
-    end
-  end
-
-  if IO.respond_to?(:copy_stream)
-    unless method_defined?(:write_body_path)
-      def write_body_path(client, body)
-        IO.copy_stream(Rainbows.body_to_io(body), client)
-      end
-    end
-
-    def write_body_stream(client, body)
-      IO.copy_stream(body, client)
-    end
-  else
-    alias write_body_stream write_body_each
-  end
-
-  if method_defined?(:write_body_path)
-    def write_body(client, body)
-      body.respond_to?(:to_path) ?
-        write_body_path(client, body) :
-        write_body_each(client, body)
-    end
-  else
-    alias write_body write_body_each
-  end
-
-  module_function :write_body, :write_body_each, :write_body_stream
-  method_defined?(:write_body_path) and module_function(:write_body_path)
 
   def wait_headers_readable(client)
     IO.select([client], nil, nil, G.kato)
@@ -115,20 +65,17 @@ module Rainbows::Base
       env[RACK_INPUT] = 0 == hp.content_length ?
                         NULL_IO : TeeInput.new(client, env, hp, buf)
       env[REMOTE_ADDR] = remote_addr
-      status, headers, body = app.call(env.update(RACK_DEFAULTS))
+      response = app.call(env.update(RACK_DEFAULTS))
 
-      if 100 == status.to_i
+      if 100 == response[0].to_i
         client.write(EXPECT_100_RESPONSE)
         env.delete(HTTP_EXPECT)
-        status, headers, body = app.call(env)
+        response = app.call(env)
       end
 
       alive = hp.keepalive? && G.alive
-      if hp.headers?
-        out = [ alive ? CONN_ALIVE : CONN_CLOSE ]
-        client.write(HttpResponse.header_string(status, headers, out))
-      end
-      write_body(client, body)
+      out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if hp.headers?
+      write_response(client, response, out)
     end while alive and hp.reset.nil? and env.clear
   # if we get any error, try to write something back to the client
   # assuming we haven't closed the socket, but don't get hung up

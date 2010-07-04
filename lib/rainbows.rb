@@ -122,20 +122,4 @@ module Rainbows
   end
   # :startdoc:
   autoload :Fiber, 'rainbows/fiber' # core class
-
-  # to_io is not part of the Rack spec, but make an exception here
-  # since we can conserve path lookups and file descriptors
-  # \Rainbows! will never get here without checking for the existence
-  # of body.to_path first.
-  def self.body_to_io(body)
-    if body.respond_to?(:to_io)
-      body.to_io
-    else
-      # try to take advantage of Rainbows::DevFdResponse, calling File.open
-      # is a last resort
-      path = body.to_path
-      path =~ %r{\A/dev/fd/(\d+)\z} ? IO.new($1.to_i) : File.open(path, 'rb')
-    end
-  end
-
 end

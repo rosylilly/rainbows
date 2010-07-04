@@ -5,7 +5,9 @@ module Rainbows
 
     class Client < ::Rev::IO
       include Rainbows::EvCore
+      include Rainbows::HttpResponse
       G = Rainbows::G
+      HH = Rack::Utils::HeaderHash
 
       def initialize(io)
         CONN[self] = false
@@ -56,6 +58,41 @@ module Rainbows
         @_write_buffer.empty? && @deferred_bodies.empty? and close.nil?
       end
 
+      def rev_write_response(response, out)
+        status, headers, body = response
+
+        body.respond_to?(:to_path) or
+          return write_response(self, response, out)
+
+        headers = HH.new(headers)
+        io = body_to_io(body)
+        st = io.stat
+
+        if st.socket? || st.pipe?
+          do_chunk = !!(headers['Transfer-Encoding'] =~ %r{\Achunked\z}i)
+          do_chunk = false if headers.delete('X-Rainbows-Autochunk') == 'no'
+          # too tricky to support keepalive/pipelining when a response can
+          # take an indeterminate amount of time here.
+          if out.nil?
+            do_chunk = false
+          else
+            out[0] = CONN_CLOSE
+          end
+
+          # we only want to attach to the Rev::Loop belonging to the
+          # main thread in Ruby 1.9
+          io = DeferredResponse.new(io, self, do_chunk, body).
+                                    attach(Server::LOOP)
+        elsif st.file?
+          headers.delete('Transfer-Encoding')
+          headers['Content-Length'] ||= st.size.to_s
+        else # char/block device, directory, whatever... nobody cares
+          return write_response(self, response, out)
+        end
+        defer_body(io, out)
+        write_header(self, response, out)
+      end
+
       def app_call
         begin
           KATO.delete(self)
@@ -65,7 +102,7 @@ module Rainbows
           alive = @hp.keepalive? && G.alive
           out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if @hp.headers?
 
-          DeferredResponse.write(self, response, out)
+          rev_write_response(response, out)
           if alive
             @env.clear
             @hp.reset

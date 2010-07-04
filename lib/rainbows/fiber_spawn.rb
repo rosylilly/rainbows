@@ -15,7 +15,7 @@ module Rainbows
 
     def worker_loop(worker)
       init_worker_process(worker)
-      Fiber::Base.const_set(:APP, app)
+      Fiber::Base.setup(self.class, app)
       limit = worker_connections
       fio = Rainbows::Fiber::IO
 

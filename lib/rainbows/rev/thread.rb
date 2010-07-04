@@ -22,7 +22,7 @@ module Rainbows
         enable
         alive = @hp.keepalive? && G.alive
         out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if @hp.headers?
-        DeferredResponse.write(self, response, out)
+        rev_write_response(response, out)
         return quit unless alive && G.alive
 
         @env.clear

@@ -6,7 +6,8 @@ module Rainbows::HttpResponse
 
   CODES = Unicorn::HttpResponse::CODES
 
-  def self.header_string(status, headers, out)
+  def response_header(response, out)
+    status, headers = response
     status = CODES[status.to_i] || status
 
     headers.each do |key, value|
@@ -25,13 +26,19 @@ module Rainbows::HttpResponse
     "#{out.join('')}\r\n"
   end
 
-  def self.write(socket, rack_response, out = [])
-    status, headers, body = rack_response
-    out and socket.write(header_string(status, headers, out))
+  def write_header(socket, response, out)
+    out and socket.write(response_header(response, out))
+  end
 
-    body.each { |chunk| socket.write(chunk) }
-    ensure
-      body.respond_to?(:close) and body.close
+  def write_response(socket, response, out)
+    write_header(socket, response, out)
+    write_body(socket, response[2])
+  end
+
+  # called after forking
+  def self.setup(klass)
+    require('rainbows/http_response/body') and
+      klass.__send__(:include, Rainbows::HttpResponse::Body)
   end
 end
 # :startdoc:

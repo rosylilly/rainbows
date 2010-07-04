@@ -50,6 +50,7 @@ module Rainbows
 
     class Client < EM::Connection
       include Rainbows::EvCore
+      include Rainbows::HttpResponse
       G = Rainbows::G
 
       def initialize(io)
@@ -103,23 +104,23 @@ module Rainbows
         if body.respond_to?(:errback) && body.respond_to?(:callback)
           body.callback { quit }
           body.errback { quit }
-          HttpResponse.write(self, response, out)
+          write_header(self, response, out)
+          write_body_each(self, body)
           return
         elsif ! body.respond_to?(:to_path)
-          HttpResponse.write(self, response, out)
+          write_response(self, response, out)
           quit unless alive
           return
         end
 
         headers = Rack::Utils::HeaderHash.new(response[1])
-        io = Rainbows.body_to_io(body)
+        io = body_to_io(body)
         st = io.stat
 
         if st.file?
           headers.delete('Transfer-Encoding')
           headers['Content-Length'] ||= st.size.to_s
-          response = [ response[0], headers, [] ]
-          HttpResponse.write(self, response, out)
+          write_header(self, [ response[0], headers ], out)
           stream = stream_file_data(body.to_path)
           stream.callback { quit } unless alive
         elsif st.socket? || st.pipe?
@@ -130,15 +131,14 @@ module Rainbows
           else
             out[0] = CONN_CLOSE
           end
-          response = [ response[0], headers, [] ]
-          HttpResponse.write(self, response, out)
+          write_header(self, [ response[0], headers ], out)
           if do_chunk
             EM.watch(io, ResponseChunkPipe, self).notify_readable = true
           else
             EM.enable_proxy(EM.attach(io, ResponsePipe, self), self, 16384)
           end
         else
-          HttpResponse.write(self, response, out)
+          write_response(self, response, out)
         end
       end
 
@@ -224,6 +224,11 @@ module Rainbows
           app.call(env)
         end
       end
+    end
+
+    def init_worker_process(worker)
+      Rainbows::HttpResponse.setup(Rainbows::EventMachine::Client)
+      super
     end
 
     # runs inside each forked worker, this sits around and waits

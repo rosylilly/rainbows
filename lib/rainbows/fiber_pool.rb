@@ -24,7 +24,7 @@ module Rainbows
           process_client(::Fiber.yield) while pool << ::Fiber.current
         }.resume # resume to hit ::Fiber.yield so it waits on a client
       }
-      Fiber::Base.const_set(:APP, app)
+      Fiber::Base.setup(self.class, app)
 
       begin
         schedule do |l|

@@ -57,33 +57,22 @@ class Sendfile < Struct.new(:app)
   # Body wrapper, this allows us to fall back gracefully to
   # +each+ in case a given concurrency model does not optimize
   # +to_path+ calls.
-  class Body < Struct.new(:to_io)
+  class Body < Struct.new(:to_path)
 
-    def initialize(path, headers)
-      # Rainbows! will try #to_io if #to_path exists to avoid unnecessary
-      # open() calls.
-      self.to_io = File.open(path, 'rb')
-
+    def self.new(path, headers)
       unless headers['Content-Length']
-        stat = to_io.stat
+        stat = File.stat(path)
         headers['Content-Length'] = stat.size.to_s if stat.file?
       end
-    end
-
-    def to_path
-      to_io.path
+      super(path)
     end
 
     # fallback in case our +to_path+ doesn't get handled for whatever reason
     def each(&block)
-      buf = ''
-      while to_io.read(0x4000, buf)
-        yield buf
+      File.open(to_path, 'rb') do |fp|
+        buf = ''
+        yield buf while fp.read(0x4000, buf)
       end
-    end
-
-    def close
-      to_io.close
     end
   end
 

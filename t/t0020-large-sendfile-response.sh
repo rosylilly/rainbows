@@ -14,10 +14,8 @@ t_plan 7 "large sendfile response for $model"
 t_begin "setup and startup" && {
 	rtmpfiles curl_out a b c
 	rainbows_setup $model 2
-
-	# FIXME: allow "require 'sendfile'" to work in $unicorn_config
-	RUBYOPT="-rsendfile"
-	export RUBYOPT
+	echo 'require "sendfile"' >> $unicorn_config
+	echo 'def (::IO).copy_stream(*x); abort "NO"; end' >> $unicorn_config
 
 	# can't load Rack::Lint here since it clobbers body#to_path
 	rainbows -E none -D large-file-response.ru -c $unicorn_config

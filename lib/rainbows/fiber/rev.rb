@@ -52,6 +52,7 @@ module Rainbows::Fiber
       include Unicorn
       include Rainbows
       include Rainbows::Const
+      include Rainbows::HttpResponse
       FIO = Rainbows::Fiber::IO
 
       def to_io
@@ -99,7 +100,7 @@ module Rainbows::Fiber
 
           alive = hp.keepalive? && G.alive
           out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if hp.headers?
-          HttpResponse.write(client, response, out)
+          write_response(client, response, out)
         end while alive and hp.reset.nil? and env.clear
       rescue => e
         Error.write(io, e)

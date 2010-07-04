@@ -72,33 +72,6 @@ module Rainbows
         max.nil? || max > (now + 1) ? 1 : max - now
       end
 
-      # TODO: IO.splice under Linux
-      alias write_body_stream write_body_each
-
-      # the sendfile 1.0.0+ gem includes IO#sendfile_nonblock
-      if ::IO.method_defined?(:sendfile_nonblock)
-        def write_body_path(client, body)
-          file = Rainbows.body_to_io(body)
-          if file.stat.file?
-            sock, off = client.to_io, 0
-            begin
-              off += sock.sendfile_nonblock(file, off, 0x10000)
-            rescue Errno::EAGAIN
-              client.wait_writable
-            rescue EOFError
-              break
-            rescue => e
-              Rainbows::Error.app(e)
-              break
-            end while true
-          else
-            write_body_stream(client, body)
-          end
-        end
-      else
-        alias write_body write_body_each
-      end
-
       def wait_headers_readable(client)
         io = client.to_io
         expire = nil
@@ -120,6 +93,11 @@ module Rainbows
         ZZ.delete(client.f)
       end
 
+      def self.setup(klass, app)
+        require 'rainbows/fiber/body'
+        klass.__send__(:include, Rainbows::Fiber::Body)
+        self.const_set(:APP, app)
+      end
     end
   end
 end

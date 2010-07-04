@@ -6,44 +6,6 @@ module Rainbows
     # or proxying IO-derived objects
     class DeferredResponse < ::Rev::IO
       include Rainbows::Const
-      G = Rainbows::G
-      HH = Rack::Utils::HeaderHash
-
-      def self.write(client, response, out)
-        status, headers, body = response
-
-        body.respond_to?(:to_path) or
-            return HttpResponse.write(client, response, out)
-
-        headers = HH.new(headers)
-        io = Rainbows.body_to_io(body)
-        st = io.stat
-
-        if st.socket? || st.pipe?
-          do_chunk = !!(headers['Transfer-Encoding'] =~ %r{\Achunked\z}i)
-          do_chunk = false if headers.delete('X-Rainbows-Autochunk') == 'no'
-          # too tricky to support keepalive/pipelining when a response can
-          # take an indeterminate amount of time here.
-          if out.nil?
-            do_chunk = false
-          else
-            out[0] = CONN_CLOSE
-          end
-
-          # we only want to attach to the Rev::Loop belonging to the
-          # main thread in Ruby 1.9
-          io = new(io, client, do_chunk, body).attach(Server::LOOP)
-        elsif st.file?
-          headers.delete('Transfer-Encoding')
-          headers['Content-Length'] ||= st.size.to_s
-        else # char/block device, directory, whatever... nobody cares
-          return HttpResponse.write(client, response, out)
-        end
-        client.defer_body(io, out)
-        out.nil? or
-          client.write(HttpResponse.header_string(status, headers, out))
-      end
-
       def initialize(io, client, do_chunk, body)
         super(io)
         @client, @do_chunk, @body = client, do_chunk, body

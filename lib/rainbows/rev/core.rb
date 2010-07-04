@@ -22,6 +22,7 @@ module Rainbows
       # for connections and doesn't die until the parent dies (or is
       # given a INT, QUIT, or TERM signal)
       def worker_loop(worker)
+        Rainbows::HttpResponse.setup(Rainbows::Rev::Client)
         init_worker_process(worker)
         mod = self.class.const_get(@use)
         rloop = Server.const_set(:LOOP, ::Rev::Loop.default)

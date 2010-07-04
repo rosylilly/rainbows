@@ -46,8 +46,10 @@ module Rainbows
       end
     end
 
-    def write_body(qclient, body)
-      qclient.q << [ qclient.to_io, :body, body ]
+    module Response
+      def write_body(qclient, body)
+        qclient.q << [ qclient.to_io, :body, body ]
+      end
     end
 
     @@nr = 0
@@ -59,6 +61,10 @@ module Rainbows
     end
 
     def worker_loop(worker)
+      Rainbows::HttpResponse.setup(self.class)
+      self.class.__send__(:alias_method, :sync_write_body, :write_body)
+      self.class.__send__(:include, Response)
+
       # we have multiple, single-thread queues since we don't want to
       # interleave writes from the same client
       qp = (1..worker_connections).map do |n|
@@ -66,7 +72,7 @@ module Rainbows
           begin
             io, arg1, arg2 = response
             case arg1
-            when :body then Base.write_body(io, arg2)
+            when :body then sync_write_body(io, arg2)
             when :close then io.close unless io.closed?
             else
               io.write(arg1)

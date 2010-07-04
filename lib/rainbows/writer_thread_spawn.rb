@@ -28,6 +28,8 @@ module Rainbows
     # used to wrap a BasicSocket to use with +q+ for all writes
     # this is compatible with IO.select
     class MySocket < Struct.new(:to_io, :q, :thr)
+      include Rainbows::HttpResponse
+
       def readpartial(size, buf = "")
         to_io.readpartial(size, buf)
       end
@@ -51,7 +53,7 @@ module Rainbows
             begin
               arg1, arg2 = response
               case arg1
-              when :body then Base.write_body(io, arg2)
+              when :body then write_body(io, arg2)
               when :close
                 io.close unless io.closed?
                 break
@@ -71,7 +73,7 @@ module Rainbows
         (self.q ||= queue_writer) << buf
       end
 
-      def write_body(body)
+      def queue_body(body)
         (self.q ||= queue_writer) << [ :body, body ]
       end
 
@@ -89,7 +91,7 @@ module Rainbows
     end
 
     def write_body(my_sock, body)
-      my_sock.write_body(body)
+      my_sock.queue_body(body)
     end
 
     def process_client(client)
@@ -98,6 +100,7 @@ module Rainbows
 
     def worker_loop(worker)
       MySocket.const_set(:MAX, worker_connections)
+      Rainbows::HttpResponse.setup(MySocket)
       super(worker) # accept loop from Unicorn
       CUR.delete_if do |t,q|
         q << nil
