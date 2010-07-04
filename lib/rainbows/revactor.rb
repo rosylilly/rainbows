@@ -147,7 +147,8 @@ module Rainbows::Revactor
     # Revactor socket reads always return an unspecified amount,
     # sometimes too much
     def readpartial(length, dst = "")
-      return dst if length == 0
+      return dst.replace("") if length == 0
+
       # always check and return from the userspace buffer first
       rbuf.size > 0 and return dst.replace(rbuf.read(length))
 
@@ -158,7 +159,7 @@ module Rainbows::Revactor
       # to avoid needlessly wasting memory bandwidth
       tmp.size <= length and return dst.replace(tmp)
 
-      # ugh, read returned too much, copy + reread to avoid slicing
+      # ugh, read returned too much
       rbuf << tmp[length, tmp.size]
       dst.replace(tmp[0, length])
     end
