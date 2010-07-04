@@ -70,7 +70,12 @@ module Rainbows
       G.quit!
       threads.delete_if do |thr|
         G.tick
-        thr.alive? ? thr.join(0.01) : true
+        begin
+          thr.run
+          thr.join(0.01)
+        rescue
+          true
+        end
       end until threads.empty?
     end
 
