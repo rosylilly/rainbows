@@ -81,14 +81,14 @@ module Rainbows
       end
 
       if IO.method_defined?(:sendfile_nonblock)
-        def sendfile(body)
+        def rev_sendfile(body)
           body.pos += @_io.sendfile_nonblock(body, body.pos, 0x10000)
           rescue Errno::EAGAIN
           ensure
             enable_write_watcher
         end
       else
-        def sendfile(body)
+        def rev_sendfile(body)
           write(body.sysread(CHUNK_SIZE))
         end
       end
@@ -100,7 +100,7 @@ module Rainbows
 
           begin
             begin
-              sendfile(body)
+              rev_sendfile(body)
             rescue EOFError # expected at file EOF
               @deferred_bodies.shift
               body.close
