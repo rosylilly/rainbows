@@ -23,6 +23,8 @@ module Rainbows
       # given a INT, QUIT, or TERM signal)
       def worker_loop(worker)
         Rainbows::HttpResponse.setup(Rainbows::Rev::Client)
+        require 'rainbows/rev/sendfile'
+        Rainbows::Rev::Client.__send__(:include, Rainbows::Rev::Sendfile)
         init_worker_process(worker)
         mod = self.class.const_get(@use)
         rloop = Server.const_set(:LOOP, ::Rev::Loop.default)
