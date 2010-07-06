@@ -4,6 +4,7 @@ module Rainbows
   module Rev
 
     class Client < ::Rev::IO
+      include Rainbows::ByteSlice
       include Rainbows::EvCore
       include Rainbows::HttpResponse
       G = Rainbows::G
@@ -33,7 +34,7 @@ module Rainbows
             end
             # we never care for the return value, but yes, we may return
             # a "fake" short write from super(buf) if anybody cares.
-            buf = buf[w..-1]
+            buf = byte_slice(buf, w..-1)
           rescue Errno::EAGAIN
             break # fall through to super(buf)
           rescue

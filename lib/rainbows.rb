@@ -122,4 +122,5 @@ module Rainbows
   end
   # :startdoc:
   autoload :Fiber, 'rainbows/fiber' # core class
+  autoload :ByteSlice, 'rainbows/byte_slice'
 end

@@ -7,6 +7,7 @@ module Rainbows
     # interface that yields away from the current Fiber whenever
     # the underlying IO object cannot read or write
     class IO < Struct.new(:to_io, :f)
+      include Rainbows::ByteSlice
 
       # :stopdoc:
       LOCALHOST = Unicorn::HttpRequest::LOCALHOST
@@ -58,8 +59,8 @@ module Rainbows
 
       def write(buf)
         begin
-          (w = to_io.write_nonblock(buf)) == buf.size and return
-          buf = buf[w..-1]
+          (w = to_io.write_nonblock(buf)) == buf.bytesize and return
+          buf = byte_slice(buf, w..-1)
         rescue Errno::EAGAIN
           wait_writable
           retry
