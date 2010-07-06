@@ -29,18 +29,16 @@ module Rainbows
           begin
             w = @_io.write_nonblock(buf)
             if w == Rack::Utils.bytesize(buf)
-              on_write_complete
-              return w
+              return on_write_complete
             end
             # we never care for the return value, but yes, we may return
             # a "fake" short write from super(buf) if anybody cares.
             buf = buf[w..-1]
           rescue Errno::EAGAIN
-            # fall through to super(buf)
+            break # fall through to super(buf)
           rescue
-            close
-            return
-          end
+            return close
+          end while true
         end
         super(buf)
       end
