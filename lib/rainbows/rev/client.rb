@@ -124,13 +124,11 @@ module Rainbows
           return if DeferredResponse === body
 
           begin
-            begin
-              rev_sendfile(body)
-            rescue EOFError # expected at file EOF
-              @deferred_bodies.shift
-              body.close
-              close if :close == @state && @deferred_bodies.empty?
-            end
+            rev_sendfile(body)
+          rescue EOFError # expected at file EOF
+            @deferred_bodies.shift
+            body.close
+            close if :close == @state && @deferred_bodies.empty?
           rescue => e
             handle_error(e)
           end
@@ -140,6 +138,9 @@ module Rainbows
       end
 
       def on_close
+        while f = @deferred_bodies.shift
+          DeferredResponse === f or f.close
+        end
         CONN.delete(self)
       end
 

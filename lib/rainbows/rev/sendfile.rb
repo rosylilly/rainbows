@@ -14,8 +14,8 @@ module Rainbows::Rev::Sendfile
 
     def rev_sendfile(body)
       body.offset += @_io.sendfile_nonblock(body, body.offset, 0x10000)
+      enable_write_watcher
       rescue Errno::EAGAIN
-      ensure
         enable_write_watcher
     end
   else

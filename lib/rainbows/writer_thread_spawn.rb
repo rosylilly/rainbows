@@ -61,7 +61,7 @@ module Rainbows
                 io.write(arg1)
               end
             rescue => e
-              Error.app(e)
+              Error.write(io, e)
             end
           end
           CUR.delete(Thread.current)

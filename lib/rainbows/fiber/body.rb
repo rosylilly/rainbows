@@ -19,9 +19,6 @@ module Rainbows::Fiber::Body # :nodoc:
         client.wait_writable
       rescue EOFError
         break
-      rescue => e
-        Rainbows::Error.app(e)
-        break
       end while true
     end
   else

@@ -78,7 +78,7 @@ module Rainbows
               io.write(arg1)
             end
           rescue => err
-            Error.app(err)
+            Error.write(io, err)
           end
         end
       end
