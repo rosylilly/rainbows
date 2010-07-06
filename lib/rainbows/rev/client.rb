@@ -86,6 +86,7 @@ module Rainbows
         elsif st.file?
           headers.delete('Transfer-Encoding')
           headers['Content-Length'] ||= st.size.to_s
+          io = to_sendfile(io)
         else # char/block device, directory, whatever... nobody cares
           return write_response(self, response, out)
         end
