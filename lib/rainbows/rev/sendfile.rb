@@ -1,12 +1,7 @@
 # -*- encoding: binary -*-
 module Rainbows::Rev::Sendfile
   if IO.method_defined?(:sendfile_nonblock)
-    class F < Struct.new(:offset, :to_io)
-      def close
-        to_io.close
-        self.to_io = nil
-      end
-    end
+    F = Rainbows::StreamFile
 
     def to_sendfile(io)
       F[0, io]
