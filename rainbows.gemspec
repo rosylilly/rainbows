@@ -46,11 +46,11 @@ Gem::Specification.new do |s|
   # we need Unicorn for the HTTP parser and process management
   # Unicorn 0.991.0 handles config.ru when started outside of
   # the prespecified working_directory
-  s.add_dependency(%q<unicorn>, [">= 0.991.0", "< 2.0.0"])
+  s.add_dependency(%q<unicorn>, [">= 1.1.0", "< 2.0.0"])
   s.add_development_dependency(%q<isolate>, "~> 2.0.2")
 
   # optional runtime dependencies depending on configuration
-  # see config/isolate.rb for the exact versions we've tested with
+  # see t/test_isolate.rb for the exact versions we've tested with
   #
   # Revactor >= 0.1.5 includes UNIX domain socket support
   # s.add_dependency(%q<revactor>, [">= 0.1.5"])
