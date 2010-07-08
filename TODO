@@ -3,6 +3,8 @@
 We're lazy and pick the easy items to do first, then the ones people
 care about.
 
+* documentation improvements
+
 * Split out NeverBlock into NeverBlockEventMachine and NeverBlockReactor
   NeverBlock will default to one of them (depending on NB upstream).
 
