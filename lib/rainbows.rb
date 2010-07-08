@@ -33,7 +33,7 @@ module Rainbows
 
   require 'rainbows/const'
   require 'rainbows/http_server'
-  require 'rainbows/http_response'
+  require 'rainbows/response'
   require 'rainbows/base'
   require 'rainbows/tee_input'
   autoload :Sendfile, 'rainbows/sendfile'
@@ -127,4 +127,5 @@ module Rainbows
   autoload :Fiber, 'rainbows/fiber' # core class
   autoload :ByteSlice, 'rainbows/byte_slice'
   autoload :StreamFile, 'rainbows/stream_file'
+  autoload :HttpResponse, 'rainbows/http_response' # deprecated
 end

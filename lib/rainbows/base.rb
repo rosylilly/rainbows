@@ -10,7 +10,7 @@ module Rainbows::Base
 
   # :stopdoc:
   include Rainbows::Const
-  include Rainbows::HttpResponse
+  include Rainbows::Response
 
   # shortcuts...
   G = Rainbows::G
@@ -21,7 +21,7 @@ module Rainbows::Base
   # this method is called by all current concurrency models
   def init_worker_process(worker)
     super(worker)
-    Rainbows::HttpResponse.setup(self.class)
+    Rainbows::Response.setup(self.class)
     Rainbows::MaxBody.setup
     G.tmp = worker.tmp
 

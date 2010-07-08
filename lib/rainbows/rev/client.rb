@@ -6,7 +6,7 @@ module Rainbows
     class Client < ::Rev::IO
       include Rainbows::ByteSlice
       include Rainbows::EvCore
-      include Rainbows::HttpResponse
+      include Rainbows::Response
       G = Rainbows::G
       HH = Rack::Utils::HeaderHash
 

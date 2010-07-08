@@ -16,7 +16,7 @@ module Rainbows
     include Fiber::Rev
 
     def worker_loop(worker)
-      Rainbows::HttpResponse.setup(Rainbows::Fiber::Rev::Server)
+      Rainbows::Response.setup(Rainbows::Fiber::Rev::Server)
       init_worker_process(worker)
       Server.const_set(:MAX, @worker_connections)
       Rainbows::Fiber::Base.setup(Rainbows::Fiber::Rev::Server, nil)

@@ -22,7 +22,7 @@ module Rainbows
       # for connections and doesn't die until the parent dies (or is
       # given a INT, QUIT, or TERM signal)
       def worker_loop(worker)
-        Rainbows::HttpResponse.setup(Rainbows::Rev::Client)
+        Rainbows::Response.setup(Rainbows::Rev::Client)
         require 'rainbows/rev/sendfile'
         Rainbows::Rev::Client.__send__(:include, Rainbows::Rev::Sendfile)
         init_worker_process(worker)

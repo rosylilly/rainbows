@@ -1,7 +1,7 @@
 # -*- encoding: binary -*-
 # non-portable body handling for Fiber-based concurrency goes here
 # this module is required and included in worker processes only
-# this is meant to be included _after_ Rainbows::HttpResponse::Body
+# this is meant to be included _after_ Rainbows::Response::Body
 module Rainbows::Fiber::Body # :nodoc:
 
   # TODO non-blocking splice(2) under Linux

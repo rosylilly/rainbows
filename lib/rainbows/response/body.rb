@@ -26,7 +26,7 @@
 #            `- write_body_file
 #            `- write_body_stream
 #
-module Rainbows::HttpResponse::Body # :nodoc:
+module Rainbows::Response::Body # :nodoc:
   ALIASES = {}
 
   # to_io is not part of the Rack spec, but make an exception here

@@ -52,7 +52,7 @@ module Rainbows::Fiber
       include Unicorn
       include Rainbows
       include Rainbows::Const
-      include Rainbows::HttpResponse
+      include Rainbows::Response
       FIO = Rainbows::Fiber::IO
 
       def to_io

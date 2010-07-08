@@ -50,7 +50,7 @@ module Rainbows
 
     class Client < EM::Connection
       include Rainbows::EvCore
-      include Rainbows::HttpResponse
+      include Rainbows::Response
       G = Rainbows::G
 
       def initialize(io)
@@ -227,7 +227,7 @@ module Rainbows
     end
 
     def init_worker_process(worker)
-      Rainbows::HttpResponse.setup(Rainbows::EventMachine::Client)
+      Rainbows::Response.setup(Rainbows::EventMachine::Client)
       super
     end
 

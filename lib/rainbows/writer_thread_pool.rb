@@ -61,7 +61,7 @@ module Rainbows
     end
 
     def worker_loop(worker)
-      Rainbows::HttpResponse.setup(self.class)
+      Rainbows::Response.setup(self.class)
       self.class.__send__(:alias_method, :sync_write_body, :write_body)
       self.class.__send__(:include, Response)
 
