@@ -71,7 +71,7 @@ module Rainbows
         begin
           @env[RACK_INPUT] = @input
           @env[REMOTE_ADDR] = @remote_addr
-          @env[ASYNC_CALLBACK] = method(:response_write)
+          @env[ASYNC_CALLBACK] = method(:em_write_response)
 
           # we're not sure if anybody uses this, but Thin sets it, too
           @env[ASYNC_CLOSE] = EM::DefaultDeferrable.new
@@ -85,7 +85,7 @@ module Rainbows
 
           alive = @hp.keepalive? && G.alive
           out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if @hp.headers?
-          response_write(response, out, alive)
+          em_write_response(response, out, alive)
 
           if alive
             @env.clear
@@ -99,7 +99,7 @@ module Rainbows
         end while true
       end
 
-      def response_write(response, out = [ CONN_CLOSE ], alive = false)
+      def em_write_response(response, out = [ CONN_CLOSE ], alive = false)
         @body = body = response[2]
         if body.respond_to?(:errback) && body.respond_to?(:callback)
           body.callback { quit }
