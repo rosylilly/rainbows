@@ -62,7 +62,7 @@ NEWS: GIT-VERSION-FILE
 	$(RAKE) -s news_rdoc > $@+
 	mv $@+ $@
 
-SINCE = 0.92.0
+SINCE = 0.94.0
 ChangeLog: LOG_VERSION = \
   $(shell git rev-parse -q "$(GIT_VERSION)" >/dev/null 2>&1 && \
           echo $(GIT_VERSION) || git describe)
