@@ -25,6 +25,7 @@ module Rainbows
 
   module Rev
 
+    # :stopdoc:
     # keep-alive timeout scoreboard
     KATO = {}
 
@@ -37,5 +38,6 @@ module Rainbows
     end
 
     include Core
+    # :startdoc:
   end
 end

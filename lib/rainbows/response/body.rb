@@ -1,4 +1,5 @@
 # -*- encoding: binary -*-
+# :enddoc:
 # non-portable body response stuff goes here
 #
 # The sendfile 1.0.0 RubyGem includes IO#sendfile and

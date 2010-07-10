@@ -20,7 +20,7 @@ module Rainbows
 
   module RevThreadSpawn
 
-    class Client < Rainbows::Rev::ThreadClient
+    class Client < Rainbows::Rev::ThreadClient # :nodoc: all
       def app_dispatch
         Thread.new(self) { |client| MASTER << [ client, app_response ] }
       end
@@ -28,7 +28,7 @@ module Rainbows
 
     include Rainbows::Rev::Core
 
-    def init_worker_process(worker)
+    def init_worker_process(worker) # :nodoc:
       super
       master = Rev::Master.new(Queue.new).attach(::Rev::Loop.default)
       Client.const_set(:MASTER, master)

@@ -82,7 +82,7 @@ module Rainbows
     end
 
     # Rack application endpoint, +env+ is the Rack environment
-    def call(env)
+    def call(env) # :nodoc:
 
       # we have to do this check at call time (and not initialize)
       # because of preload_app=true and models being changeable with SIGHUP

@@ -1,4 +1,5 @@
 # -*- encoding: binary -*-
+# :enddoc:
 # non-portable body handling for Fiber-based concurrency goes here
 # this module is required and included in worker processes only
 # this is meant to be included _after_ Rainbows::Response::Body

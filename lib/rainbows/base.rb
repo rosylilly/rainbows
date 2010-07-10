@@ -19,7 +19,7 @@ module Rainbows::Base
   HttpParser = Unicorn::HttpParser
 
   # this method is called by all current concurrency models
-  def init_worker_process(worker)
+  def init_worker_process(worker) # :nodoc:
     super(worker)
     Rainbows::Response.setup(self.class)
     Rainbows::MaxBody.setup
@@ -40,7 +40,7 @@ module Rainbows::Base
     logger.info "Rainbows! #@use worker_connections=#@worker_connections"
   end
 
-  def wait_headers_readable(client)
+  def wait_headers_readable(client)  # :nodoc:
     IO.select([client], nil, nil, G.kato)
   end
 
@@ -48,7 +48,7 @@ module Rainbows::Base
   # in 3 easy steps: read request, call app, write app response
   # this is used by synchronous concurrency models
   #   Base, ThreadSpawn, ThreadPool
-  def process_client(client)
+  def process_client(client) # :nodoc:
     buf = client.readpartial(CHUNK_SIZE) # accept filters protect us here
     hp = HttpParser.new
     env = {}
@@ -87,7 +87,7 @@ module Rainbows::Base
     client.close unless client.closed?
   end
 
-  def self.included(klass)
+  def self.included(klass) # :nodoc:
     klass.const_set :LISTENERS, Rainbows::HttpServer::LISTENERS
     klass.const_set :G, Rainbows::G
   end

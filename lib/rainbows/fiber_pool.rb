@@ -16,7 +16,7 @@ module Rainbows
   module FiberPool
     include Fiber::Base
 
-    def worker_loop(worker)
+    def worker_loop(worker) # :nodoc:
       init_worker_process(worker)
       pool = []
       worker_connections.times {

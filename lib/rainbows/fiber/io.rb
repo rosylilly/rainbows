@@ -21,7 +21,6 @@ module Rainbows
       def peeraddr
         to_io.respond_to?(:peeraddr) ? to_io.peeraddr : [ LOCALHOST ]
       end
-      # :stopdoc:
 
       # for wrapping output response bodies
       def each(&block)

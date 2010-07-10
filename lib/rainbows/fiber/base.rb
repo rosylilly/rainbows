@@ -1,4 +1,5 @@
 # -*- encoding: binary -*-
+# :enddoc:
 require 'rainbows/fiber/io'
 
 module Rainbows

@@ -28,7 +28,7 @@ module Rainbows::Revactor
 
   # once a client is accepted, it is processed in its entirety here
   # in 3 easy steps: read request, call app, write app response
-  def process_client(client)
+  def process_client(client) # :nodoc:
     io = client.instance_variable_get(:@_io)
     io.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
     rd_args = [ nil ]
@@ -72,7 +72,7 @@ module Rainbows::Revactor
   # runs inside each forked worker, this sits around and waits
   # for connections and doesn't die until the parent dies (or is
   # given a INT, QUIT, or TERM signal)
-  def worker_loop(worker)
+  def worker_loop(worker) #:nodoc:
     init_worker_process(worker)
     self.class.__send__(:alias_method, :write_body, :write_body_each)
     RD_ARGS[:timeout] = G.kato if G.kato > 0

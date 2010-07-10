@@ -20,7 +20,7 @@ module Rainbows
     # runs inside each forked worker, this sits around and waits
     # for connections and doesn't die until the parent dies (or is
     # given a INT, QUIT, or TERM signal)
-    def worker_loop(worker)
+    def worker_loop(worker) # :nodoc:
       Const::RACK_DEFAULTS["rack.multithread"] = true # :(
       init_worker_process(worker)
       accept_loop(Actor)

@@ -48,7 +48,7 @@ module Rainbows
 
     include Base
 
-    class Client < EM::Connection
+    class Client < EM::Connection # :nodoc: all
       include Rainbows::EvCore
       include Rainbows::Response
       G = Rainbows::G
@@ -149,7 +149,7 @@ module Rainbows
       end
     end
 
-    module ResponsePipe
+    module ResponsePipe # :nodoc: all
       def initialize(client)
         @client = client
       end
@@ -160,7 +160,7 @@ module Rainbows
       end
     end
 
-    module ResponseChunkPipe
+    module ResponseChunkPipe # :nodoc: all
       include ResponsePipe
 
       def unbind
@@ -187,7 +187,7 @@ module Rainbows
       end
     end
 
-    module Server
+    module Server # :nodoc: all
 
       def close
         detach
@@ -205,7 +205,7 @@ module Rainbows
     # Middleware that will run the app dispatch in a separate thread.
     # This middleware is automatically loaded by Rainbows! when using
     # EventMachine and if the app responds to the +deferred?+ method.
-    class TryDefer < Struct.new(:app)
+    class TryDefer < Struct.new(:app) # :nodoc: all
 
       def initialize(app)
         # the entire app becomes multithreaded, even the root (non-deferred)
@@ -226,7 +226,7 @@ module Rainbows
       end
     end
 
-    def init_worker_process(worker)
+    def init_worker_process(worker) # :nodoc:
       Rainbows::Response.setup(Rainbows::EventMachine::Client)
       super
     end
@@ -234,7 +234,7 @@ module Rainbows
     # runs inside each forked worker, this sits around and waits
     # for connections and doesn't die until the parent dies (or is
     # given a INT, QUIT, or TERM signal)
-    def worker_loop(worker)
+    def worker_loop(worker) # :nodoc:
       init_worker_process(worker)
       G.server.app.respond_to?(:deferred?) and
         G.server.app = TryDefer[G.server.app]

@@ -57,7 +57,7 @@ class Sendfile < Struct.new(:app)
   # Body wrapper, this allows us to fall back gracefully to
   # +each+ in case a given concurrency model does not optimize
   # +to_path+ calls.
-  class Body < Struct.new(:to_path)
+  class Body < Struct.new(:to_path) # :nodoc: all
 
     def self.new(path, headers)
       unless headers['Content-Length']
@@ -76,7 +76,7 @@ class Sendfile < Struct.new(:app)
     end
   end
 
-  def call(env)
+  def call(env) # :nodoc:
     status, headers, body = app.call(env)
     headers = HH.new(headers)
     if path = headers.delete('X-Sendfile')

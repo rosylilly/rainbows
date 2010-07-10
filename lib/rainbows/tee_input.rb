@@ -1,4 +1,5 @@
 # -*- encoding: binary -*-
+# :enddoc:
 module Rainbows
 
   # acts like tee(1) on an input input to provide a input-like stream

@@ -1,5 +1,5 @@
 # -*- encoding: binary -*-
-
+# :enddoc:
 module Rainbows
 
   module Const

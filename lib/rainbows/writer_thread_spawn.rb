@@ -23,11 +23,11 @@ module Rainbows
   module WriterThreadSpawn
     include Base
 
-    CUR = {}
+    CUR = {} # :nodoc:
 
     # used to wrap a BasicSocket to use with +q+ for all writes
     # this is compatible with IO.select
-    class MySocket < Struct.new(:to_io, :q, :thr)
+    class MySocket < Struct.new(:to_io, :q, :thr)  # :nodoc: all
       include Rainbows::Response
 
       def readpartial(size, buf = "")
@@ -90,15 +90,15 @@ module Rainbows
       end
     end
 
-    def write_body(my_sock, body)
+    def write_body(my_sock, body) # :nodoc:
       my_sock.queue_body(body)
     end
 
-    def process_client(client)
+    def process_client(client) # :nodoc:
       super(MySocket[client])
     end
 
-    def worker_loop(worker)
+    def worker_loop(worker)  # :nodoc:
       MySocket.const_set(:MAX, worker_connections)
       Rainbows::Response.setup(MySocket)
       super(worker) # accept loop from Unicorn

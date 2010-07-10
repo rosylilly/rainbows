@@ -17,10 +17,9 @@ module Rainbows
   # capabilities
 
   module ThreadSpawn
-
     include Base
 
-    def accept_loop(klass)
+    def accept_loop(klass) #:nodoc:
       lock = Mutex.new
       limit = worker_connections
       LISTENERS.each do |l|
@@ -55,7 +54,7 @@ module Rainbows
       sleep 1 while G.tick || lock.synchronize { G.cur > 0 }
     end
 
-    def worker_loop(worker)
+    def worker_loop(worker) #:nodoc:
       init_worker_process(worker)
       accept_loop(Thread)
     end

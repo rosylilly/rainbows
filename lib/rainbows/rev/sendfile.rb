@@ -1,4 +1,5 @@
 # -*- encoding: binary -*-
+# :enddoc:
 module Rainbows::Rev::Sendfile
   if IO.method_defined?(:sendfile_nonblock)
     F = Rainbows::StreamFile

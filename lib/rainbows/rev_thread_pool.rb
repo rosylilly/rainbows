@@ -20,17 +20,19 @@ module Rainbows
 
   module RevThreadPool
 
+    # :stopdoc:
     DEFAULTS = {
       :pool_size => 20, # same default size as ThreadPool (w/o Rev)
     }
+    #:startdoc:
 
-    def self.setup
+    def self.setup # :nodoc:
       DEFAULTS.each { |k,v| O[k] ||= v }
       Integer === O[:pool_size] && O[:pool_size] > 0 or
         raise ArgumentError, "pool_size must a be an Integer > 0"
     end
 
-    class PoolWatcher < ::Rev::TimerWatcher
+    class PoolWatcher < ::Rev::TimerWatcher # :nodoc: all
       def initialize(threads)
         @threads = threads
         super(G.server.timeout, true)
@@ -41,7 +43,7 @@ module Rainbows
       end
     end
 
-    class Client < Rainbows::Rev::ThreadClient
+    class Client < Rainbows::Rev::ThreadClient # :nodoc:
       def app_dispatch
         QUEUE << self
       end
@@ -49,7 +51,7 @@ module Rainbows
 
     include Rainbows::Rev::Core
 
-    def init_worker_threads(master, queue)
+    def init_worker_threads(master, queue) # :nodoc:
       O[:pool_size].times.map do
         Thread.new do
           begin
@@ -62,7 +64,7 @@ module Rainbows
       end
     end
 
-    def init_worker_process(worker)
+    def init_worker_process(worker) # :nodoc:
       super
       master = Rev::Master.new(Queue.new).attach(::Rev::Loop.default)
       queue = Client.const_set(:QUEUE, Queue.new)

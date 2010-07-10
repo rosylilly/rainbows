@@ -1,7 +1,7 @@
 # -*- encoding: binary -*-
+# :enddoc:
 require 'time' # for Time#httpdate
 
-# :stopdoc:
 module Rainbows::Response
 
   CODES = Unicorn::HttpResponse::CODES
@@ -41,4 +41,3 @@ module Rainbows::Response
       klass.__send__(:include, Rainbows::Response::Body)
   end
 end
-# :startdoc:

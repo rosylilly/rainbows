@@ -1,4 +1,5 @@
 # -*- encoding: binary -*-
+# :enddoc:
 require 'rainbows/ev_core'
 module Rainbows
   module Rev

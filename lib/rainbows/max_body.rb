@@ -1,4 +1,5 @@
 # -*- encoding: binary -*-
+# :enddoc:
 module Rainbows
 
 # middleware used to enforce client_max_body_size for TeeInput users,

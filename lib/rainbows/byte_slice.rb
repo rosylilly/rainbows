@@ -1,4 +1,5 @@
 # -*- encoding: binary -*-
+# :enddoc:
 module Rainbows::ByteSlice
   if String.method_defined?(:encoding)
     def byte_slice(buf, range)

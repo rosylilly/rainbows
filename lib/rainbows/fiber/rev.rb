@@ -1,4 +1,5 @@
 # -*- encoding: binary -*-
+# :enddoc:
 require 'rev'
 require 'rainbows/fiber'
 require 'rainbows/fiber/io'

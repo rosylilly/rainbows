@@ -13,7 +13,7 @@ module Rainbows
   module FiberSpawn
     include Fiber::Base
 
-    def worker_loop(worker)
+    def worker_loop(worker) # :nodoc:
       init_worker_process(worker)
       Fiber::Base.setup(self.class, app)
       limit = worker_connections

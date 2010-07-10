@@ -1,4 +1,5 @@
 # -*- encoding: binary -*-
+# :enddoc:
 begin
   require 'fiber'
 rescue LoadError

@@ -24,7 +24,7 @@ module Rainbows
 
     # used to wrap a BasicSocket to use with +q+ for all writes
     # this is compatible with IO.select
-    class QueueSocket < Struct.new(:to_io, :q)
+    class QueueSocket < Struct.new(:to_io, :q) # :nodoc:
       def readpartial(size, buf = "")
         to_io.readpartial(size, buf)
       end
@@ -46,7 +46,7 @@ module Rainbows
       end
     end
 
-    module Response
+    module Response # :nodoc:
       def write_body(qclient, body)
         qclient.q << [ qclient.to_io, :body, body ]
       end
@@ -55,12 +55,12 @@ module Rainbows
     @@nr = 0
     @@q = nil
 
-    def process_client(client)
+    def process_client(client) # :nodoc:
       @@nr += 1
       super(QueueSocket[client, @@q[@@nr %= @@q.size]])
     end
 
-    def worker_loop(worker)
+    def worker_loop(worker) # :nodoc:
       Rainbows::Response.setup(self.class)
       self.class.__send__(:alias_method, :sync_write_body, :write_body)
       self.class.__send__(:include, Response)

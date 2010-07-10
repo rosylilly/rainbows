@@ -25,7 +25,7 @@ module Rainbows
 
     include Base
 
-    def worker_loop(worker)
+    def worker_loop(worker) # :nodoc:
       init_worker_process(worker)
       pool = (1..worker_connections).map do
         Thread.new { LISTENERS.size == 1 ? sync_worker : async_worker }
@@ -41,7 +41,7 @@ module Rainbows
       join_threads(pool)
     end
 
-    def sync_worker
+    def sync_worker # :nodoc:
       s = LISTENERS[0]
       begin
         c = Rainbows.sync_accept(s) and process_client(c)
@@ -50,7 +50,7 @@ module Rainbows
       end while G.alive
     end
 
-    def async_worker
+    def async_worker # :nodoc:
       begin
         # TODO: check if select() or accept() is a problem on large
         # SMP systems under Ruby 1.9.  Hundreds of native threads
@@ -66,7 +66,7 @@ module Rainbows
       end while G.alive
     end
 
-    def join_threads(threads)
+    def join_threads(threads) # :nodoc:
       G.quit!
       threads.delete_if do |thr|
         G.tick

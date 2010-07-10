@@ -1,5 +1,5 @@
 # -*- encoding: binary -*-
-
+# :enddoc:
 module Rainbows
 
   # base module for evented models like Rev and EventMachine

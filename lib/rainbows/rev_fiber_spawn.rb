@@ -15,7 +15,7 @@ module Rainbows
     include Base
     include Fiber::Rev
 
-    def worker_loop(worker)
+    def worker_loop(worker) # :nodoc:
       Rainbows::Response.setup(Rainbows::Fiber::Rev::Server)
       init_worker_process(worker)
       Server.const_set(:MAX, @worker_connections)

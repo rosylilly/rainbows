@@ -12,6 +12,7 @@ module Rainbows
   # global vars because class/instance variables are confusing me :<
   # this struct is only accessed inside workers and thus private to each
   # G.cur may not be used in the network concurrency model
+  # :stopdoc:
   class State < Struct.new(:alive,:m,:cur,:kato,:server,:tmp,:expire)
     def tick
       tmp.chmod(self.m = m == 0 ? 1 : 0)
@@ -26,7 +27,6 @@ module Rainbows
       false
     end
   end
-  # :stopdoc:
   G = State.new(true, 0, 0, 5)
   O = {}
   # :startdoc:
@@ -64,12 +64,12 @@ module Rainbows
 
     # runs the Rainbows! HttpServer with +app+ and +options+ and does
     # not return until the server has exited.
-    def run(app, options = {})
+    def run(app, options = {}) # :nodoc:
       HttpServer.new(app, options).start.join
     end
 
     # returns nil if accept fails
-    def sync_accept(sock)
+    def sync_accept(sock) # :nodoc:
       rv = sock.accept
       rv.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
       rv
@@ -77,7 +77,7 @@ module Rainbows
     end
 
     # returns nil if accept fails
-    def accept(sock)
+    def accept(sock) # :nodoc:
       rv = sock.accept_nonblock
       rv.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
       rv
@@ -87,16 +87,18 @@ module Rainbows
     # returns a string representing the address of the given client +io+
     # For local UNIX domain sockets, this will return a string referred
     # to by the (non-frozen) Unicorn::HttpRequest::LOCALHOST constant.
-    def addr(io)
+    def addr(io) # :nodoc:
       io.respond_to?(:peeraddr) ?
                         io.peeraddr[-1] : Unicorn::HttpRequest::LOCALHOST
     end
 
+    # :stopdoc:
     # the default max body size is 1 megabyte (1024 * 1024 bytes)
     @@max_bytes = 1024 * 1024
 
     def max_bytes; @@max_bytes; end
     def max_bytes=(nr); @@max_bytes = nr; end
+    # :startdoc:
   end
 
   # :stopdoc:

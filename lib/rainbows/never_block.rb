@@ -18,13 +18,14 @@ module Rainbows
   #
   module NeverBlock
 
+    # :stopdoc:
     DEFAULTS = {
       :pool_size => 20, # same default size used by NB
       :backend => :EventMachine, # NeverBlock doesn't support Rev yet
     }
 
     # same pool size NB core itself uses
-    def self.setup
+    def self.setup # :nodoc:
       DEFAULTS.each { |k,v| O[k] ||= v }
       Integer === O[:pool_size] && O[:pool_size] > 0 or
         raise ArgumentError, "pool_size must a be an Integer > 0"
@@ -34,7 +35,7 @@ module Rainbows
       G.server.extend(Core)
     end
 
-    module Core
+    module Core  # :nodoc: all
       def self.setup
         self.const_set(:POOL, ::NB::Pool::FiberPool.new(O[:pool_size]))
         base = O[:backend].to_s.gsub!(/([a-z])([A-Z])/, '\1_\2').downcase!
@@ -57,15 +58,15 @@ module Rainbows
           end
         end
       end
-    end
 
-    module Core
       def init_worker_process(worker)
         super
         Core.setup
         logger.info "NeverBlock/#{O[:backend]} pool_size=#{O[:pool_size]}"
       end
     end
+
+    # :startdoc:
 
   end
 end

@@ -1,4 +1,5 @@
 # -*- encoding: binary -*-
+# :enddoc:
 require 'thread'
 require 'rainbows/rev/master'
 

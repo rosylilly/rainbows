@@ -1,7 +1,7 @@
 # -*- encoding: binary -*-
+# :enddoc:
 # deprecated, use Rainbows::Response instead
 # Cramp 0.11 relies on this, and is only activated by Cramp
-# :enddoc:
 if defined?(Cramp) && defined?(Rainbows::EventMachine::Client)
   class Rainbows::HttpResponse
     class << self
