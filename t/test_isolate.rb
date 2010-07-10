@@ -14,7 +14,7 @@ old_out = $stdout.dup
 $stdout.reopen($stderr)
 
 Isolate.now!(opts) do
-  gem 'rack', '1.1.0'
+  gem 'rack', '1.1.0' # Cramp currently requires ~> 1.1.0
   gem 'unicorn', '1.1.0'
 
   if engine == "ruby"
