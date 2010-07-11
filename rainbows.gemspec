@@ -46,7 +46,7 @@ Gem::Specification.new do |s|
   # we need Unicorn for the HTTP parser and process management
   # Unicorn 0.991.0 handles config.ru when started outside of
   # the prespecified working_directory
-  s.add_dependency(%q<unicorn>, [">= 1.1.0", "< 2.0.0"])
+  s.add_dependency(%q<unicorn>, [">= 1.1.1", "< 2.0.0"])
   s.add_development_dependency(%q<isolate>, "~> 2.1.0")
 
   # optional runtime dependencies depending on configuration
