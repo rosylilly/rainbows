@@ -1,7 +1,6 @@
 # -*- encoding: binary -*-
 require 'rainbows/rev/core'
 require 'rainbows/rev/client'
-require 'rainbows/rev/deferred_response'
 
 module Rainbows
 
@@ -37,6 +36,7 @@ module Rainbows
       KATO.compare_by_identity
     end
 
+    autoload :DeferredResponse,'rainbows/rev/deferred_response'
     include Core
     # :startdoc:
   end
