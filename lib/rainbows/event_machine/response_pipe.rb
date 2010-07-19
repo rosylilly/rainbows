@@ -5,8 +5,8 @@ module Rainbows::EventMachine::ResponsePipe
   # so a single buffer for all clients will work safely
   BUF = ''
 
-  def initialize(client, alive)
-    @client, @alive = client, alive
+  def initialize(client, alive, body)
+    @client, @alive, @body = client, alive, body
   end
 
   def notify_readable
@@ -23,6 +23,7 @@ module Rainbows::EventMachine::ResponsePipe
 
   def unbind
     @client.quit unless @alive
-    @io.close
+    @body.close if @body.respond_to?(:close)
+    @io.close unless @io.closed?
   end
 end

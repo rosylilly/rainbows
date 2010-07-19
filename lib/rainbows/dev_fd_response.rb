@@ -36,6 +36,7 @@ class Rainbows::DevFdResponse < Struct.new(:app)
 
     headers = HeaderHash.new(headers)
     st = io.stat
+    fileno = io.fileno
     if st.file?
       headers['Content-Length'] ||= st.size.to_s
       headers.delete('Transfer-Encoding')
@@ -51,15 +52,15 @@ class Rainbows::DevFdResponse < Struct.new(:app)
       # we need to make sure our pipe output is Fiber-compatible
       case env["rainbows.model"]
       when :FiberSpawn, :FiberPool, :RevFiberSpawn
-        return [ status, headers, Rainbows::Fiber::IO.new(io,::Fiber.current) ]
+        io = Rainbows::Fiber::IO.new(io,::Fiber.current)
       end
     else # unlikely, char/block device file, directory, ...
       return response
     end
-    [ status, headers, Body.new(io, "/dev/fd/#{io.fileno}") ]
+    [ status, headers, Body.new(io, "/dev/fd/#{fileno}", body) ]
   end
 
-  class Body < Struct.new(:to_io, :to_path)
+  class Body < Struct.new(:to_io, :to_path, :orig_body)
     # called by the webserver or other middlewares if they can't
     # handle #to_path
     def each(&block)
@@ -74,7 +75,8 @@ class Rainbows::DevFdResponse < Struct.new(:app)
 
     # called by the web server after #each
     def close
-      to_io.close if to_io.respond_to?(:close)
+      to_io.close unless to_io.closed?
+      orig_body.close if orig_body.respond_to?(:close) # may not be an IO
     rescue IOError # could've been IO::new()'ed and closed
     end
   end

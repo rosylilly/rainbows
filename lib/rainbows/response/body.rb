@@ -88,9 +88,11 @@ module Rainbows::Response::Body # :nodoc:
       ensure
         body.respond_to?(:close) && inp != body and body.close
     end
-  else
+  elsif method_defined?(:write_body_stream)
     def write_body_path(sock, body)
-      write_body_stream(sock, body_to_io(body))
+      write_body_stream(sock, inp = body_to_io(body))
+      ensure
+        body.respond_to?(:close) && inp != body and body.close
     end
   end
 

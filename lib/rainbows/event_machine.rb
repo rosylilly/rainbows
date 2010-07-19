@@ -126,7 +126,7 @@ module Rainbows
           elsif st.socket? || st.pipe?
             chunk = stream_response_headers(status, headers) if headers
             m = chunk ? ResponseChunkPipe : ResponsePipe
-            return EM.watch(io, m, self, alive).notify_readable = true
+            return EM.watch(io, m, self, alive, body).notify_readable = true
           end
           # char or block device... WTF? fall through to body.each
         end
