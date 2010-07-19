@@ -120,6 +120,7 @@ module Rainbows
 
           if st.file?
             write(response_header(status, headers)) if headers
+            io.close
             @body = stream = stream_file_data(body.to_path)
             stream.callback do
               body.close if body.respond_to?(:close)
