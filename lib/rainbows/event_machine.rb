@@ -50,7 +50,6 @@ module Rainbows
 
     class Client < EM::Connection # :nodoc: all
       include Rainbows::EvCore
-      include Rainbows::Response
       G = Rainbows::G
 
       def initialize(io)
@@ -98,14 +97,7 @@ module Rainbows
 
       # used for streaming sockets and pipes
       def stream_response(status, headers, io)
-        if headers
-          do_chunk = !!(headers['Transfer-Encoding'] =~ %r{\Achunked\z}i)
-          do_chunk = false if headers.delete('X-Rainbows-Autochunk') == 'no'
-          headers[CONNECTION] = CLOSE # TODO: allow keep-alive
-          write(response_header(status, headers))
-        else
-          do_chunk = false
-        end
+        do_chunk = stream_response_headers(status, headers) if headers
         mod = do_chunk ? ResponseChunkPipe : ResponsePipe
         EM.watch(io, mod, self).notify_readable = true
       end

@@ -7,7 +7,6 @@ module Rainbows
     class Client < ::Rev::IO
       include Rainbows::ByteSlice
       include Rainbows::EvCore
-      include Rainbows::Response
       G = Rainbows::G
 
       def initialize(io)
@@ -59,14 +58,7 @@ module Rainbows
 
       # used for streaming sockets and pipes
       def stream_response(status, headers, io, body)
-        if headers
-          do_chunk = !!(headers['Transfer-Encoding'] =~ %r{\Achunked\z}i)
-          do_chunk = false if headers.delete('X-Rainbows-Autochunk') == 'no'
-          headers[CONNECTION] = CLOSE # TODO: allow keep-alive
-          write(response_header(status, headers))
-        else
-          do_chunk = false
-        end
+        do_chunk = stream_response_headers(status, headers) if headers
         # we only want to attach to the Rev::Loop belonging to the
         # main thread in Ruby 1.9
         io = DeferredResponse.new(io, self, do_chunk, body)

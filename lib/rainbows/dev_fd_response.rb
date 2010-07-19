@@ -40,11 +40,12 @@ class Rainbows::DevFdResponse < Struct.new(:app)
       headers['Content-Length'] ||= st.size.to_s
       headers.delete('Transfer-Encoding')
     elsif st.pipe? || st.socket? # epoll-able things
-      if env['rainbows.autochunk']
-        headers['Transfer-Encoding'] = 'chunked'
-        headers.delete('Content-Length')
-      else
-        headers['X-Rainbows-Autochunk'] = 'no'
+      unless headers['Content-Length']
+        if env['rainbows.autochunk']
+          headers['Transfer-Encoding'] = 'chunked'
+        else
+          headers['X-Rainbows-Autochunk'] = 'no'
+        end
       end
 
       # we need to make sure our pipe output is Fiber-compatible

@@ -6,6 +6,7 @@ module Rainbows
   module EvCore
     include Unicorn
     include Rainbows::Const
+    include Rainbows::Response
     G = Rainbows::G
     NULL_IO = Unicorn::HttpRequest::NULL_IO
 
@@ -31,6 +32,19 @@ module Rainbows
       msg = Error.response(e) and write(msg)
       ensure
         quit
+    end
+
+    # returns whether to enable response chunking for autochunk models
+    def stream_response_headers(status, headers)
+      if headers['Content-Length']
+        rv = false
+      else
+        rv = !!(headers['Transfer-Encoding'] =~ %r{\Achunked\z}i)
+        rv = false if headers.delete('X-Rainbows-Autochunk') == 'no'
+      end
+      headers[CONNECTION] = CLOSE # TODO: allow keep-alive
+      write(response_header(status, headers))
+      rv
     end
 
     # TeeInput doesn't map too well to this right now...
