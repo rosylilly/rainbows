@@ -20,7 +20,7 @@ module Rainbows
 
       def on_close
         @do_chunk and @client.write("0\r\n\r\n")
-        @client.quit
+        @client.next
         @body.respond_to?(:close) and @body.close
       end
     end # class DeferredResponse

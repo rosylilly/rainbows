@@ -42,7 +42,6 @@ module Rainbows
         rv = !!(headers['Transfer-Encoding'] =~ %r{\Achunked\z}i)
         rv = false if headers.delete('X-Rainbows-Autochunk') == 'no'
       end
-      headers[CONNECTION] = CLOSE # TODO: allow keep-alive
       write(response_header(status, headers))
       rv
     end

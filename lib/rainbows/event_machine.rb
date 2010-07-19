@@ -95,16 +95,14 @@ module Rainbows
         end while true
       end
 
-      # used for streaming sockets and pipes
-      def stream_response(status, headers, io)
-        do_chunk = stream_response_headers(status, headers) if headers
-        mod = do_chunk ? ResponseChunkPipe : ResponsePipe
-        EM.watch(io, mod, self).notify_readable = true
-      end
-
       def em_write_response(response, alive = false)
         status, headers, body = response
-        headers = @hp.headers? ? HH.new(headers) : nil if headers
+        if @hp.headers?
+          headers = HH.new(headers)
+          headers[CONNECTION] = alive ? KEEP_ALIVE : CLOSE
+        else
+          headers = nil
+        end
         @body = body
 
         if body.respond_to?(:errback) && body.respond_to?(:callback)
@@ -121,23 +119,19 @@ module Rainbows
           st = io.stat
 
           if st.file?
-            if headers
-              headers[CONNECTION] = alive ? KEEP_ALIVE : CLOSE
-              write(response_header(status, headers))
-            end
+            write(response_header(status, headers)) if headers
             stream = stream_file_data(body.to_path)
             stream.callback { quit } unless alive
             return
           elsif st.socket? || st.pipe?
-            return stream_response(status, headers, io)
+            chunk = stream_response_headers(status, headers) if headers
+            m = chunk ? ResponseChunkPipe : ResponsePipe
+            return EM.watch(io, m, self, alive).notify_readable = true
           end
           # char or block device... WTF? fall through to body.each
         end
 
-        if headers
-          headers[CONNECTION] = alive ? KEEP_ALIVE : CLOSE
-          write(response_header(status, headers))
-        end
+        write(response_header(status, headers)) if headers
         write_body_each(self, body)
         quit unless alive
       end
@@ -154,8 +148,8 @@ module Rainbows
       # so a single buffer for all clients will work safely
       BUF = ''
 
-      def initialize(client)
-        @client = client
+      def initialize(client, alive)
+        @client, @alive = client, alive
       end
 
       def notify_readable
@@ -172,8 +166,8 @@ module Rainbows
       end
 
       def unbind
+        @client.quit unless @alive
         @io.close
-        @client.quit
       end
     end
 

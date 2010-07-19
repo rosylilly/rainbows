@@ -52,6 +52,10 @@ module Rainbows
         schedule_write
       end
 
+      def next
+        @deferred_bodies.shift
+      end
+
       def timeout?
         @_write_buffer.empty? && @deferred_bodies.empty? and close.nil?
       end
@@ -69,25 +73,20 @@ module Rainbows
         status, headers, body = response
         headers = @hp.headers? ? HH.new(headers) : nil
 
+        headers[CONNECTION] = alive ? KEEP_ALIVE : CLOSE if headers
         if body.respond_to?(:to_path)
           io = body_to_io(body)
           st = io.stat
 
           if st.file?
-            if headers
-              headers[CONNECTION] = alive ? KEEP_ALIVE : CLOSE
-              write(response_header(status, headers))
-            end
+            write(response_header(status, headers)) if headers
             return defer_body(to_sendfile(io))
           elsif st.socket? || st.pipe?
             return stream_response(status, headers, io, body)
           end
           # char or block device... WTF? fall through to body.each
         end
-        if headers
-          headers[CONNECTION] = alive ? KEEP_ALIVE : CLOSE
-          write(response_header(status, headers))
-        end
+        write(response_header(status, headers)) if headers
         write_body_each(self, body)
       end
 
