@@ -1,22 +1,49 @@
 #!/bin/sh
 . ./test-lib.sh
 
-t_plan 5 "close pipe response for $model"
+t_plan 10 "close pipe response for $model"
 
 t_begin "setup and startup" && {
-	rtmpfiles err out
+	rtmpfiles err out http_fifo sub_ok
 	rainbows_setup $model
 	export fifo
 	rainbows -E none -D close-pipe-response.ru -c $unicorn_config
 	rainbows_wait_start
 }
 
-t_begin "single request matches" && {
+t_begin "read random blob sha1" && {
+	random_blob_sha1=$(rsha1 < random_blob)
+}
+
+t_begin "start FIFO reader" && {
 	cat $fifo > $out &
-	test x'hello world' = x"$(curl -sSfv 2> $err http://$listen/)"
+}
+
+t_begin "single request matches" && {
+	sha1=$(curl -sSfv 2> $err http://$listen/ | rsha1)
+	test -n "$sha1"
+	test x"$sha1" = x"$random_blob_sha1"
 }
 
 t_begin "body.close called" && {
+	wait # for cat $fifo
+	grep CLOSING $out || die "body.close not logged"
+}
+
+t_begin "start FIFO reader for abortive request" && {
+	cat $fifo > $out &
+}
+
+t_begin "send abortive request" && {
+	(
+		printf 'GET /random_blob\r\n'
+		dd bs=4096 count=1 < $http_fifo >/dev/null
+		echo ok > $ok
+	) | socat - TCP:$listen > $http_fifo || :
+	test xok = x$(cat $ok)
+}
+
+t_begin "body.close called for aborted request" && {
 	wait # for cat $fifo
 	grep CLOSING $out || die "body.close not logged"
 }

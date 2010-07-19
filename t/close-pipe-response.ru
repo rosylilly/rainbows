@@ -15,11 +15,10 @@ class CloseWrapper < Struct.new(:to_io)
 end
 use Rainbows::DevFdResponse
 run(lambda { |env|
-  body = 'hello world'
-  io = IO.popen("echo '#{body}'", 'rb')
+  io = IO.popen('cat random_blob', 'rb')
   [ 200,
     {
-      'Content-Length' => (body.size + 1).to_s,
+      'Content-Length' => ::File.stat('random_blob').size.to_s,
       'Content-Type' => 'application/octet-stream',
     },
     CloseWrapper[io] ]

@@ -119,14 +119,15 @@ module Rainbows
           st = io.stat
 
           if st.file?
-            write(response_header(status, headers)) if headers
-            io.close
-            @body = stream = stream_file_data(body.to_path)
-            stream.callback do
+            cb = lambda do
               body.close if body.respond_to?(:close)
               quit unless alive
             end
-            return
+            write(response_header(status, headers)) if headers
+            io.close
+            @body = stream = stream_file_data(body.to_path)
+            stream.errback(&cb)
+            return stream.callback(&cb)
           elsif st.socket? || st.pipe?
             chunk = stream_response_headers(status, headers) if headers
             m = chunk ? ResponseChunkPipe : ResponsePipe

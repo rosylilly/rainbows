@@ -9,10 +9,10 @@ ruby) ;;
 	;;
 esac
 
-t_plan 7 "sendfile wrap body response for $model"
+t_plan 10 "sendfile wrap body response for $model"
 
 t_begin "setup and startup" && {
-	rtmpfiles out err
+	rtmpfiles out err http_fifo sub_ok
 	rainbows_setup $model
 	echo 'require "sendfile"' >> $unicorn_config
 	echo 'def (::IO).copy_stream(*x); abort "NO"; end' >> $unicorn_config
@@ -38,6 +38,24 @@ t_begin "single request matches" && {
 }
 
 t_begin "body.close called" && {
+	wait # for cat $fifo
+	grep CLOSING $out || die "body.close not logged"
+}
+
+t_begin "start FIFO reader for abortive request" && {
+	cat $fifo > $out &
+}
+
+t_begin "send abortive request" && {
+	(
+		printf 'GET /random_blob\r\n'
+		dd bs=4096 count=1 < $http_fifo >/dev/null
+		echo ok > $ok
+	) | socat - TCP:$listen > $http_fifo || :
+	test xok = x$(cat $ok)
+}
+
+t_begin "body.close called for aborted request" && {
 	wait # for cat $fifo
 	grep CLOSING $out || die "body.close not logged"
 }
