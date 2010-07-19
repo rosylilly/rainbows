@@ -8,6 +8,7 @@ module Rainbows
       include Rainbows::ByteSlice
       include Rainbows::EvCore
       G = Rainbows::G
+      F = Rainbows::StreamFile
 
       def initialize(io)
         CONN[self] = false
@@ -80,7 +81,7 @@ module Rainbows
 
           if st.file?
             write(response_header(status, headers)) if headers
-            return defer_body(to_sendfile(io))
+            return defer_body(F.new(0, io, body))
           elsif st.socket? || st.pipe?
             return stream_response(status, headers, io, body)
           end
