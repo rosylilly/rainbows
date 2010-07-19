@@ -106,11 +106,8 @@ module Rainbows
         else
           do_chunk = false
         end
-        if do_chunk
-          EM.watch(io, ResponseChunkPipe, self).notify_readable = true
-        else
-          EM.enable_proxy(EM.attach(io, ResponsePipe, self), self, 16384)
-        end
+        mod = do_chunk ? ResponseChunkPipe : ResponsePipe
+        EM.watch(io, mod, self).notify_readable = true
       end
 
       def em_write_response(response, alive = false)
@@ -163,6 +160,19 @@ module Rainbows
     module ResponsePipe # :nodoc: all
       def initialize(client)
         @client = client
+      end
+
+      def notify_readable
+        begin
+          @client.write(@io.read_nonblock(16384))
+        rescue Errno::EINTR
+          retry
+        rescue Errno::EAGAIN
+          return
+        rescue EOFError
+          detach
+          return
+        end while true
       end
 
       def unbind
