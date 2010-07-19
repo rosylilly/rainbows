@@ -22,9 +22,8 @@ module Rainbows
       def response_write(response)
         enable
         alive = @hp.keepalive? && G.alive
-        out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if @hp.headers?
-        rev_write_response(response, out)
-        return quit unless alive && G.alive
+        rev_write_response(response, alive)
+        return quit unless alive
 
         @env.clear
         @hp.reset

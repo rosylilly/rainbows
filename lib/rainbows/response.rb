@@ -5,34 +5,29 @@ require 'time' # for Time#httpdate
 module Rainbows::Response
 
   CODES = Unicorn::HttpResponse::CODES
+  CRLF = "\r\n"
 
-  def response_header(response, out)
-    status, headers = response
+  # freeze headers we may set as hash keys for a small speedup
+  CONNECTION = "Connection".freeze
+  CLOSE = "close"
+  KEEP_ALIVE = "keep-alive"
+  HH = Rack::Utils::HeaderHash
+
+  def response_header(status, headers)
     status = CODES[status.to_i] || status
-
+    rv = "HTTP/1.1 #{status}\r\n" \
+         "Date: #{Time.now.httpdate}\r\n" \
+         "Status: #{status}\r\n"
     headers.each do |key, value|
-      next if %r{\A(?:X-Rainbows-|Connection\z|Date\z|Status\z)}i =~ key
+      next if %r{\A(?:X-Rainbows-|Date\z|Status\z)}i =~ key
       if value =~ /\n/
         # avoiding blank, key-only cookies with /\n+/
-        out.concat(value.split(/\n+/).map! { |v| "#{key}: #{v}\r\n" })
+        rv << value.split(/\n+/).map! { |v| "#{key}: #{v}\r\n" }.join('')
       else
-        out << "#{key}: #{value}\r\n"
+        rv << "#{key}: #{value}\r\n"
       end
     end
-
-    "HTTP/1.1 #{status}\r\n" \
-    "Date: #{Time.now.httpdate}\r\n" \
-    "Status: #{status}\r\n" \
-    "#{out.join('')}\r\n"
-  end
-
-  def write_header(socket, response, out)
-    out and socket.write(response_header(response, out))
-  end
-
-  def write_response(socket, response, out)
-    write_header(socket, response, out)
-    write_body(socket, response[2])
+    rv << CRLF
   end
 
   # called after forking

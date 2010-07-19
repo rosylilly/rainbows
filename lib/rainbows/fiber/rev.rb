@@ -81,7 +81,6 @@ module Rainbows::Fiber
         buf = client.read_timeout or return
         hp = HttpParser.new
         env = {}
-        alive = true
         remote_addr = Rainbows.addr(io)
 
         begin # loop
@@ -91,18 +90,26 @@ module Rainbows::Fiber
           env[RACK_INPUT] = 0 == hp.content_length ?
                     HttpRequest::NULL_IO : TeeInput.new(client, env, hp, buf)
           env[REMOTE_ADDR] = remote_addr
-          response = APP.call(env.update(RACK_DEFAULTS))
+          status, headers, body = APP.call(env.update(RACK_DEFAULTS))
 
-          if 100 == response[0].to_i
+          if 100 == status.to_i
             client.write(EXPECT_100_RESPONSE)
             env.delete(HTTP_EXPECT)
-            response = APP.call(env)
+            status, headers, body = APP.call(env)
           end
 
-          alive = hp.keepalive? && G.alive
-          out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if hp.headers?
-          write_response(client, response, out)
-        end while alive and hp.reset.nil? and env.clear
+          if hp.headers?
+            headers = HH.new(headers)
+            headers[CONNECTION] = if hp.keepalive? && G.alive
+              KEEP_ALIVE
+            else
+              env = false
+              CLOSE
+            end
+            client.write(response_header(status, headers))
+          end
+          write_body(client, body)
+        end while env && env.clear && hp.reset.nil?
       rescue => e
         Error.write(io, e)
       ensure

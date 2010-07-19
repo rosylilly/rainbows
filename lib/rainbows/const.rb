@@ -15,9 +15,6 @@ module Rainbows
       # "rainbows.autochunk" => false,
     })
 
-    CONN_CLOSE = "Connection: close\r\n"
-    CONN_ALIVE = "Connection: keep-alive\r\n"
-
     # client IO object that supports reading and writing directly
     # without filtering it through the HTTP chunk parser.
     # Maybe we can get this renamed to "rack.io" if it becomes part

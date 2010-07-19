@@ -41,7 +41,6 @@ module Rainbows::Revactor
     buf = client.read(*rd_args)
     hp = HttpParser.new
     env = {}
-    alive = true
 
     begin
       buf << client.read(*rd_args) until hp.headers(env, buf)
@@ -50,18 +49,26 @@ module Rainbows::Revactor
       env[RACK_INPUT] = 0 == hp.content_length ?
                NULL_IO : TeeInput.new(PartialSocket.new(client), env, hp, buf)
       env[REMOTE_ADDR] = remote_addr
-      response = app.call(env.update(RACK_DEFAULTS))
+      status, headers, body = app.call(env.update(RACK_DEFAULTS))
 
-      if 100 == response[0].to_i
+      if 100 == status.to_i
         client.write(EXPECT_100_RESPONSE)
         env.delete(HTTP_EXPECT)
-        response = app.call(env)
+        status, headers, body = app.call(env)
       end
 
-      alive = hp.keepalive? && G.alive
-      out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if hp.headers?
-      write_response(client, response, out)
-    end while alive and hp.reset.nil? and env.clear
+      if hp.headers?
+        headers = HH.new(headers)
+        headers[CONNECTION] = if hp.keepalive? && G.alive
+          KEEP_ALIVE
+        else
+          env = false
+          CLOSE
+        end
+        client.write(response_header(status, headers))
+      end
+      write_body(client, body)
+    end while env && env.clear && hp.reset.nil?
   rescue ::Revactor::TCP::ReadError
   rescue => e
     Rainbows::Error.write(io, e)

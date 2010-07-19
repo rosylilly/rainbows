@@ -52,7 +52,6 @@ module Rainbows::Base
     buf = client.readpartial(CHUNK_SIZE) # accept filters protect us here
     hp = HttpParser.new
     env = {}
-    alive = true
     remote_addr = Rainbows.addr(client)
 
     begin # loop
@@ -65,18 +64,22 @@ module Rainbows::Base
       env[RACK_INPUT] = 0 == hp.content_length ?
                         NULL_IO : TeeInput.new(client, env, hp, buf)
       env[REMOTE_ADDR] = remote_addr
-      response = app.call(env.update(RACK_DEFAULTS))
+      status, headers, body = app.call(env.update(RACK_DEFAULTS))
 
-      if 100 == response[0].to_i
+      if 100 == status.to_i
         client.write(EXPECT_100_RESPONSE)
         env.delete(HTTP_EXPECT)
-        response = app.call(env)
+        status, headers, body = app.call(env)
       end
 
-      alive = hp.keepalive? && G.alive
-      out = [ alive ? CONN_ALIVE : CONN_CLOSE ] if hp.headers?
-      write_response(client, response, out)
-    end while alive and hp.reset.nil? and env.clear
+      if hp.headers?
+        headers = HH.new(headers)
+        env = false unless hp.keepalive? && G.alive
+        headers[CONNECTION] = env ? KEEP_ALIVE : CLOSE
+        client.write(response_header(status, headers))
+      end
+      write_body(client, body)
+    end while env && env.clear && hp.reset.nil?
   # if we get any error, try to write something back to the client
   # assuming we haven't closed the socket, but don't get hung up
   # if the socket is already closed or broken.  We'll always ensure

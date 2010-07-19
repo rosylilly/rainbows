@@ -4,20 +4,19 @@
 # Cramp 0.11 relies on this, and is only activated by Cramp
 if defined?(Cramp) && defined?(Rainbows::EventMachine::Client)
   class Rainbows::HttpResponse
-    class << self
-      include Rainbows::Response
-      alias write write_response
+    # dummy method for Cramp to alias_method_chain
+    def self.write(client, response, out)
     end
   end
 
   module Rainbows::EventMachine::CrampSocket
-    def write_header(_, response, out)
+    def em_write_response(response, alive = false)
       if websocket?
         write web_socket_upgrade_data
         web_socket_handshake!
-        out = nil # disable response headers
+        response[1] = nil # disable response headers
       end
-      super(self, response, out)
+      super
     end
   end
 
