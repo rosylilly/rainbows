@@ -11,7 +11,7 @@ module Rainbows::EventMachine::ResponseChunkPipe
   def notify_readable
     begin
       data = @io.read_nonblock(16384, BUF)
-      @client.write(sprintf("%x\r\n", data.size))
+      @client.write("#{data.size.to_s(16)}\r\n")
       @client.write(data)
       @client.write("\r\n")
     rescue Errno::EINTR

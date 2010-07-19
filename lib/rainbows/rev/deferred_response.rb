@@ -13,7 +13,7 @@ module Rainbows
       end
 
       def on_read(data)
-        @do_chunk and @client.write(sprintf("%x\r\n", data.size))
+        @do_chunk and @client.write("#{data.size.to_s(16)}\r\n")
         @client.write(data)
         @do_chunk and @client.write("\r\n")
       end
