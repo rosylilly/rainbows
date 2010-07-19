@@ -112,11 +112,8 @@ module Rainbows
           body.callback { quit }
           body.errback { quit }
           # async response, this could be a trickle as is in comet-style apps
-          if headers
-            headers[CONNECTION] = CLOSE
-            write(response_header(status, headers))
-          end
-          return write_body_each(self, body)
+          headers[CONNECTION] = CLOSE if headers
+          alive = true
         elsif body.respond_to?(:to_path)
           io = body_to_io(body)
           st = io.stat
