@@ -47,6 +47,9 @@ module Rainbows
   module EventMachine
 
     include Base
+    autoload :ResponsePipe, 'rainbows/event_machine/response_pipe'
+    autoload :ResponseChunkPipe, 'rainbows/event_machine/response_chunk_pipe'
+    autoload :TryDefer, 'rainbows/event_machine/try_defer'
 
     class Client < EM::Connection # :nodoc: all
       include Rainbows::EvCore
@@ -143,59 +146,6 @@ module Rainbows
       end
     end
 
-    module ResponsePipe # :nodoc: all
-      # garbage avoidance, EM always uses this in a single thread,
-      # so a single buffer for all clients will work safely
-      BUF = ''
-
-      def initialize(client, alive)
-        @client, @alive = client, alive
-      end
-
-      def notify_readable
-        begin
-          @client.write(@io.read_nonblock(16384, BUF))
-        rescue Errno::EINTR
-          retry
-        rescue Errno::EAGAIN
-          return
-        rescue EOFError
-          detach
-          return
-        end while true
-      end
-
-      def unbind
-        @client.quit unless @alive
-        @io.close
-      end
-    end
-
-    module ResponseChunkPipe # :nodoc: all
-      include ResponsePipe
-
-      def unbind
-        @client.write("0\r\n\r\n")
-        super
-      end
-
-      def notify_readable
-        begin
-          data = @io.read_nonblock(16384, BUF)
-          @client.write(sprintf("%x\r\n", data.size))
-          @client.write(data)
-          @client.write("\r\n")
-        rescue Errno::EINTR
-          retry
-        rescue Errno::EAGAIN
-          return
-        rescue EOFError
-          detach
-          return
-        end while true
-      end
-    end
-
     module Server # :nodoc: all
 
       def close
@@ -208,30 +158,6 @@ module Rainbows
         io = Rainbows.accept(@io) or return
         sig = EM.attach_fd(io.fileno, false)
         CUR[sig] = CL.new(sig, io)
-      end
-    end
-
-    # Middleware that will run the app dispatch in a separate thread.
-    # This middleware is automatically loaded by Rainbows! when using
-    # EventMachine and if the app responds to the +deferred?+ method.
-    class TryDefer < Struct.new(:app) # :nodoc: all
-
-      def initialize(app)
-        # the entire app becomes multithreaded, even the root (non-deferred)
-        # thread since any thread can share processes with others
-        Const::RACK_DEFAULTS['rack.multithread'] = true
-        super
-      end
-
-      def call(env)
-        if app.deferred?(env)
-          EM.defer(proc { catch(:async) { app.call(env) } },
-                   env[EvCore::ASYNC_CALLBACK])
-          # all of the async/deferred stuff breaks Rack::Lint :<
-          nil
-        else
-          app.call(env)
-        end
       end
     end
 
