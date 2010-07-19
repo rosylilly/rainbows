@@ -158,13 +158,17 @@ module Rainbows
     end
 
     module ResponsePipe # :nodoc: all
+      # garbage avoidance, EM always uses this in a single thread,
+      # so a single buffer for all clients will work safely
+      BUF = ''
+
       def initialize(client)
         @client = client
       end
 
       def notify_readable
         begin
-          @client.write(@io.read_nonblock(16384))
+          @client.write(@io.read_nonblock(16384, BUF))
         rescue Errno::EINTR
           retry
         rescue Errno::EAGAIN
@@ -192,7 +196,7 @@ module Rainbows
       def notify_readable
         begin
           data = begin
-            @io.read_nonblock(16384)
+            @io.read_nonblock(16384, BUF)
           rescue Errno::EINTR
             retry
           rescue Errno::EAGAIN
