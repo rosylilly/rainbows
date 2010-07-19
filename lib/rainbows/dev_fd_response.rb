@@ -73,10 +73,8 @@ class Rainbows::DevFdResponse < Struct.new(:app)
 
     # called by the web server after #each
     def close
-      begin
-        to_io.close if to_io.respond_to?(:close)
-      rescue IOError # could've been IO::new()'ed and closed
-      end
+      to_io.close if to_io.respond_to?(:close)
+    rescue IOError # could've been IO::new()'ed and closed
     end
   end
   #:startdoc:
