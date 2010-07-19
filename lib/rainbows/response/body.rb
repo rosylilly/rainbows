@@ -41,7 +41,7 @@ module Rainbows::Response::Body # :nodoc:
       # try to take advantage of Rainbows::DevFdResponse, calling File.open
       # is a last resort
       path = body.to_path
-      path =~ %r{\A/dev/fd/(\d+)\z} ? IO.new($1.to_i) : File.open(path, 'rb')
+      path =~ %r{\A/dev/fd/(\d+)\z} ? IO.new($1.to_i) : File.open(path)
     end
   end
 

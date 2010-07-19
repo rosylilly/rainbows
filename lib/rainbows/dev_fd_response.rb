@@ -31,7 +31,7 @@ class Rainbows::DevFdResponse < Struct.new(:app)
     return response if STATUS_WITH_NO_ENTITY_BODY.include?(status)
 
     io = body.to_io if body.respond_to?(:to_io)
-    io ||= File.open(body.to_path, 'rb') if body.respond_to?(:to_path)
+    io ||= File.open(body.to_path) if body.respond_to?(:to_path)
     return response if io.nil?
 
     headers = HeaderHash.new(headers)
