@@ -62,10 +62,10 @@ module Rainbows
 
       # used for streaming sockets and pipes
       def stream_response(status, headers, io, body)
-        do_chunk = stream_response_headers(status, headers) if headers
+        c = stream_response_headers(status, headers) if headers
         # we only want to attach to the Rev::Loop belonging to the
         # main thread in Ruby 1.9
-        io = DeferredResponse.new(io, self, do_chunk, body)
+        io = (c ? DeferredChunkResponse : DeferredResponse).new(io, self, body)
         defer_body(io.attach(Server::LOOP))
       end
 

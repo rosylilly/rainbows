@@ -37,6 +37,7 @@ module Rainbows
     end
 
     autoload :DeferredResponse,'rainbows/rev/deferred_response'
+    autoload :DeferredChunkResponse,'rainbows/rev/deferred_chunk_response'
     include Core
     # :startdoc:
   end
