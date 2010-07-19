@@ -133,8 +133,6 @@ module Rainbows
 
           if st.file?
             if headers
-              headers.delete('Transfer-Encoding')
-              headers['Content-Length'] ||= st.size.to_s
               headers[CONNECTION] = alive ? KEEP_ALIVE : CLOSE
               write(response_header(status, headers))
             end
