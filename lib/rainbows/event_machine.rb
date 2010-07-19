@@ -195,19 +195,17 @@ module Rainbows
 
       def notify_readable
         begin
-          data = begin
-            @io.read_nonblock(16384, BUF)
-          rescue Errno::EINTR
-            retry
-          rescue Errno::EAGAIN
-            return
-          rescue EOFError
-            detach
-            return
-          end
-          @client.send_data(sprintf("%x\r\n", data.size))
-          @client.send_data(data)
-          @client.send_data("\r\n")
+          data = @io.read_nonblock(16384, BUF)
+          @client.write(sprintf("%x\r\n", data.size))
+          @client.write(data)
+          @client.write("\r\n")
+        rescue Errno::EINTR
+          retry
+        rescue Errno::EAGAIN
+          return
+        rescue EOFError
+          detach
+          return
         end while true
       end
     end
