@@ -106,9 +106,9 @@ module Rainbows
         else
           headers = nil
         end
-        @body = body
 
         if body.respond_to?(:errback) && body.respond_to?(:callback)
+          @body = body
           body.callback { quit }
           body.errback { quit }
           # async response, this could be a trickle as is in comet-style apps
@@ -120,7 +120,7 @@ module Rainbows
 
           if st.file?
             write(response_header(status, headers)) if headers
-            stream = stream_file_data(body.to_path)
+            @body = stream = stream_file_data(body.to_path)
             stream.callback { quit } unless alive
             return
           elsif st.socket? || st.pipe?
