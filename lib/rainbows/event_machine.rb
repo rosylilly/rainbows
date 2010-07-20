@@ -115,8 +115,7 @@ module Rainbows
           headers[CONNECTION] = CLOSE if headers
           alive = true
         elsif body.respond_to?(:to_path)
-          io = body_to_io(body)
-          st = io.stat
+          st = File.stat(path = body.to_path)
 
           if st.file?
             cb = lambda do
@@ -124,11 +123,11 @@ module Rainbows
               quit unless alive
             end
             write(response_header(status, headers)) if headers
-            io.close
-            @body = stream = stream_file_data(body.to_path)
+            @body = stream = stream_file_data(path)
             stream.errback(&cb)
             return stream.callback(&cb)
           elsif st.socket? || st.pipe?
+            io = body_to_io(body)
             chunk = stream_response_headers(status, headers) if headers
             m = chunk ? ResponseChunkPipe : ResponsePipe
             return EM.watch(io, m, self, alive, body).notify_readable = true
