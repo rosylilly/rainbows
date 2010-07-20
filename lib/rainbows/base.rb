@@ -1,5 +1,4 @@
 # -*- encoding: binary -*-
-require 'rainbows/tee_input'
 
 # base class for Rainbows concurrency models, this is currently used by
 # ThreadSpawn and ThreadPool models.  Base is also its own
