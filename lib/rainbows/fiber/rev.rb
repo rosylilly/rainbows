@@ -100,6 +100,7 @@ module Rainbows::Fiber
 
           if hp.headers?
             headers = HH.new(headers)
+            range = parse_range(env, status, headers) and status = range.shift
             headers[CONNECTION] = if hp.keepalive? && G.alive
               KEEP_ALIVE
             else
@@ -108,7 +109,7 @@ module Rainbows::Fiber
             end
             client.write(response_header(status, headers))
           end
-          write_body(client, body)
+          write_body(client, body, range)
         end while env && env.clear && hp.reset.nil?
       rescue => e
         Error.write(io, e)

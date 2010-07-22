@@ -32,6 +32,8 @@ module Rainbows
         when EOFError, Errno::ECONNRESET, Errno::EPIPE, Errno::EINVAL,
              Errno::EBADF, Errno::ENOTCONN
           # swallow error if client shuts down one end or disconnects
+        when Rainbows::Response416
+          Const::ERROR_416_RESPONSE
         when Unicorn::HttpParserError
           Const::ERROR_400_RESPONSE # try to tell the client they're bad
         when IOError # HttpParserError is an IOError

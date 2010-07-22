@@ -3,6 +3,8 @@
 require 'time' # for Time#httpdate
 
 module Rainbows::Response
+  autoload :Body, 'rainbows/response/body'
+  autoload :Range, 'rainbows/response/range'
 
   CODES = Unicorn::HttpResponse::CODES
   CRLF = "\r\n"
@@ -32,7 +34,25 @@ module Rainbows::Response
 
   # called after forking
   def self.setup(klass)
-    require('rainbows/response/body') and
-      klass.__send__(:include, Rainbows::Response::Body)
+    range_class = body_class = klass
+    case Rainbows::Const::RACK_DEFAULTS['rainbows.model']
+    when :WriterThreadSpawn
+      body_class = Rainbows::WriterThreadSpawn::MySocket
+      range_class = Rainbows::HttpServer
+    when :EventMachine, :NeverBlock, :Revactor
+      range_class = nil # :<
+    end
+    return if body_class.included_modules.include?(Body)
+    body_class.__send__(:include, Body)
+    sf = IO.respond_to?(:copy_stream) || IO.method_defined?(:sendfile_nonblock)
+    if range_class
+      range_class.__send__(:include, sf ? Range : NoRange)
+    end
+  end
+
+  module NoRange
+    # dummy method if we can't send range responses
+    def parse_range(env, status, headers)
+    end
   end
 end

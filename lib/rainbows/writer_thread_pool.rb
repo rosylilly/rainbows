@@ -47,8 +47,8 @@ module Rainbows
     end
 
     module Response # :nodoc:
-      def write_body(qclient, body)
-        qclient.q << [ qclient.to_io, :body, body ]
+      def write_body(qclient, body, range)
+        qclient.q << [ qclient.to_io, :body, body, range ]
       end
     end
 
@@ -70,9 +70,9 @@ module Rainbows
       qp = (1..worker_connections).map do |n|
         QueuePool.new(1) do |response|
           begin
-            io, arg1, arg2 = response
+            io, arg1, arg2, arg3 = response
             case arg1
-            when :body then sync_write_body(io, arg2)
+            when :body then sync_write_body(io, arg2, arg3)
             when :close then io.close unless io.closed?
             else
               io.write(arg1)

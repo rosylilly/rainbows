@@ -73,11 +73,12 @@ module Rainbows::Base
 
       if hp.headers?
         headers = HH.new(headers)
+        range = parse_range(env, status, headers) and status = range.shift
         env = false unless hp.keepalive? && G.alive
         headers[CONNECTION] = env ? KEEP_ALIVE : CLOSE
         client.write(response_header(status, headers))
       end
-      write_body(client, body)
+      write_body(client, body, range)
     end while env && env.clear && hp.reset.nil?
   # if we get any error, try to write something back to the client
   # assuming we haven't closed the socket, but don't get hung up

@@ -80,15 +80,21 @@ module Rainbows
           st = io.stat
 
           if st.file?
-            write(response_header(status, headers)) if headers
-            return defer_body(F.new(0, io, body))
+            offset, count = 0, st.size
+            if headers
+              if range = parse_range(@env, status, headers)
+                status, offset, count = range
+              end
+              write(response_header(status, headers))
+            end
+            return defer_body(F.new(offset, count, io, body))
           elsif st.socket? || st.pipe?
             return stream_response(status, headers, io, body)
           end
           # char or block device... WTF? fall through to body.each
         end
         write(response_header(status, headers)) if headers
-        write_body_each(self, body)
+        write_body_each(self, body, nil)
       end
 
       def app_call

@@ -46,22 +46,23 @@ module Rainbows::Response::Body # :nodoc:
   end
 
   if IO.method_defined?(:sendfile_nonblock)
-    def write_body_file(sock, body)
-      sock.sendfile(body, 0)
+    def write_body_file(sock, body, range)
+      range ? sock.sendfile(body, range[0], range[1]) : sock.sendfile(body, 0)
     end
   end
 
   if IO.respond_to?(:copy_stream)
     unless method_defined?(:write_body_file)
       # try to use sendfile() via IO.copy_stream, otherwise pread()+write()
-      def write_body_file(sock, body)
-        IO.copy_stream(body, sock, nil, 0)
+      def write_body_file(sock, body, range)
+        range ? IO.copy_stream(body, sock, range[1], range[0]) :
+                IO.copy_stream(body, sock, nil, 0)
       end
     end
 
     # only used when body is a pipe or socket that can't handle
     # pread() semantics
-    def write_body_stream(sock, body)
+    def write_body_stream(sock, body, range)
       IO.copy_stream(body, sock)
       ensure
         body.respond_to?(:close) and body.close
@@ -74,40 +75,40 @@ module Rainbows::Response::Body # :nodoc:
   if method_defined?(:write_body_file)
 
     # middlewares/apps may return with a body that responds to +to_path+
-    def write_body_path(sock, body)
+    def write_body_path(sock, body, range)
       inp = body_to_io(body)
       if inp.stat.file?
         begin
-          write_body_file(sock, inp)
+          write_body_file(sock, inp, range)
         ensure
           inp.close if inp != body
         end
       else
-        write_body_stream(sock, inp)
+        write_body_stream(sock, inp, range)
       end
       ensure
         body.respond_to?(:close) && inp != body and body.close
     end
   elsif method_defined?(:write_body_stream)
-    def write_body_path(sock, body)
-      write_body_stream(sock, inp = body_to_io(body))
+    def write_body_path(sock, body, range)
+      write_body_stream(sock, inp = body_to_io(body), range)
       ensure
         body.respond_to?(:close) && inp != body and body.close
     end
   end
 
   if method_defined?(:write_body_path)
-    def write_body(client, body)
+    def write_body(client, body, range)
       body.respond_to?(:to_path) ?
-        write_body_path(client, body) :
-        write_body_each(client, body)
+        write_body_path(client, body, range) :
+        write_body_each(client, body, range)
     end
   else
     ALIASES[:write_body] = :write_body_each
   end
 
   # generic body writer, used for most dynamically generated responses
-  def write_body_each(socket, body)
+  def write_body_each(socket, body, range = nil)
     body.each { |chunk| socket.write(chunk) }
     ensure
       body.respond_to?(:close) and body.close

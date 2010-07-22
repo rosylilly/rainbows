@@ -51,9 +51,9 @@ module Rainbows
         self.thr = Thread.new(to_io, q) do |io, q|
           while response = q.shift
             begin
-              arg1, arg2 = response
+              arg1, arg2, arg3 = response
               case arg1
-              when :body then write_body(io, arg2)
+              when :body then write_body(io, arg2, arg3)
               when :close
                 io.close unless io.closed?
                 break
@@ -73,8 +73,8 @@ module Rainbows
         (self.q ||= queue_writer) << buf
       end
 
-      def queue_body(body)
-        (self.q ||= queue_writer) << [ :body, body ]
+      def queue_body(body, range)
+        (self.q ||= queue_writer) << [ :body, body, range ]
       end
 
       def close
@@ -90,8 +90,8 @@ module Rainbows
       end
     end
 
-    def write_body(my_sock, body) # :nodoc:
-      my_sock.queue_body(body)
+    def write_body(my_sock, body, range) # :nodoc:
+      my_sock.queue_body(body, range)
     end
 
     def process_client(client) # :nodoc:
@@ -100,7 +100,6 @@ module Rainbows
 
     def worker_loop(worker)  # :nodoc:
       MySocket.const_set(:MAX, worker_connections)
-      Rainbows::Response.setup(MySocket)
       super(worker) # accept loop from Unicorn
       CUR.delete_if do |t,q|
         q << nil

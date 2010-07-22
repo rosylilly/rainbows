@@ -2,8 +2,9 @@
 # :enddoc:
 module Rainbows::Rev::Sendfile
   if IO.method_defined?(:sendfile_nonblock)
-    def rev_sendfile(body)
-      body.offset += @_io.sendfile_nonblock(body, body.offset, 0x10000)
+    def rev_sendfile(sf) # +sf+ is a Rainbows::StreamFile object
+      sf.offset += (n = @_io.sendfile_nonblock(sf, sf.offset, sf.count))
+      0 == (sf.count -= n) and raise EOFError
       enable_write_watcher
       rescue Errno::EAGAIN
         enable_write_watcher
