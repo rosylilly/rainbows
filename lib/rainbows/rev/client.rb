@@ -50,11 +50,14 @@ module Rainbows
       # here to prevent connections from being closed on us.
       def defer_body(io)
         @deferred_bodies << io
-        schedule_write
+        @_write_buffer.empty? ? on_write_complete : schedule_write
       end
 
       def next
         @deferred_bodies.shift
+        if :close == @state && @deferred_bodies.empty? && @_write_buffer.empty?
+          close
+        end
       end
 
       def timeout?
