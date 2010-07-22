@@ -19,7 +19,7 @@ class WelcomeController < Cramp::Controller::Websocket
   end
 
   def send_hello_world
-    render "Hello from the Server!\n"
+    render("Hello from the Server!\n" * 256)
   end
 end
 

@@ -24,6 +24,7 @@ t_begin "setup and start" && {
 
 t_begin "wait for server to say hello to us" && {
 	ok=$((curl --no-buffer -sS http://$listen/ || :) | \
+	     (tr -d '\0\0377' || :) | \
 	     awk '/Hello from the Server/ { print "ok"; exit 0 }')
 
 	test x"$ok" = xok
