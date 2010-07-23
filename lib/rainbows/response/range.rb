@@ -7,7 +7,7 @@ module Rainbows::Response::Range
 
   # This does not support multipart responses (does anybody actually
   # use those?) +headers+ is always a Rack::Utils::HeaderHash
-  def parse_range(env, status, headers)
+  def make_range!(env, status, headers)
     if 200 == status.to_i &&
         (clen = headers[Content_Length]) &&
         /\Abytes=(\d+-\d*|\d*-\d+)\z/ =~ env[HTTP_RANGE]

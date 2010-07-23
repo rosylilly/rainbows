@@ -85,7 +85,7 @@ module Rainbows
           if st.file?
             offset, count = 0, st.size
             if headers
-              if range = parse_range(@env, status, headers)
+              if range = make_range!(@env, status, headers)
                 status, offset, count = range
               end
               write(response_header(status, headers))

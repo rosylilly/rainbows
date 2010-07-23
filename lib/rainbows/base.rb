@@ -73,7 +73,7 @@ module Rainbows::Base
 
       if hp.headers?
         headers = HH.new(headers)
-        range = parse_range(env, status, headers) and status = range.shift
+        range = make_range!(env, status, headers) and status = range.shift
         env = false unless hp.keepalive? && G.alive
         headers[CONNECTION] = env ? KEEP_ALIVE : CLOSE
         client.write(response_header(status, headers))

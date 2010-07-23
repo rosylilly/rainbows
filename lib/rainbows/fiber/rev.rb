@@ -100,7 +100,7 @@ module Rainbows::Fiber
 
           if hp.headers?
             headers = HH.new(headers)
-            range = parse_range(env, status, headers) and status = range.shift
+            range = make_range!(env, status, headers) and status = range.shift
             headers[CONNECTION] = if hp.keepalive? && G.alive
               KEEP_ALIVE
             else

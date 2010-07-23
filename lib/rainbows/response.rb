@@ -52,7 +52,7 @@ module Rainbows::Response
 
   module NoRange
     # dummy method if we can't send range responses
-    def parse_range(env, status, headers)
+    def make_range!(env, status, headers)
     end
   end
 end
