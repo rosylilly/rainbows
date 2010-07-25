@@ -14,7 +14,7 @@ class Rainbows::Rev::DeferredResponse < ::Rev::IO
   end
 
   def on_close
-    @client.next
+    @client.next!
     @body.respond_to?(:close) and @body.close
   end
 end

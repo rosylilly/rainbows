@@ -13,28 +13,20 @@ module Rainbows
 
       def app_call
         KATO.delete(self)
-        disable
+        disable if enabled?
         @env[RACK_INPUT] = @input
         app_dispatch # must be implemented by subclass
       end
 
       # this is only called in the master thread
       def response_write(response)
-        enable
         alive = @hp.keepalive? && G.alive
         rev_write_response(response, alive)
-        return quit unless alive
+        return quit unless alive && :close != @state
 
         @env.clear
         @hp.reset
         @state = :headers
-        # keepalive requests are always body-less, so @input is unchanged
-        if @hp.headers(@env, @buf)
-          @input = HttpRequest::NULL_IO
-          app_call
-        else
-          KATO[self] = Time.now
-        end
       end
 
       # fails-safe application dispatch, we absolutely cannot

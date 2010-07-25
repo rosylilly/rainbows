@@ -16,6 +16,7 @@ $stdout.reopen($stderr)
 Isolate.now!(opts) do
   gem 'rack', '1.1.0' # Cramp currently requires ~> 1.1.0
   gem 'unicorn', '1.1.1'
+  gem 'kcar', '0.1.1'
 
   if engine == "ruby"
     gem 'sendfile', '1.0.0' # next Rubinius should support this
