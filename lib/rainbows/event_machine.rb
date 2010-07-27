@@ -150,7 +150,7 @@ module Rainbows
       def unbind
         async_close = @env[ASYNC_CLOSE] and async_close.succeed
         @body.respond_to?(:fail) and @body.fail
-        @_io.close
+        @_io.close unless @_io.closed?
       end
     end
 
