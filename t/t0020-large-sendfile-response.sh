@@ -46,7 +46,7 @@ t_begin "send a batch of abortive HTTP/1.1 requests in parallel" && {
 	do
 		rm -f $i
 		(
-			curl -sSf --max-time 5 --limit-rate 1K \
+			curl -sSf --max-time 2 --limit-rate 1K \
 			  http://$listen/random_blob >/dev/null || echo ok > $i
 		) &
 	done
@@ -77,11 +77,11 @@ t_begin "check proc to ensure file is closed properly (Linux only)" && {
 
 t_begin "send a bunch of HTTP/1.1 requests in parallel" && {
 	(
-		curl -sSf --limit-rate 1M http://$listen/random_blob | \
+		curl -sSf --limit-rate 5M http://$listen/random_blob | \
 		  rsha1 > $slow_a
 	) &
 	(
-		curl -sSf --limit-rate 750K http://$listen/random_blob | \
+		curl -sSf --limit-rate 6M http://$listen/random_blob | \
 		  rsha1 > $slow_b
 	) &
 	for i in $a $b $c
