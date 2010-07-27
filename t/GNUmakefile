@@ -27,7 +27,6 @@ models += Rev
 models += EventMachine
 models += NeverBlock
 models += RevThreadSpawn
-models += RevThreadPool
 
 ifeq ($(RUBY_ENGINE),ruby)
   rp := )
@@ -37,6 +36,7 @@ ifeq ($(RUBY_ENGINE),ruby)
     models += FiberSpawn
     models += RevFiberSpawn
     models += FiberPool
+    models += RevThreadPool
   endif
 endif
 

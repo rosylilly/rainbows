@@ -15,8 +15,8 @@ module Rainbows
   # slow clients and applications with medium-to-slow response times
   # (I/O bound), but less suitable for sleepy applications.
   #
-  # Ruby 1.8 users are strongly advised to use Rev >= 0.3.2 to get
-  # usable performance.
+  # This concurrency model is designed for Ruby 1.9, and Ruby 1.8
+  # users are NOT advised to use this due to high CPU usage.
 
   module RevThreadPool
 
