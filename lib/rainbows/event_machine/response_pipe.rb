@@ -22,7 +22,8 @@ module Rainbows::EventMachine::ResponsePipe
   end
 
   def unbind
-    @client.quit unless @alive
+    @client.body = nil
+    @alive ? @client.on_read('') : @client.quit
     @body.close if @body.respond_to?(:close)
     @io.close unless @io.closed?
   end

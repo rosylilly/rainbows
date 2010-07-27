@@ -1,14 +1,6 @@
 #!/bin/sh
 . ./test-lib.sh
 
-case $model in
-EventMachine|NeverBlock)
-	t_info "skipping $T since it's not compatible with $model"
-	exit 0
-	;;
-*) ;;
-esac
-
 t_plan 5 "pipelined sendfile response for $model"
 
 t_begin "setup and startup" && {
