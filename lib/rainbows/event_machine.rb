@@ -62,7 +62,19 @@ module Rainbows
       end
 
       alias write send_data
-      alias receive_data on_read
+
+      def receive_data(data)
+        # To avoid clobbering the current streaming response
+        # (often a static file), we do not attempt to process another
+        # request on the same connection until the first is complete
+        if @body
+          @buf << data
+          @_io.shutdown(Socket::SHUT_RD) if @buf.size > 0x1c000
+          return EM.next_tick { receive_data('') }
+        else
+          on_read(data)
+        end
+      end
 
       def quit
         super
@@ -70,11 +82,6 @@ module Rainbows
       end
 
       def app_call
-        # To avoid clobbering the current streaming response
-        # (often a static file), we do not attempt to process another
-        # request on the same connection until the first is complete
-        return EM.next_tick { app_call } if @body
-
         set_comm_inactivity_timeout 0
         @env[RACK_INPUT] = @input
         @env[REMOTE_ADDR] = @remote_addr
@@ -93,10 +100,10 @@ module Rainbows
           @env.clear
           @hp.reset
           @state = :headers
-          if @body.nil? && @hp.headers(@env, @buf)
-            EM.next_tick { on_read('') }
-          else
+          if @buf.empty?
             set_comm_inactivity_timeout(G.kato)
+          else
+            EM.next_tick { receive_data('') }
           end
         end
       end
@@ -130,7 +137,7 @@ module Rainbows
             @body.callback do
               body.close if body.respond_to?(:close)
               @body = nil
-              alive ? on_read('') : quit
+              alive ? receive_data('') : quit
             end
             return
           elsif st.socket? || st.pipe?
