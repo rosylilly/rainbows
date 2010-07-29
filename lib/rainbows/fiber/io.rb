@@ -24,11 +24,11 @@ module Rainbows
 
       # for wrapping output response bodies
       def each(&block)
-        begin
-          yield readpartial(16384)
+        if buf = readpartial(16384)
+          yield buf
+          yield buf while readpartial(16384, buf)
+        end
         rescue EOFError
-          break
-        end while true
         self
       end
 
