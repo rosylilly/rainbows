@@ -22,6 +22,8 @@ module Rainbows::Revactor
   # :stopdoc:
   RD_ARGS = {}
 
+  autoload :Proxy, 'rainbows/revactor/proxy'
+
   include Rainbows::Base
   LOCALHOST = Unicorn::HttpRequest::LOCALHOST
   TCP = ::Revactor::TCP::Socket

@@ -53,6 +53,8 @@ class Rainbows::DevFdResponse < Struct.new(:app)
       case env["rainbows.model"]
       when :FiberSpawn, :FiberPool, :RevFiberSpawn
         io = Rainbows::Fiber::IO.new(io,::Fiber.current)
+      when :Revactor
+        io = Rainbows::Revactor::Proxy.new(io)
       end
     else # unlikely, char/block device file, directory, ...
       return response
