@@ -6,7 +6,7 @@ then
 fi
 . ./test-lib.sh
 
-t_plan 4 "config.ru inside alt working_directory"
+t_plan 5 "config.ru inside alt working_directory"
 
 t_begin "setup and start" && {
 	rainbows_setup
@@ -51,6 +51,10 @@ t_begin "killing succeeds" && {
 
 t_begin "response body ppid == 1 (daemonized)" && {
 	test "$body" -eq 1
+}
+
+t_begin "cleanup working directory" && {
+	rm -r $t_pfx.app
 }
 
 t_done
