@@ -118,7 +118,7 @@ $(MODEL_T): script = $(subst $(model).,,$@)
 $(MODEL_T): export RUBY := $(RUBY)
 $(MODEL_T): export PATH := $(bindir):$(PATH)
 $(MODEL_T): $(t_deps)
-	RUBYLIB=$(rainbows_lib):$$(cat $(libs)) \
+	RUBYLIB=$(rainbows_lib):$$(cat $(libs)):$(RUBYLIB) \
 	   $(TRACER) $(SHELL) $(SH_TEST_OPTS) $(script) $(TEST_OPTS)
 
 trash/.gitignore:
