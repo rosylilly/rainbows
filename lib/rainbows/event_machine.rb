@@ -157,7 +157,14 @@ module Rainbows
       def unbind
         async_close = @env[ASYNC_CLOSE] and async_close.succeed
         @body.respond_to?(:fail) and @body.fail
-        @_io.close unless @_io.closed?
+        begin
+          @_io.close
+        rescue Errno::EBADF
+          # EventMachine's EventableDescriptor::Close() may close
+          # the underlying file descriptor without invalidating the
+          # associated IO object on errors, so @_io.closed? isn't
+          # sufficient.
+        end
       end
     end
 
