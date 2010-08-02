@@ -39,7 +39,7 @@ module Rainbows::Response
     when :WriterThreadSpawn
       body_class = Rainbows::WriterThreadSpawn::MySocket
       range_class = Rainbows::HttpServer
-    when :EventMachine, :NeverBlock, :Revactor
+    when :EventMachine, :NeverBlock
       range_class = nil # :<
     end
     return if body_class.included_modules.include?(Body)

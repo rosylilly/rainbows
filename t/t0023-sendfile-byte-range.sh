@@ -10,7 +10,7 @@ ruby) ;;
 esac
 
 case $model in
-EventMachine|NeverBlock|Revactor)
+EventMachine|NeverBlock)
 	t_info "skipping $T since it's not compatible with $model"
 	exit 0
 	;;

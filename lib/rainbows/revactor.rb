@@ -61,15 +61,12 @@ module Rainbows::Revactor
 
       if hp.headers?
         headers = HH.new(headers)
-        headers[CONNECTION] = if hp.keepalive? && G.alive
-          KEEP_ALIVE
-        else
-          env = false
-          CLOSE
-        end
+        range = make_range!(env, status, headers) and status = range.shift
+        env = false unless hp.keepalive? && G.alive
+        headers[CONNECTION] = env ? KEEP_ALIVE : CLOSE
         client.write(response_header(status, headers))
       end
-      write_body(client, body)
+      write_body(client, body, range)
     end while env && env.clear && hp.reset.nil?
   rescue ::Revactor::TCP::ReadError
   rescue => e
@@ -83,7 +80,8 @@ module Rainbows::Revactor
   # given a INT, QUIT, or TERM signal)
   def worker_loop(worker) #:nodoc:
     init_worker_process(worker)
-    self.class.__send__(:alias_method, :write_body, :write_body_each)
+    require 'rainbows/revactor/body'
+    self.class.__send__(:include, Rainbows::Revactor::Body)
     RD_ARGS[:timeout] = G.kato if G.kato > 0
     nr = 0
     limit = worker_connections
