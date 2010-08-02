@@ -11,12 +11,10 @@ care about.
 * allow _OPTIONAL_ splice(2) with DevFdResponse under Linux
   (splice is very broken under some older kernels)
 
-* use IO#sendfile_nonblock for EventMachine/Revactor/NeverBlock
+* use IO#sendfile_nonblock for EventMachine/NeverBlock
 
 * Open file cache Rack app/middleware (idea from nginx), since sendfile
   (and IO.copy_stream) allows pread(2)-style offsets
-
-* Byte range responses for static files + sendfile
 
 * Improve test suite coverage.  We won't waste cycles with puny
   unit tests, only integration tests that exercise externally
@@ -35,8 +33,5 @@ care about.
 * Omnibus - haven't looked into it, probably like Revactor with 1.8?
 
 * Packet - pure Ruby, EventMachine-like library
-
-* Rubinius Actors - should be like Revactor and easily doable once
-  Rubinius gets more mature.
 
 * test and improve performance (throughput/latency/memory usage)
