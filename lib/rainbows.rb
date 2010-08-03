@@ -29,6 +29,7 @@ module Rainbows
   end
   G = State.new(true, 0, 0, 5)
   O = {}
+  class Response416 < RangeError; end
   # :startdoc:
 
   require 'rainbows/const'
@@ -130,6 +131,4 @@ module Rainbows
   autoload :ByteSlice, 'rainbows/byte_slice'
   autoload :StreamFile, 'rainbows/stream_file'
   autoload :HttpResponse, 'rainbows/http_response' # deprecated
-
-  class Response416 < RangeError; end
 end
