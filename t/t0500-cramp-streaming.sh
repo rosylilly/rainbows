@@ -27,7 +27,6 @@ t_begin "setup and start" && {
 # this will spew any unexpected input to stdout and be silent on success
 check () {
 	(
-		t0=$(date +%s)
 		i=0
 		while read hello world
 		do
