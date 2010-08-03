@@ -10,7 +10,7 @@ to simplify your deployments and only deploy one server?
 == {sendfile}[http://rubygems.org/gems/sendfile] RubyGem
 
 To enable the "sendfile" gem, just make sure you have 1.0.0 or later and
-"require" it in your Rainbows!/Unicorn config file (not your Rack
+"require" it in your \Rainbows!/Unicorn config file (not your Rack
 config.ru):
 
     require 'sendfile' # that's it! nothing else to do
@@ -24,9 +24,9 @@ config.ru):
     end
 
 The sendfile gem is works for all of our concurrency models except
-Revactor, NeverBlock and EventMachine (see below).
+NeverBlock and EventMachine (see below).
 
-The sendfile gem is less buggy than current (Ruby 1.9.2-rc1)
+The sendfile gem is less buggy than current (Ruby 1.9.2-rc2)
 IO.copy_stream and supports FreeBSD and Solaris in addition to Linux.
 This RubyGem also works under Ruby 1.8 (even with threads) and should
 work with rubinius.git, too.
@@ -40,17 +40,18 @@ their Writer* variants use the core IO.copy_stream method under Ruby
 1.9.  IO.copy_stream uses sendfile() under Linux, and a pread()/write()
 loop (implemented in C) on other systems.
 
-IO.copy_stream under Linux with Ruby 1.9.2-rc1 (and before) is also
+IO.copy_stream under Linux with Ruby 1.9.3 (and before) is also
 subject to hanging indefinitely when a client disconnected prematurely.
-This issue is fixed in Ruby trunk (July 2010) and will be in the next
-Ruby 1.9.2 release.
+This issue is fixed in Ruby trunk (July 2010).
 
 \Rainbows! supports IO.copy_stream since v0.93.0
 
 == EventMachine FileStreamer
 
-EventMachine and NeverBlock users automatically take advantage of
-the mmap()-based FileStreamer class distributed with EventMachine.
+EventMachine and NeverBlock users automatically take advantage of the
+mmap()-based FileStreamer class distributed with EventMachine.
+Unfortunately, as of EventMachine 0.12.10, FileStreamer cannot easily
+support HTTP Range responses.
 
 \Rainbows! supports EventMachine FileStreamer since v0.4.0
 
@@ -63,9 +64,8 @@ slower clients and smaller files.
 
 == The Future...
 
-Future releases of \Rainbows! will have byte-range support to serve
-partial and multipart responses, too.  We'll also support an open file
-cache (similar to nginx) which allows us to reuse open file descriptors.
+We'll also support an open file cache (similar to nginx) which
+allows us to reuse open file descriptors.
 
 Under Linux, we'll support the splice(2) system call for zero-copy
 proxying {io_splice}[http://bogomips.org/ruby_io_splice/], too.
