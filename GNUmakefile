@@ -183,6 +183,7 @@ release: verify package $(release_notes) $(release_changes)
 	  $(rfproject) $(rfpackage) $(VERSION) $(pkggem)
 	$(RAKE) raa_update VERSION=$(VERSION)
 	$(RAKE) fm_update VERSION=$(VERSION)
+	$(RAKE) publish_news VERSION=$(VERSION)
 else
 gem install-gem: GIT-VERSION-FILE
 	$(MAKE) $@ VERSION=$(GIT_VERSION)
