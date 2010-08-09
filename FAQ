@@ -77,15 +77,15 @@ to set RAILS_ENV.
 For Rails 2.3.x, the following config.ru will work for you:
 
   ENV["RAILS_ENV"] ||= ENV["RACK_ENV"]
-  require "config/environment"
+  require "#{::File.expand_path('config/environment')}"
   use Rails::Rack::Static
   run ActionController::Dispatcher.new
 
 For older versions of Rails, the following config.ru will work:
 
   ENV["RAILS_ENV"] ||= ENV["RACK_ENV"]
-  require 'config/boot'
-  require 'config/environment'
+  require "#{::File.expand_path('config/boot')}"
+  require "#{::File.expand_path('config/environment')}"
   require 'unicorn/app/old_rails'
   require 'unicorn/app/old_rails/static' # not needed with Unicorn 0.95+
   use Unicorn::App::OldRails::Static
