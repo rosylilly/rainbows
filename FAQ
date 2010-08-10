@@ -2,7 +2,7 @@
 
 === Why is \Rainbows! a separate project from Unicorn?
 
-\Rainbows is for the odd, corner-case requests that Unicorn is poorly
+\Rainbows! is for the odd, corner-case requests that Unicorn is poorly
 suited for.  More scalable concurrency models introduce additional
 complexity that Unicorn users and developers are uncomfortable with for
 the common cases.

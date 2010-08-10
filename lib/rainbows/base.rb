@@ -1,6 +1,6 @@
 # -*- encoding: binary -*-
 
-# base class for Rainbows concurrency models, this is currently used by
+# base class for \Rainbows! concurrency models, this is currently used by
 # ThreadSpawn and ThreadPool models.  Base is also its own
 # (non-)concurrency model which is basically Unicorn-with-keepalive, and
 # not intended for production use, as keepalive with a pure prefork

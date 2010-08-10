@@ -67,7 +67,7 @@ network concurrency.
 
 == Applications
 
-\Rainbows is mainly designed for the odd things Unicorn sucks at:
+\Rainbows! is mainly designed for the odd things Unicorn sucks at:
 
 * Web Sockets (via {Sunshowers}[http://rainbows.rubyforge.org/sunshowers/])
 * 3rd-party APIs (to services outside your control/LAN)
@@ -81,7 +81,7 @@ network concurrency.
 * Reverse AJAX
 * real-time upload processing (via {upr}[http://upr.bogomips.org/])
 
-\Rainbows can also be used to service slow clients directly even with
+\Rainbows! can also be used to service slow clients directly even with
 fast applications.
 
 == License
@@ -97,7 +97,7 @@ details.
 
 == Install
 
-You may download the tarball from the Rainbows project page on Rubyforge
+You may download the tarball from the \Rainbows! project page on Rubyforge
 and run setup.rb after unpacking it:
 
 http://rubyforge.org/frs/?group_id=8977
