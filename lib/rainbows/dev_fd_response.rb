@@ -70,7 +70,7 @@ class Rainbows::DevFdResponse < Struct.new(:app)
     end
 
     # remain Rack::Lint-compatible for people with wonky systems :P
-    unless File.exist?("/dev/fd/0")
+    unless File.directory?("/dev/fd")
       alias to_path_orig to_path
       undef_method :to_path
     end
