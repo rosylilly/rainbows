@@ -52,9 +52,14 @@ solution even if nginx will always outperform it in raw throughput.
 
 === How do I support SSL?
 
-If you need a streaming "rack.input" to do upload processing within your
-Rack application, then {stunnel}[http://stunnel.org/] is required.
-Otherwise, nginx is a perfectly good reverse proxy.
+If you need streaming "rack.input" to do on-the-fly upload processing
+within your Rack application, then using an SSL proxy such as
+{Pound}[http://www.apsis.ch/pound/] or {Stunnel}[http://stunnel.org/] is
+required.  Pound has built-in X-Forwarded-For support while Stunnel
+requires a extra {patch}[http://haproxy.1wt.eu/download/patches/].
+
+If you don't need streaming "rack.input", then nginx is a great HTTPS
+reverse proxy.
 
 Refer to the {Unicorn FAQ}[http://unicorn.bogomips.org/FAQ.html] on how
 to ensure redirects go to "https://" URLs.
