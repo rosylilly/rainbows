@@ -30,6 +30,12 @@ module Rainbows
   G = State.new(true, 0, 0, 5)
   O = {}
   class Response416 < RangeError; end
+
+  # map of numeric file descriptors to IO objects to avoid using IO.new
+  # and potentially causing race conditions when using /dev/fd/
+  FD_MAP = {}
+  FD_MAP.compare_by_identity if FD_MAP.respond_to?(:compare_by_identity)
+
   # :startdoc:
 
   require 'rainbows/const'

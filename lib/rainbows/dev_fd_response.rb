@@ -14,7 +14,8 @@
 class Rainbows::DevFdResponse < Struct.new(:app)
 
   # :stopdoc:
-  #
+  FD_MAP = Rainbows::FD_MAP
+
   # make this a no-op under Rubinius, it's pointless anyways
   # since Rubinius doesn't have IO.copy_stream
   def self.new(app)
@@ -37,6 +38,7 @@ class Rainbows::DevFdResponse < Struct.new(:app)
     headers = HeaderHash.new(headers)
     st = io.stat
     fileno = io.fileno
+    FD_MAP[fileno] = io
     if st.file?
       headers['Content-Length'] ||= st.size.to_s
       headers.delete('Transfer-Encoding')

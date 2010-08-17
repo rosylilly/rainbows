@@ -30,6 +30,12 @@
 module Rainbows::Response::Body # :nodoc:
   ALIASES = {}
 
+  FD_MAP = Rainbows::FD_MAP
+
+  def io_for_fd(fd)
+    FD_MAP.delete(fd) || IO.new(fd)
+  end
+
   # to_io is not part of the Rack spec, but make an exception here
   # since we can conserve path lookups and file descriptors.
   # \Rainbows! will never get here without checking for the existence
@@ -41,7 +47,7 @@ module Rainbows::Response::Body # :nodoc:
       # try to take advantage of Rainbows::DevFdResponse, calling File.open
       # is a last resort
       path = body.to_path
-      path =~ %r{\A/dev/fd/(\d+)\z} ? IO.new($1.to_i) : File.open(path)
+      path =~ %r{\A/dev/fd/(\d+)\z} ? io_for_fd($1.to_i) : File.open(path)
     end
   end
 
