@@ -170,6 +170,7 @@ module Rainbows
       def on_close
         close_deferred
         CONN.delete(self)
+        KATO.delete(self)
       end
 
     end # module Client
