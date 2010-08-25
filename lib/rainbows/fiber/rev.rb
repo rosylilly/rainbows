@@ -54,6 +54,7 @@ module Rainbows::Fiber
       include Rainbows
       include Rainbows::Const
       include Rainbows::Response
+      include Rainbows::Acceptor
       FIO = Rainbows::Fiber::IO
 
       def to_io
@@ -72,7 +73,7 @@ module Rainbows::Fiber
 
       def on_readable
         return if G.cur >= MAX
-        c = Rainbows.accept(@io) and ::Fiber.new { process(c) }.resume
+        c = accept(@io) and ::Fiber.new { process(c) }.resume
       end
 
       def process(io)

@@ -169,6 +169,7 @@ module Rainbows
     end
 
     module Server # :nodoc: all
+      include Rainbows::Acceptor
 
       def close
         detach
@@ -177,7 +178,7 @@ module Rainbows
 
       def notify_readable
         return if CUR.size >= MAX
-        io = Rainbows.accept(@io) or return
+        io = accept(@io) or return
         sig = EM.attach_fd(io.fileno, false)
         CUR[sig] = CL.new(sig, io)
       end

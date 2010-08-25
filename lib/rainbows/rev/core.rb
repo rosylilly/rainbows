@@ -7,12 +7,13 @@ require 'rainbows/rev/heartbeat'
 module Rainbows
   module Rev
     class Server < ::Rev::IO
+      include Rainbows::Acceptor
       G = Rainbows::G
       # CL and MAX will be defined in the corresponding worker loop
 
       def on_readable
         return if CONN.size >= MAX
-        io = Rainbows.accept(@_io) and CL.new(io).attach(LOOP)
+        io = accept(@_io) and CL.new(io).attach(LOOP)
       end
     end # class Server
 

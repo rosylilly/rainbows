@@ -75,22 +75,6 @@ module Rainbows
       HttpServer.new(app, options).start.join
     end
 
-    # returns nil if accept fails
-    def sync_accept(sock) # :nodoc:
-      rv = sock.accept
-      rv.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
-      rv
-    rescue Errno::EAGAIN, Errno::ECONNABORTED, Errno::EINTR
-    end
-
-    # returns nil if accept fails
-    def accept(sock) # :nodoc:
-      rv = sock.accept_nonblock
-      rv.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
-      rv
-    rescue Errno::EAGAIN, Errno::ECONNABORTED
-    end
-
     # returns a string representing the address of the given client +io+
     # For local UNIX domain sockets, this will return a string referred
     # to by the (non-frozen) Unicorn::HttpRequest::LOCALHOST constant.
@@ -139,3 +123,4 @@ module Rainbows
   autoload :HttpResponse, 'rainbows/http_response' # deprecated
   autoload :ThreadTimeout, 'rainbows/thread_timeout'
 end
+require 'rainbows/acceptor'
