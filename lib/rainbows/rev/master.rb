@@ -2,25 +2,20 @@
 # :enddoc:
 require 'rainbows/rev'
 
-module Rainbows
+class Rainbows::Rev::Master < Rev::AsyncWatcher
 
-  module Rev
-    class Master < ::Rev::AsyncWatcher
+  def initialize(queue)
+    super()
+    @queue = queue
+  end
 
-      def initialize(queue)
-        super()
-        @queue = queue
-      end
+  def <<(output)
+    @queue << output
+    signal
+  end
 
-      def <<(output)
-        @queue << output
-        signal
-      end
-
-      def on_signal
-        client, response = @queue.pop
-        client.response_write(response)
-      end
-    end
+  def on_signal
+    client, response = @queue.pop
+    client.response_write(response)
   end
 end
