@@ -8,7 +8,6 @@ module Rainbows
   module Rev
     class Server < ::Rev::IO
       include Rainbows::Acceptor
-      G = Rainbows::G
       # CL and MAX will be defined in the corresponding worker loop
 
       def on_readable
