@@ -58,7 +58,7 @@ module Rainbows
 
       def next!
         @deferred = nil
-        on_write_complete
+        enable_write_watcher
       end
 
       def timeout?
