@@ -4,7 +4,7 @@ t_plan 4 "proper handling of onenine encoding for $model"
 
 t_begin "setup and startup" && {
 	rainbows_setup $model
-	rainbows -D ./t0016.rb -c $unicorn_config
+	rainbows -E none -D ./t0016.rb -c $unicorn_config
 	rainbows_wait_start
 	expect_sha1=8ff79d8115f9fe38d18be858c66aa08a1cc27a66
 }
