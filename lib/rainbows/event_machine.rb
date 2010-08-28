@@ -95,7 +95,8 @@ module Rainbows
         # long-running async response
         (response.nil? || -1 == response[0]) and return @state = :close
 
-        em_write_response(response, alive = @hp.keepalive? && G.alive)
+        alive = @hp.keepalive? && G.alive && G.kato > 0
+        em_write_response(response, alive)
         if alive
           @env.clear
           @hp.reset

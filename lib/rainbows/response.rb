@@ -34,6 +34,7 @@ module Rainbows::Response
 
   # called after forking
   def self.setup(klass)
+    Rainbows::G.kato == 0 and KEEP_ALIVE.replace(CLOSE)
     range_class = body_class = klass
     case Rainbows::Const::RACK_DEFAULTS['rainbows.model']
     when :WriterThreadSpawn
