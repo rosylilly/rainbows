@@ -70,7 +70,7 @@ module Rainbows
         if @body
           @buf << data
           @_io.shutdown(Socket::SHUT_RD) if @buf.size > 0x1c000
-          return EM.next_tick { receive_data('') }
+          EM.next_tick { receive_data('') }
         else
           on_read(data)
         end
