@@ -47,6 +47,7 @@ Gem::Specification.new do |s|
   # Unicorn 0.991.0 handles config.ru when started outside of
   # the prespecified working_directory
   s.add_dependency(%q<unicorn>, [">= 1.1.3", "< 2.0.0"])
+  s.add_dependency(%q<kgio>, ["~> 1.0.1"])
   s.add_development_dependency(%q<isolate>, "~> 2.1.0")
 
   # optional runtime dependencies depending on configuration

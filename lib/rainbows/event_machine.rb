@@ -84,7 +84,7 @@ module Rainbows
       def app_call
         set_comm_inactivity_timeout 0
         @env[RACK_INPUT] = @input
-        @env[REMOTE_ADDR] = @remote_addr
+        @env[REMOTE_ADDR] = @_io.kgio_addr
         @env[ASYNC_CALLBACK] = method(:em_write_response)
         @env[ASYNC_CLOSE] = EM::DefaultDeferrable.new
 
@@ -170,8 +170,6 @@ module Rainbows
     end
 
     module Server # :nodoc: all
-      include Rainbows::Acceptor
-
       def close
         detach
         @io.close
@@ -179,7 +177,7 @@ module Rainbows
 
       def notify_readable
         return if CUR.size >= MAX
-        io = accept(@io) or return
+        io = @io.kgio_tryaccept or return
         sig = EM.attach_fd(io.fileno, false)
         CUR[sig] = CL.new(sig, io)
       end

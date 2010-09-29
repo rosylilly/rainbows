@@ -1,11 +1,11 @@
 # -*- encoding: binary -*-
+require 'kgio'
 require 'unicorn'
 # the value passed to TCP_DEFER_ACCEPT actually matters in Linux 2.6.32+
 Unicorn::SocketHelper::DEFAULTS[:tcp_defer_accept] = 60
 
 require 'rainbows/error'
 require 'rainbows/configurator'
-require 'fcntl'
 
 module Rainbows
 
@@ -118,9 +118,7 @@ module Rainbows
   end
   # :startdoc:
   autoload :Fiber, 'rainbows/fiber' # core class
-  autoload :ByteSlice, 'rainbows/byte_slice'
   autoload :StreamFile, 'rainbows/stream_file'
   autoload :HttpResponse, 'rainbows/http_response' # deprecated
   autoload :ThreadTimeout, 'rainbows/thread_timeout'
 end
-require 'rainbows/acceptor'

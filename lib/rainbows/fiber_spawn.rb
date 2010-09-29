@@ -12,7 +12,6 @@ module Rainbows
 
   module FiberSpawn
     include Fiber::Base
-    include Rainbows::Acceptor
 
     def worker_loop(worker) # :nodoc:
       init_worker_process(worker)
@@ -23,7 +22,7 @@ module Rainbows
       begin
         schedule do |l|
           break if G.cur >= limit
-          io = accept(l) or next
+          io = l.kgio_tryaccept or next
           ::Fiber.new { process_client(fio.new(io, ::Fiber.current)) }.resume
         end
       rescue => e

@@ -54,7 +54,6 @@ module Rainbows::Fiber
       include Rainbows
       include Rainbows::Const
       include Rainbows::Response
-      include Rainbows::Acceptor
       FIO = Rainbows::Fiber::IO
 
       def to_io
@@ -73,7 +72,7 @@ module Rainbows::Fiber
 
       def on_readable
         return if G.cur >= MAX
-        c = accept(@io) and ::Fiber.new { process(c) }.resume
+        c = @io.kgio_tryaccept and ::Fiber.new { process(c) }.resume
       end
 
       def process(io)
@@ -82,7 +81,6 @@ module Rainbows::Fiber
         buf = client.read_timeout or return
         hp = HttpParser.new
         env = {}
-        remote_addr = Rainbows.addr(io)
 
         begin # loop
           buf << (client.read_timeout or return) until hp.headers(env, buf)
@@ -90,7 +88,7 @@ module Rainbows::Fiber
           env[CLIENT_IO] = client
           env[RACK_INPUT] = 0 == hp.content_length ?
                     HttpRequest::NULL_IO : TeeInput.new(client, env, hp, buf)
-          env[REMOTE_ADDR] = remote_addr
+          env[REMOTE_ADDR] = io.kgio_addr
           status, headers, body = APP.call(env.update(RACK_DEFAULTS))
 
           if 100 == status.to_i

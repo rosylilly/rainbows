@@ -34,7 +34,7 @@ module Rainbows
       # here because that could cause a deadlock and we'd leak FDs
       def app_response
         begin
-          @env[REMOTE_ADDR] = @remote_addr
+          @env[REMOTE_ADDR] = @_io.kgio_addr
           APP.call(@env.update(RACK_DEFAULTS))
         rescue => e
           Error.app(e) # we guarantee this does not raise

@@ -6,9 +6,9 @@ module Rainbows
     # #to_io method and gives users the illusion of a synchronous
     # interface that yields away from the current Fiber whenever
     # the underlying IO object cannot read or write
+    #
+    # TODO: subclass off IO and include Kgio::SocketMethods instead
     class IO < Struct.new(:to_io, :f)
-      include Rainbows::ByteSlice
-
       # :stopdoc:
       LOCALHOST = Unicorn::HttpRequest::LOCALHOST
 
@@ -17,9 +17,8 @@ module Rainbows
         to_io.write_nonblock(buf)
       end
 
-      # enough for Rainbows.addr
-      def peeraddr
-        to_io.respond_to?(:peeraddr) ? to_io.peeraddr : [ LOCALHOST ]
+      def kgio_addr
+        to_io.kgio_addr
       end
 
       # for wrapping output response bodies
@@ -58,11 +57,14 @@ module Rainbows
 
       def write(buf)
         begin
-          (w = to_io.write_nonblock(buf)) == buf.bytesize and return
-          buf = byte_slice(buf, w..-1)
-        rescue Errno::EAGAIN
-          wait_writable
-          retry
+          case rv = to_io.kgio_trywrite(buf)
+          when nil
+            return
+          when String
+            buf = rv
+          when Kgio::WaitWritable
+            wait_writable
+          end
         end while true
       end
 

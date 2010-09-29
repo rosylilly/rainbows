@@ -18,7 +18,6 @@ module Rainbows
 
   module ThreadSpawn
     include Base
-    include Rainbows::Acceptor
 
     def accept_loop(klass) #:nodoc:
       lock = Mutex.new
@@ -37,7 +36,7 @@ module Rainbows
               # CPU during I/O wait, CPU cycles that can be better used
               # by other worker _processes_.
               sleep(0.01)
-            elsif c = sync_accept(l)
+            elsif c = l.kgio_accept
               klass.new(c) do |c|
                 begin
                   lock.synchronize { G.cur += 1 }

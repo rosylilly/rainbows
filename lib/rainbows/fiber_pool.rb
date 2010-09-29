@@ -15,7 +15,6 @@ module Rainbows
 
   module FiberPool
     include Fiber::Base
-    include Rainbows::Acceptor
 
     def worker_loop(worker) # :nodoc:
       init_worker_process(worker)
@@ -30,7 +29,7 @@ module Rainbows
       begin
         schedule do |l|
           fib = pool.shift or break # let another worker process take it
-          if io = accept(l)
+          if io = l.kgio_tryaccept
             fib.resume(Fiber::IO.new(io, fib))
           else
             pool << fib

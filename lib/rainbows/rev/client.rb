@@ -5,7 +5,6 @@ module Rainbows
   module Rev
 
     class Client < ::Rev::IO
-      include Rainbows::ByteSlice
       include Rainbows::EvCore
       G = Rainbows::G
       F = Rainbows::StreamFile
@@ -28,13 +27,14 @@ module Rainbows
       def write(buf)
         if @_write_buffer.empty?
           begin
-            w = @_io.write_nonblock(buf)
-            return enable_write_watcher if w == Rack::Utils.bytesize(buf)
-            # we never care for the return value, but yes, we may return
-            # a "fake" short write from super(buf) if anybody cares.
-            buf = byte_slice(buf, w..-1)
-          rescue Errno::EAGAIN
-            break # fall through to super(buf)
+            case rv = @_io.kgio_trywrite(buf)
+            when nil
+              return enable_write_watcher
+            when Kgio::WaitWritable
+              break # fall through to super(buf)
+            when String
+              buf = rv # retry, skb could grow or been drained
+            end
           rescue => e
             return handle_error(e)
           end while true
@@ -104,7 +104,7 @@ module Rainbows
       def app_call
         KATO.delete(self)
         @env[RACK_INPUT] = @input
-        @env[REMOTE_ADDR] = @remote_addr
+        @env[REMOTE_ADDR] = @_io.kgio_addr
         response = APP.call(@env.update(RACK_DEFAULTS))
 
         rev_write_response(response, alive = @hp.keepalive? && G.alive)

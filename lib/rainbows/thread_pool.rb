@@ -22,9 +22,7 @@ module Rainbows
   # others and thus a lower +worker_connections+ setting is recommended.
 
   module ThreadPool
-
     include Base
-    include Rainbows::Acceptor
 
     def worker_loop(worker) # :nodoc:
       init_worker_process(worker)
@@ -45,7 +43,7 @@ module Rainbows
     def sync_worker # :nodoc:
       s = LISTENERS[0]
       begin
-        c = sync_accept(s) and process_client(c)
+        c = s.kgio_accept and process_client(c)
       rescue => e
         Error.listen_loop(e)
       end while G.alive
@@ -59,7 +57,7 @@ module Rainbows
         # problem.  On the other hand, a thundering herd may not
         # even incur as much overhead as an extra Mutex#synchronize
         ret = IO.select(LISTENERS, nil, nil, 1) and ret[0].each do |s|
-          s = accept(s) and process_client(s)
+          s = s.kgio_tryaccept and process_client(s)
         end
       rescue Errno::EINTR
       rescue => e

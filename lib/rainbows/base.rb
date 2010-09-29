@@ -24,10 +24,19 @@ module Rainbows::Base
     Rainbows::MaxBody.setup
     G.tmp = worker.tmp
 
-    # avoid spurious wakeups and blocking-accept() with 1.8 green threads
-    if ! defined?(RUBY_ENGINE) && RUBY_VERSION.to_f < 1.9
-      require "io/nonblock"
-      Rainbows::HttpServer::LISTENERS.each { |l| l.nonblock = true }
+    listeners = Rainbows::HttpServer::LISTENERS
+    Rainbows::HttpServer::IO_PURGATORY.concat(listeners)
+
+    # no need for this when Unicorn uses Kgio
+    listeners.map! do |io|
+      case io
+      when TCPServer
+        Kgio::TCPServer.for_fd(io.fileno)
+      when UNIXServer
+        Kgio::UNIXServer.for_fd(io.fileno)
+      else
+        io
+      end
     end
 
     # we're don't use the self-pipe mechanism in the Rainbows! worker
