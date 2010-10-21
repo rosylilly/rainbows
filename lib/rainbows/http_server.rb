@@ -13,6 +13,7 @@ module Rainbows
 
     def initialize(app, options)
       G.server = self
+      @logger = Unicorn::Configurator::DEFAULTS[:logger]
       rv = super(app, options)
       defined?(@use) or use(:Base)
       @worker_connections ||= MODEL_WORKER_CONNECTIONS[@use]
@@ -43,7 +44,9 @@ module Rainbows
       model = args.shift or return @use
       mod = begin
         Rainbows.const_get(model)
-      rescue NameError
+      rescue NameError => e
+        logger.error "error loading #{model.inspect}: #{e}"
+        e.backtrace.each { |l| logger.error l }
         raise ArgumentError, "concurrency model #{model.inspect} not supported"
       end
 
