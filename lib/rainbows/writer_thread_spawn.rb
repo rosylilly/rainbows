@@ -30,6 +30,10 @@ module Rainbows
     class MySocket < Struct.new(:to_io, :q, :thr)  # :nodoc: all
       include Rainbows::Response
 
+      def kgio_addr
+        to_io.kgio_addr
+      end
+
       def readpartial(size, buf = "")
         to_io.readpartial(size, buf)
       end

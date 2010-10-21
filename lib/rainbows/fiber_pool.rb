@@ -21,7 +21,7 @@ module Rainbows
       pool = []
       worker_connections.times {
         ::Fiber.new {
-          process_client(::Fiber.yield) while pool << ::Fiber.current
+          process(::Fiber.yield) while pool << ::Fiber.current
         }.resume # resume to hit ::Fiber.yield so it waits on a client
       }
       Fiber::Base.setup(self.class, app)

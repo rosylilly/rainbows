@@ -41,8 +41,11 @@ module Rainbows
   require 'rainbows/const'
   require 'rainbows/http_server'
   require 'rainbows/response'
+  require 'rainbows/client'
+  require 'rainbows/http_request'
+  require 'rainbows/tee_input'
+  require 'rainbows/process_client'
   autoload :Base, 'rainbows/base'
-  autoload :TeeInput, 'rainbows/tee_input'
   autoload :Sendfile, 'rainbows/sendfile'
   autoload :AppPool, 'rainbows/app_pool'
   autoload :DevFdResponse, 'rainbows/dev_fd_response'
@@ -73,13 +76,6 @@ module Rainbows
     # not return until the server has exited.
     def run(app, options = {}) # :nodoc:
       HttpServer.new(app, options).start.join
-    end
-
-    # returns a string representing the address of the given client +io+
-    # For local UNIX domain sockets, this will return a string referred
-    # to by the (non-frozen) Kgio::LOCALHOST constant.
-    def addr(io) # :nodoc:
-      io.respond_to?(:peeraddr) ? io.peeraddr[-1] : Kgio::LOCALHOST
     end
 
     # :stopdoc:

@@ -8,14 +8,10 @@
 module Rainbows::Base
 
   # :stopdoc:
-  include Rainbows::Const
-  include Rainbows::Response
+  include Rainbows::ProcessClient
 
   # shortcuts...
   G = Rainbows::G
-  NULL_IO = Unicorn::HttpRequest::NULL_IO
-  TeeInput = Rainbows::TeeInput
-  HttpParser = Unicorn::HttpParser
 
   # this method is called by all current concurrency models
   def init_worker_process(worker) # :nodoc:
@@ -33,56 +29,8 @@ module Rainbows::Base
     trap(:USR1) { reopen_worker_logs(worker.nr) }
     trap(:QUIT) { G.quit! }
     [:TERM, :INT].each { |sig| trap(sig) { exit!(0) } } # instant shutdown
+    Rainbows::ProcessClient.const_set(:APP, G.server.app)
     logger.info "Rainbows! #@use worker_connections=#@worker_connections"
-  end
-
-  def wait_headers_readable(client)  # :nodoc:
-    IO.select([client], nil, nil, G.kato)
-  end
-
-  # once a client is accepted, it is processed in its entirety here
-  # in 3 easy steps: read request, call app, write app response
-  # this is used by synchronous concurrency models
-  #   Base, ThreadSpawn, ThreadPool
-  def process_client(client) # :nodoc:
-    hp = HttpParser.new
-    client.readpartial(CHUNK_SIZE, buf = hp.buf)
-    remote_addr = Rainbows.addr(client)
-
-    begin # loop
-      until env = hp.parse
-        wait_headers_readable(client) or return
-        buf << client.readpartial(CHUNK_SIZE)
-      end
-
-      env[CLIENT_IO] = client
-      env[RACK_INPUT] = 0 == hp.content_length ? NULL_IO : TeeInput.new(client, hp)
-      env[REMOTE_ADDR] = remote_addr
-      status, headers, body = app.call(env.update(RACK_DEFAULTS))
-
-      if 100 == status.to_i
-        client.write(EXPECT_100_RESPONSE)
-        env.delete(HTTP_EXPECT)
-        status, headers, body = app.call(env)
-      end
-
-      if hp.headers?
-        headers = HH.new(headers)
-        range = make_range!(env, status, headers) and status = range.shift
-        env = hp.keepalive? && G.alive
-        headers[CONNECTION] = env ? KEEP_ALIVE : CLOSE
-        client.write(response_header(status, headers))
-      end
-      write_body(client, body, range)
-    end while env && hp.reset.nil?
-  # if we get any error, try to write something back to the client
-  # assuming we haven't closed the socket, but don't get hung up
-  # if the socket is already closed or broken.  We'll always ensure
-  # the socket is closed at the end of this function
-  rescue => e
-    Rainbows::Error.write(client, e)
-  ensure
-    client.close unless client.closed?
   end
 
   def self.included(klass) # :nodoc:

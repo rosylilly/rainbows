@@ -25,6 +25,10 @@ module Rainbows
     # used to wrap a BasicSocket to use with +q+ for all writes
     # this is compatible with IO.select
     class QueueSocket < Struct.new(:to_io, :q) # :nodoc:
+      def kgio_addr
+        to_io.kgio_addr
+      end
+
       def readpartial(size, buf = "")
         to_io.readpartial(size, buf)
       end

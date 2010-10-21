@@ -17,13 +17,12 @@ module Rainbows
       init_worker_process(worker)
       Fiber::Base.setup(self.class, app)
       limit = worker_connections
-      fio = Rainbows::Fiber::IO
 
       begin
         schedule do |l|
           break if G.cur >= limit
           io = l.kgio_tryaccept or next
-          ::Fiber.new { process_client(fio.new(io, ::Fiber.current)) }.resume
+          ::Fiber.new { process(io) }.resume
         end
       rescue => e
         Error.listen_loop(e)
