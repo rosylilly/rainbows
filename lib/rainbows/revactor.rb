@@ -26,7 +26,7 @@ module Rainbows::Revactor
   autoload :Proxy, 'rainbows/revactor/proxy'
 
   include Rainbows::Base
-  LOCALHOST = Unicorn::HttpRequest::LOCALHOST
+  LOCALHOST = Kgio::LOCALHOST
   TCP = ::Revactor::TCP::Socket
 
   # once a client is accepted, it is processed in its entirety here
@@ -41,16 +41,17 @@ module Rainbows::Revactor
     else
       LOCALHOST
     end
-    buf = client.read(*rd_args)
-    hp = HttpParser.new
-    env = {}
+    hp = Unicorn::HttpParser.new
+    buf = hp.buf
 
     begin
-      buf << client.read(*rd_args) until hp.headers(env, buf)
+      until env = hp.parse
+        buf << client.read(*rd_args)
+      end
 
       env[CLIENT_IO] = client
       env[RACK_INPUT] = 0 == hp.content_length ?
-               NULL_IO : TeeInput.new(PartialSocket.new(client), env, hp, buf)
+               NULL_IO : TeeInput.new(TeeSocket.new(client), hp)
       env[REMOTE_ADDR] = remote_addr
       status, headers, body = app.call(env.update(RACK_DEFAULTS))
 
@@ -63,12 +64,12 @@ module Rainbows::Revactor
       if hp.headers?
         headers = HH.new(headers)
         range = make_range!(env, status, headers) and status = range.shift
-        env = false unless hp.keepalive? && G.alive && G.kato > 0
+        env = hp.keepalive? && G.alive && G.kato > 0
         headers[CONNECTION] = env ? KEEP_ALIVE : CLOSE
         client.write(response_header(status, headers))
       end
       write_body(client, body, range)
-    end while env && env.clear && hp.reset.nil?
+    end while env && hp.reset.nil?
   rescue ::Revactor::TCP::ReadError
   rescue => e
     Rainbows::Error.write(io, e)
@@ -146,36 +147,37 @@ module Rainbows::Revactor
   # enough to avoid mucking with TeeInput internals.  Fortunately
   # this code is not heavily used so we can usually avoid the overhead
   # of adding a userspace buffer.
-  class PartialSocket < Struct.new(:socket, :rbuf)
+  class TeeSocket
     def initialize(socket)
       # IO::Buffer is used internally by Rev which Revactor is based on
       # so we'll always have it available
-      super(socket, IO::Buffer.new)
+      @socket, @rbuf = socket, IO::Buffer.new
     end
 
     # Revactor socket reads always return an unspecified amount,
     # sometimes too much
-    def readpartial(length, dst = "")
+    def kgio_read(length, dst = "")
       return dst.replace("") if length == 0
 
       # always check and return from the userspace buffer first
-      rbuf.size > 0 and return dst.replace(rbuf.read(length))
+      @rbuf.size > 0 and return dst.replace(@rbuf.read(length))
 
       # read off the socket since there was nothing in rbuf
-      tmp = socket.read
+      tmp = @socket.read
 
       # we didn't read too much, good, just return it straight back
       # to avoid needlessly wasting memory bandwidth
       tmp.size <= length and return dst.replace(tmp)
 
       # ugh, read returned too much
-      rbuf << tmp[length, tmp.size]
+      @rbuf << tmp[length, tmp.size]
       dst.replace(tmp[0, length])
+      rescue EOFError
     end
 
     # just proxy any remaining methods TeeInput may use
     def close
-      socket.close
+      @socket.close
     end
   end
 

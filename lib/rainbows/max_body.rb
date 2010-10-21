@@ -11,32 +11,32 @@ class MaxBody < Struct.new(:app)
   # this is meant to be included in Rainbows::TeeInput (and derived
   # classes) to limit body sizes
   module Limit
-    Util = Unicorn::Util
+    TmpIO = Unicorn::TmpIO
 
-    def initialize(socket, req, parser, buf)
-      self.len = parser.content_length
+    def initialize(socket, request)
+      @parser = request
+      @buf = request.buf
+      @env = request.env
+      @len = request.content_length
 
       max = Rainbows.max_bytes # never nil, see MaxBody.setup
-      if len && len > max
+      if @len && @len > max
         socket.write(Const::ERROR_413_RESPONSE)
         socket.close
-        raise IOError, "Content-Length too big: #{len} > #{max}", []
+        raise IOError, "Content-Length too big: #@len > #{max}", []
       end
 
-      self.req = req
-      self.parser = parser
-      self.buf = buf
-      self.socket = socket
-      self.buf2 = ""
-      if buf.size > 0
-        parser.filter_body(buf2, buf) and finalize_input
-        buf2.size > max and raise IOError, "chunked request body too big", []
+      @socket = socket
+      @buf2 = ""
+      if @buf.size > 0
+        parser.filter_body(@buf2, @buf) and finalize_input
+        @buf2.size > max and raise IOError, "chunked request body too big", []
       end
-      self.tmp = len && len < Const::MAX_BODY ? StringIO.new("") : Util.tmpio
-      if buf2.size > 0
-        tmp.write(buf2)
-        tmp.seek(0)
-        max -= buf2.size
+      @tmp = @len && @len < Const::MAX_BODY ? StringIO.new("") : TmpIO.new
+      if @buf2.size > 0
+        @tmp.write(@buf2)
+        @tmp.rewind
+        max -= @buf2.size
       end
       @max_body = max
     end
@@ -46,7 +46,7 @@ class MaxBody < Struct.new(:app)
       if rv && ((@max_body -= rv.size) < 0)
         # make HttpParser#keepalive? => false to force an immediate disconnect
         # after we write
-        parser.reset
+        @parser.reset
         throw :rainbows_EFBIG
       end
       rv

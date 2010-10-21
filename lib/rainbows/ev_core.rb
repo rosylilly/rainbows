@@ -88,7 +88,7 @@ module Rainbows
 
     class CapInput < Struct.new(:io, :client, :bytes_left)
       MAX_BODY = Unicorn::Const::MAX_BODY
-      Util = Unicorn::Util
+      TmpIO = Unicorn::TmpIO
 
       def self.err(client, msg)
         client.write(Const::ERROR_413_RESPONSE)
@@ -104,9 +104,9 @@ module Rainbows
           if max && (len > max)
             err(client, "Content-Length too big: #{len} > #{max}")
           end
-          len <= MAX_BODY ? StringIO.new("") : Util.tmpio
+          len <= MAX_BODY ? StringIO.new("") : TmpIO.new
         else
-          max ? super(Util.tmpio, client, max) : Util.tmpio
+          max ? super(TmpIO.new, client, max) : TmpIO.new
         end
       end
 

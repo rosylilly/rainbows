@@ -10,7 +10,7 @@ module Rainbows
     # TODO: subclass off IO and include Kgio::SocketMethods instead
     class IO < Struct.new(:to_io, :f)
       # :stopdoc:
-      LOCALHOST = Unicorn::HttpRequest::LOCALHOST
+      LOCALHOST = Kgio::LOCALHOST
 
       # needed to write errors with
       def write_nonblock(buf)
@@ -82,14 +82,36 @@ module Rainbows
       end
 
       def readpartial(length, buf = "")
-        begin
-          to_io.read_nonblock(length, buf)
-        rescue Errno::EAGAIN
-          wait_readable
-          retry
+        if to_io.respond_to?(:kgio_tryread)
+          # TODO: use kgio_read!
+          begin
+            rv = to_io.kgio_tryread(length, buf)
+            case rv
+            when nil
+              raise EOFError, "end of file reached", []
+            when Kgio::WaitReadable
+              wait_readable
+            else
+              return rv
+            end
+          end while true
+        else
+          begin
+            to_io.read_nonblock(length, buf)
+          rescue Errno::EAGAIN
+            wait_readable
+            retry
+          end
         end
       end
 
+      def kgio_read(*args)
+        to_io.kgio_read(*args)
+      end
+
+      def kgio_read!(*args)
+        to_io.kgio_read!(*args)
+      end
     end
   end
 end

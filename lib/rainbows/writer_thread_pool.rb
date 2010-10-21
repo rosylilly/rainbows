@@ -29,6 +29,14 @@ module Rainbows
         to_io.readpartial(size, buf)
       end
 
+      def kgio_read(size, buf = "")
+        to_io.kgio_read(size, buf)
+      end
+
+      def kgio_read!(size, buf = "")
+        to_io.kgio_read!(size, buf)
+      end
+
       def write_nonblock(buf)
         to_io.write_nonblock(buf)
       end

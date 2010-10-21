@@ -77,10 +77,9 @@ module Rainbows
 
     # returns a string representing the address of the given client +io+
     # For local UNIX domain sockets, this will return a string referred
-    # to by the (non-frozen) Unicorn::HttpRequest::LOCALHOST constant.
+    # to by the (non-frozen) Kgio::LOCALHOST constant.
     def addr(io) # :nodoc:
-      io.respond_to?(:peeraddr) ?
-                        io.peeraddr[-1] : Unicorn::HttpRequest::LOCALHOST
+      io.respond_to?(:peeraddr) ? io.peeraddr[-1] : Kgio::LOCALHOST
     end
 
     # :stopdoc:

@@ -78,16 +78,17 @@ module Rainbows::Fiber
       def process(io)
         G.cur += 1
         client = FIO.new(io, ::Fiber.current)
-        buf = client.read_timeout or return
         hp = HttpParser.new
-        env = {}
+        client.readpartial(16384, buf = hp.buf)
 
         begin # loop
-          buf << (client.read_timeout or return) until hp.headers(env, buf)
+          until env = hp.parse
+            buf << (client.read_timeout or return)
+          end
 
           env[CLIENT_IO] = client
           env[RACK_INPUT] = 0 == hp.content_length ?
-                    HttpRequest::NULL_IO : TeeInput.new(client, env, hp, buf)
+                    HttpRequest::NULL_IO : TeeInput.new(client, hp)
           env[REMOTE_ADDR] = io.kgio_addr
           status, headers, body = APP.call(env.update(RACK_DEFAULTS))
 
@@ -100,16 +101,12 @@ module Rainbows::Fiber
           if hp.headers?
             headers = HH.new(headers)
             range = make_range!(env, status, headers) and status = range.shift
-            headers[CONNECTION] = if hp.keepalive? && G.alive
-              KEEP_ALIVE
-            else
-              env = false
-              CLOSE
-            end
+            env = hp.keepalive? && G.alive
+            headers[CONNECTION] = env ? KEEP_ALIVE : CLOSE
             client.write(response_header(status, headers))
           end
           write_body(client, body, range)
-        end while env && env.clear && hp.reset.nil?
+        end while env && hp.reset.nil?
       rescue => e
         Error.write(io, e)
       ensure

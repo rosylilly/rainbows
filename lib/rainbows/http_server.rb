@@ -36,7 +36,7 @@ module Rainbows
     # fact that we let clients keep idle connections open for long
     # periods of time means we have to chmod at a fixed interval.
     def timeout=(nr)
-      super(nr + 1)
+      @timeout = nr + 1
     end
     #:startdoc:
 

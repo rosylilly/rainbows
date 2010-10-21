@@ -27,18 +27,6 @@ module Rainbows::Base
     listeners = Rainbows::HttpServer::LISTENERS
     Rainbows::HttpServer::IO_PURGATORY.concat(listeners)
 
-    # no need for this when Unicorn uses Kgio
-    listeners.map! do |io|
-      case io
-      when TCPServer
-        Kgio::TCPServer.for_fd(io.fileno)
-      when UNIXServer
-        Kgio::UNIXServer.for_fd(io.fileno)
-      else
-        io
-      end
-    end
-
     # we're don't use the self-pipe mechanism in the Rainbows! worker
     # since we don't defer reopening logs
     Rainbows::HttpServer::SELF_PIPE.each { |x| x.close }.clear
@@ -57,20 +45,18 @@ module Rainbows::Base
   # this is used by synchronous concurrency models
   #   Base, ThreadSpawn, ThreadPool
   def process_client(client) # :nodoc:
-    buf = client.readpartial(CHUNK_SIZE) # accept filters protect us here
     hp = HttpParser.new
-    env = {}
+    client.readpartial(CHUNK_SIZE, buf = hp.buf)
     remote_addr = Rainbows.addr(client)
 
     begin # loop
-      until hp.headers(env, buf)
+      until env = hp.parse
         wait_headers_readable(client) or return
         buf << client.readpartial(CHUNK_SIZE)
       end
 
       env[CLIENT_IO] = client
-      env[RACK_INPUT] = 0 == hp.content_length ?
-                        NULL_IO : TeeInput.new(client, env, hp, buf)
+      env[RACK_INPUT] = 0 == hp.content_length ? NULL_IO : TeeInput.new(client, hp)
       env[REMOTE_ADDR] = remote_addr
       status, headers, body = app.call(env.update(RACK_DEFAULTS))
 
@@ -83,12 +69,12 @@ module Rainbows::Base
       if hp.headers?
         headers = HH.new(headers)
         range = make_range!(env, status, headers) and status = range.shift
-        env = false unless hp.keepalive? && G.alive
+        env = hp.keepalive? && G.alive
         headers[CONNECTION] = env ? KEEP_ALIVE : CLOSE
         client.write(response_header(status, headers))
       end
       write_body(client, body, range)
-    end while env && env.clear && hp.reset.nil?
+    end while env && hp.reset.nil?
   # if we get any error, try to write something back to the client
   # assuming we haven't closed the socket, but don't get hung up
   # if the socket is already closed or broken.  We'll always ensure
