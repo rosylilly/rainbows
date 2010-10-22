@@ -44,5 +44,12 @@ module Rainbows::Fiber::Rev::Methods
   end
 end
 
-Rainbows::Fiber::IO.__send__(:include, Rainbows::Fiber::Rev::Methods)
-Rainbows::Client.__send__(:include, Rainbows::Fiber::Rev::Methods)
+[
+  Rainbows::Fiber::IO,
+  Rainbows::Client,
+  # the next two trigger autoload, ugh, oh well...
+  Rainbows::Fiber::IO::Socket,
+  Rainbows::Fiber::IO::Pipe
+].each do |klass|
+  klass.__send__(:include, Rainbows::Fiber::Rev::Methods)
+end
