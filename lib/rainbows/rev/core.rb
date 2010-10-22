@@ -26,7 +26,7 @@ module Rainbows
         require 'rainbows/rev/sendfile'
         Rainbows::Rev::Client.__send__(:include, Rainbows::Rev::Sendfile)
         init_worker_process(worker)
-        mod = self.class.const_get(@use)
+        mod = Rainbows.const_get(@use)
         rloop = Server.const_set(:LOOP, ::Rev::Loop.default)
         Server.const_set(:MAX, @worker_connections)
         Server.const_set(:CL, mod.const_get(:Client))

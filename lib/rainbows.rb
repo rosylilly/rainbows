@@ -4,9 +4,6 @@ require 'unicorn'
 # the value passed to TCP_DEFER_ACCEPT actually matters in Linux 2.6.32+
 Unicorn::SocketHelper::DEFAULTS[:tcp_defer_accept] = 60
 
-require 'rainbows/error'
-require 'rainbows/configurator'
-
 module Rainbows
 
   # global vars because class/instance variables are confusing me :<
@@ -117,3 +114,6 @@ module Rainbows
   autoload :HttpResponse, 'rainbows/http_response' # deprecated
   autoload :ThreadTimeout, 'rainbows/thread_timeout'
 end
+
+require 'rainbows/error'
+require 'rainbows/configurator'

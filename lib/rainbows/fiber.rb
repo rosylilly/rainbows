@@ -30,4 +30,5 @@ module Rainbows::Fiber
 
   autoload :Base, 'rainbows/fiber/base'
   autoload :Queue, 'rainbows/fiber/queue'
+  autoload :IO, 'rainbows/fiber/io'
 end
