@@ -1,33 +1,28 @@
 # -*- encoding: binary -*-
 require 'rainbows/fiber'
 
-module Rainbows
+# Simple Fiber-based concurrency model for 1.9.  This spawns a new
+# Fiber for every incoming client connection and the root Fiber for
+# scheduling and connection acceptance.  This exports a streaming
+# "rack.input" with lightweight concurrency.  Applications are
+# strongly advised to wrap all slow IO objects (sockets, pipes) using
+# the Rainbows::Fiber::IO class whenever possible.
+module Rainbows::FiberSpawn
+  include Rainbows::Fiber::Base
 
-  # Simple Fiber-based concurrency model for 1.9.  This spawns a new
-  # Fiber for every incoming client connection and the root Fiber for
-  # scheduling and connection acceptance.  This exports a streaming
-  # "rack.input" with lightweight concurrency.  Applications are
-  # strongly advised to wrap all slow IO objects (sockets, pipes) using
-  # the Rainbows::Fiber::IO class whenever possible.
+  def worker_loop(worker) # :nodoc:
+    init_worker_process(worker)
+    Rainbows::Fiber::Base.setup(self.class, app)
+    limit = worker_connections
 
-  module FiberSpawn
-    include Fiber::Base
-
-    def worker_loop(worker) # :nodoc:
-      init_worker_process(worker)
-      Fiber::Base.setup(self.class, app)
-      limit = worker_connections
-
-      begin
-        schedule do |l|
-          break if G.cur >= limit
-          io = l.kgio_tryaccept or next
-          ::Fiber.new { process(io) }.resume
-        end
-      rescue => e
-        Error.listen_loop(e)
-      end while G.alive || G.cur > 0
-    end
-
+    begin
+      schedule do |l|
+        break if G.cur >= limit
+        io = l.kgio_tryaccept or next
+        Fiber.new { process(io) }.resume
+      end
+    rescue => e
+      Rainbows::Error.listen_loop(e)
+    end while G.alive || G.cur > 0
   end
 end
