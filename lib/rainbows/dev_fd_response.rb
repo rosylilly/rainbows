@@ -54,7 +54,8 @@ class Rainbows::DevFdResponse < Struct.new(:app)
       # we need to make sure our pipe output is Fiber-compatible
       case env["rainbows.model"]
       when :FiberSpawn, :FiberPool, :RevFiberSpawn
-        io = Rainbows::Fiber::IO.new(io,::Fiber.current)
+        io.respond_to?(:wait_readable) or
+          io = Rainbows::Fiber::IO.new(io)
       when :Revactor
         io = Rainbows::Revactor::Proxy.new(io)
       end
