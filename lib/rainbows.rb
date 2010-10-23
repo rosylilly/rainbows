@@ -39,7 +39,6 @@ module Rainbows
   require 'rainbows/http_server'
   require 'rainbows/response'
   require 'rainbows/client'
-  require 'rainbows/http_request'
   require 'rainbows/tee_input'
   require 'rainbows/process_client'
   autoload :Base, 'rainbows/base'
