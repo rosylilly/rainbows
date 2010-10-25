@@ -19,13 +19,13 @@ module Rainbows::ProcessClient
   #   Base, ThreadSpawn, ThreadPool
   def process_client(client) # :nodoc:
     hp = HttpParser.new
-    client.readpartial(16384, buf = hp.buf)
+    client.kgio_read!(16384, buf = hp.buf)
     remote_addr = client.kgio_addr
 
     begin # loop
       until env = hp.parse
         wait_headers_readable(client) or return
-        buf << client.readpartial(16384)
+        buf << client.kgio_read!(16384)
       end
 
       env[CLIENT_IO] = client

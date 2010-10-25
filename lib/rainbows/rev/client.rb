@@ -147,7 +147,7 @@ module Rainbows
       def handle_error(e)
         close_deferred
         if msg = Error.response(e)
-          @_io.write_nonblock(msg) rescue nil
+          @_io.kgio_trywrite(msg) rescue nil
         end
         @_write_buffer.clear
         ensure

@@ -29,10 +29,6 @@ module Rainbows
         to_io.kgio_addr
       end
 
-      def readpartial(size, buf = "")
-        to_io.readpartial(size, buf)
-      end
-
       def kgio_read(size, buf = "")
         to_io.kgio_read(size, buf)
       end
@@ -41,8 +37,8 @@ module Rainbows
         to_io.kgio_read!(size, buf)
       end
 
-      def write_nonblock(buf)
-        to_io.write_nonblock(buf)
+      def kgio_trywrite(buf)
+        to_io.kgio_trywrite(buf)
       end
 
       def write(buf)

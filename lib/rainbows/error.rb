@@ -9,7 +9,13 @@ module Rainbows::Error
   # if the socket is already closed or broken.  We'll always ensure
   # the socket is closed at the end of this function
   def self.write(io, e)
-    msg = response(e) and io.write_nonblock(msg)
+    if msg = response(e)
+      if io.respond_to?(:kgio_trywrite)
+        io.kgio_trywrite(msg)
+      else
+        io.write_nonblock(msg)
+      end
+    end
     rescue
   end
 
