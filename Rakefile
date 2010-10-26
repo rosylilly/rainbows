@@ -7,7 +7,7 @@ autoload :Tempfile, 'tempfile'
 def tags
   timefmt = '%Y-%m-%dT%H:%M:%SZ'
   @tags ||= `git tag -l`.split(/\n/).map do |tag|
-    if %r{\Av[\d\.]+\z} =~ tag
+    if %r{\Av[\d\.]+} =~ tag
       header, subject, body = `git cat-file tag #{tag}`.split(/\n\n/, 3)
       header = header.split(/\n/)
       tagger = header.grep(/\Atagger /).first
@@ -192,7 +192,11 @@ task :fm_update do
       "changelog" => changelog,
     },
   }.to_json
-  Net::HTTP.start(uri.host, uri.port) do |http|
-    p http.post(uri.path, req, {'Content-Type'=>'application/json'})
+  if ! changelog.strip.empty? && version =~ %r{\A[\d\.]+\d+\z}
+    Net::HTTP.start(uri.host, uri.port) do |http|
+      p http.post(uri.path, req, {'Content-Type'=>'application/json'})
+    end
+  else
+    warn "not updating freshmeat for v#{version}"
   end
 end
