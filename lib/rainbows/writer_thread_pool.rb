@@ -20,6 +20,7 @@ module Rainbows
   # slow client denial-of-service attacks.
 
   module WriterThreadPool
+    # :stopdoc:
     include Base
 
     # used to wrap a BasicSocket to use with +q+ for all writes
@@ -95,5 +96,6 @@ module Rainbows
       super(worker) # accept loop from Unicorn
       qp.map { |q| q.quit! }
     end
+    # :startdoc:
   end
 end

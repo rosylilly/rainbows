@@ -21,6 +21,7 @@ module Rainbows
   # vulnerable to slow client denial-of-service attacks.
 
   module WriterThreadSpawn
+    # :stopdoc:
     include Base
 
     CUR = {} # :nodoc:
@@ -115,5 +116,6 @@ module Rainbows
         t.alive? ? t.join(0.01) : true
       end until CUR.empty?
     end
+    # :startdoc:
   end
 end

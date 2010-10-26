@@ -1,5 +1,10 @@
 # -*- encoding: binary -*-
+#
+# :enddoc:
 
+# this is used to augment Kgio::Socket and Kgio::Pipe-enhanced classes
+# for use with Rainbows!  Do no use this directly, see
+# Rainbows::Fiber::IO::Pipe and Rainbows::Fiber::IO::Socket instead.
 module Rainbows::Fiber::IO::Methods
   RD = Rainbows::Fiber::RD
   WR = Rainbows::Fiber::WR

@@ -12,6 +12,7 @@ class Rainbows::Fiber::IO
   attr_accessor :to_io
 
   # :stopdoc:
+  # see Rainbows::Fiber::IO::Compat for initialize implementation
   class << self
     alias :[] :new
   end
