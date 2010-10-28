@@ -24,7 +24,6 @@ module Rainbows
         rev_write_response(response, alive)
         return quit unless alive && :close != @state
 
-        @env.clear
         @hp.reset
         @state = :headers
       end

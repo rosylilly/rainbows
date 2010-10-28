@@ -109,7 +109,6 @@ module Rainbows
 
         rev_write_response(response, alive = @hp.keepalive? && G.alive)
         return quit unless alive && :close != @state
-        @env.clear
         @hp.reset
         @state = :headers
         disable if enabled?
@@ -131,7 +130,7 @@ module Rainbows
         when :close
           close if @_write_buffer.empty?
         when :headers
-          if @hp.headers(@env, @buf)
+          if @hp.parse
             app_call
           else
             unless enabled?

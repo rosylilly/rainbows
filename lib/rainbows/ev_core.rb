@@ -14,10 +14,10 @@ module Rainbows::EvCore
   ASYNC_CLOSE = "async.close".freeze
 
   def post_init
-    @env = {}
     @hp = HttpParser.new
+    @env = @hp.env
+    @buf = @hp.buf
     @state = :headers # [ :body [ :trailers ] ] :app_call :close
-    @buf = ""
   end
 
   # graceful exit, like SIGQUIT
@@ -47,7 +47,8 @@ module Rainbows::EvCore
   def on_read(data)
     case @state
     when :headers
-      @hp.headers(@env, @buf << data) or return
+      @buf << data
+      @hp.parse or return
       @state = :body
       len = @hp.content_length
       if len == 0

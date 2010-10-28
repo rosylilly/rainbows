@@ -94,7 +94,6 @@ module Rainbows::EventMachine
       alive = @hp.keepalive? && G.alive && G.kato > 0
       em_write_response(response, alive)
       if alive
-        @env.clear
         @hp.reset
         @state = :headers
         if @buf.empty?
