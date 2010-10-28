@@ -148,6 +148,31 @@ rainbows_wait_start () {
 	rainbows_pid=$(cat $pid)
 }
 
+wait_for_reload () {
+	case $# in
+	0) err_log=$r_err status=done ;;
+	1) err_log=$1 status=done ;;
+	2) err_log=$1 status=$2 ;;
+	esac
+	while ! egrep '(done|error) reloading' < $err_log >/dev/null
+	do
+		sleep 1
+	done
+	grep "$status reloading" $err_log >/dev/null
+}
+
+wait_for_reap () {
+	case $# in
+	0) err_log=$r_err ;;
+	1) err_log=$1 ;;
+	esac
+
+	while ! grep reaped < $err_log >/dev/null
+	do
+		sleep 1
+	done
+}
+
 rsha1 () {
 	_cmd="$(which sha1sum 2>/dev/null || :)"
 	test -n "$_cmd" || _cmd="$(which openssl 2>/dev/null || :) sha1"

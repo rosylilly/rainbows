@@ -19,16 +19,8 @@ t_begin "clobber config and reload" && {
 stderr_path "$r_err"
 EOF
 	kill -HUP $rainbows_pid
-	while ! egrep '(done|error) reloading' $r_err >/dev/null
-	do
-		sleep 1
-	done
-
-	grep 'done reloading' $r_err >/dev/null
-	while ! grep reaped $r_err >/dev/null
-	do
-		sleep 1
-	done
+	wait_for_reload
+	wait_for_reap
 }
 
 t_begin "HTTP request confirms we're on the default model" && {
@@ -41,15 +33,8 @@ t_begin "restore config and reload" && {
 	> $r_err
 	kill -HUP $rainbows_pid
 	rainbows_wait_start
-	while ! egrep '(done|error) reloading' $r_err >/dev/null
-	do
-		sleep 1
-	done
-	while ! grep reaped $r_err >/dev/null
-	do
-		sleep 1
-	done
-	grep 'done reloading' $r_err >/dev/null
+	wait_for_reload
+	wait_for_reap
 }
 
 t_begin "HTTP request confirms we're back on the correct model" && {

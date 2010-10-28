@@ -29,12 +29,8 @@ t_begin "introduce syntax error in rackup file" && {
 t_begin "reload signal succeeds" && {
 	kill -HUP $rainbows_pid
 	rainbows_wait_start
-	while ! egrep '(done|error) reloading' $r_err >/dev/null
-	do
-		sleep 1
-	done
-
-	grep 'error reloading' $r_err >/dev/null
+	wait_for_reload $r_err error
+	wait_for_reap
 	> $r_err
 }
 
