@@ -31,8 +31,11 @@ module Rainbows
         raise ArgumentError, "pool_size must a be an Integer > 0"
       mod = Rainbows.const_get(O[:backend])
       require "never_block" # require EM first since we need a higher version
-      G.server.extend(mod)
-      G.server.extend(Core)
+    end
+
+    def self.extended(klass)
+      klass.extend(Rainbows.const_get(O[:backend])) # EventMachine
+      klass.extend(Core)
     end
 
     module Core  # :nodoc: all

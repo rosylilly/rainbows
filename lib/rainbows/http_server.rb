@@ -24,8 +24,6 @@ class Rainbows::HttpServer < Unicorn::HttpServer
       G.quit! # let the master reopen and refork us
   end
 
-  #:stopdoc:
-  #
   # Add one second to the timeout since our fchmod heartbeat is less
   # precise (and must be more conservative) than Unicorn does.  We
   # handle many clients per process and can't chmod on every
@@ -35,7 +33,23 @@ class Rainbows::HttpServer < Unicorn::HttpServer
   def timeout=(nr)
     @timeout = nr + 1
   end
-  #:startdoc:
+
+  def load_config!
+    use :Base
+    G.kato = 5
+    Rainbows.max_bytes = 1024 * 1024
+    @worker_connections = nil
+    super
+    @worker_connections ||= Rainbows::MODEL_WORKER_CONNECTIONS[@use]
+  end
+
+  def ready_pipe=(v)
+    # hacky hook got force Rainbows! to load modules only in workers
+    if @master_pid && @master_pid == Process.ppid
+      extend(Rainbows.const_get(@use))
+    end
+    super
+  end
 
   def use(*args)
     model = args.shift or return @use
@@ -49,7 +63,6 @@ class Rainbows::HttpServer < Unicorn::HttpServer
 
     Module === mod or
       raise ArgumentError, "concurrency model #{model.inspect} not supported"
-    extend(mod)
     args.each do |opt|
       case opt
       when Hash; O.update(opt)
@@ -61,11 +74,8 @@ class Rainbows::HttpServer < Unicorn::HttpServer
     new_defaults = {
       'rainbows.model' => (@use = model.to_sym),
       'rack.multithread' => !!(model.to_s =~ /Thread/),
+      'rainbows.autochunk' => [:Rev,:EventMachine,:NeverBlock].include?(@use),
     }
-    case @use
-    when :Rev, :EventMachine, :NeverBlock
-      new_defaults['rainbows.autochunk'] = true
-    end
     Rainbows::Const::RACK_DEFAULTS.update(new_defaults)
   end
 
