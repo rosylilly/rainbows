@@ -25,6 +25,10 @@ EOF
 	done
 
 	grep 'done reloading' $r_err >/dev/null
+	while ! grep reaped $r_err >/dev/null
+	do
+		sleep 1
+	done
 }
 
 t_begin "HTTP request confirms we're on the default model" && {
@@ -38,6 +42,10 @@ t_begin "restore config and reload" && {
 	kill -HUP $rainbows_pid
 	rainbows_wait_start
 	while ! egrep '(done|error) reloading' $r_err >/dev/null
+	do
+		sleep 1
+	done
+	while ! grep reaped $r_err >/dev/null
 	do
 		sleep 1
 	done
