@@ -52,7 +52,7 @@ class Rainbows::Fiber::IO
           return
         when String
           buf = rv
-        when Kgio::WaitWritable
+        when :wait_writable
           wait_writable
         end
       end while true
@@ -93,7 +93,7 @@ class Rainbows::Fiber::IO
         case rv
         when nil
           raise EOFError, "end of file reached", []
-        when Kgio::WaitReadable
+        when :wait_readable
           wait_readable
         else
           return rv

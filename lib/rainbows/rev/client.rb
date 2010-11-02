@@ -30,7 +30,7 @@ module Rainbows
             case rv = @_io.kgio_trywrite(buf)
             when nil
               return enable_write_watcher
-            when Kgio::WaitWritable
+            when :wait_writable
               break # fall through to super(buf)
             when String
               buf = rv # retry, skb could grow or been drained
