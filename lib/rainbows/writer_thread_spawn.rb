@@ -47,6 +47,10 @@ module Rainbows
         to_io.kgio_trywrite(buf)
       end
 
+      def timed_read(buf)
+        to_io.timed_read(buf)
+      end
+
       def queue_writer
         # not using Thread.pass here because that spins the CPU during
         # I/O wait and will eat cycles from other worker processes.

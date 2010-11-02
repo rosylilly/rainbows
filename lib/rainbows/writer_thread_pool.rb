@@ -42,6 +42,10 @@ module Rainbows
         to_io.kgio_trywrite(buf)
       end
 
+      def timed_read(buf)
+        to_io.timed_read(buf)
+      end
+
       def write(buf)
         q << [ to_io, buf ]
       end

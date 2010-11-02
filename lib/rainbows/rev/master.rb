@@ -2,20 +2,23 @@
 # :enddoc:
 require 'rainbows/rev'
 
-class Rainbows::Rev::Master < Rev::AsyncWatcher
+class Rainbows::Rev::Master < Rev::IOWatcher
 
   def initialize(queue)
-    super()
+    @reader, @writer = Kgio::Pipe.new
+    super(@reader)
     @queue = queue
   end
 
   def <<(output)
     @queue << output
-    signal
+    @writer.kgio_trywrite("\0")
   end
 
-  def on_signal
-    client, response = @queue.pop
-    client.response_write(response)
+  def on_readable
+    if String === @reader.kgio_tryread(1)
+      client, response = @queue.pop
+      client.response_write(response)
+    end
   end
 end

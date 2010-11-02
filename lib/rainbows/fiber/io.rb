@@ -75,15 +75,28 @@ class Rainbows::Fiber::IO
   end
 
   # used for reading headers (respecting keepalive_timeout)
-  def read_timeout
+  def timed_read(buf)
     expire = nil
-    begin
-      return @to_io.read_nonblock(16384)
-    rescue Errno::EAGAIN
-      return if expire && expire < Time.now
-      expire ||= Time.now + G.kato
-      wait_readable
-    end while true
+    if @to_io.respond_to?(:kgio_tryread)
+      begin
+        case rv = @to_io.kgio_tryread(16384, buf)
+        when :wait_readable
+          return if expire && expire < Time.now
+          expire ||= Time.now + G.kato
+          wait_readable
+        else
+          return rv
+        end
+      end while true
+    else
+      begin
+        return @to_io.read_nonblock(16384, buf)
+      rescue Errno::EAGAIN
+        return if expire && expire < Time.now
+        expire ||= Time.now + G.kato
+        wait_readable
+      end while true
+    end
   end
 
   def readpartial(length, buf = "")

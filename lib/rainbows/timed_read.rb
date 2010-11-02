@@ -1,6 +1,6 @@
 # -*- encoding: binary -*-
 # :enddoc:
-module Rainbows::ReadTimeout
+module Rainbows::TimedRead
   G = Rainbows::G # :nodoc:
 
   def wait_readable
@@ -8,17 +8,13 @@ module Rainbows::ReadTimeout
   end
 
   # used for reading headers (respecting keepalive_timeout)
-  def read_timeout(buf = "")
+  def timed_read(buf)
     expire = nil
     begin
       case rv = kgio_tryread(16384, buf)
       when :wait_readable
-        now = Time.now.to_f
-        if expire
-          now > expire and return
-        else
-          expire = now + G.kato
-        end
+        return if expire && expire < Time.now
+        expire ||= Time.now + G.kato
         wait_readable
       else
         return rv

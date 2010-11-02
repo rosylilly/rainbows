@@ -9,10 +9,6 @@ module Rainbows::ProcessClient
   TeeInput = Rainbows::TeeInput
   include Rainbows::Const
 
-  def wait_headers_readable(client)
-    IO.select([client], nil, nil, G.kato)
-  end
-
   # once a client is accepted, it is processed in its entirety here
   # in 3 easy steps: read request, call app, write app response
   # this is used by synchronous concurrency models
@@ -25,8 +21,8 @@ module Rainbows::ProcessClient
 
     begin # loop
       until env = hp.parse
-        wait_headers_readable(client) or return
-        buf << client.kgio_read!(16384)
+        client.timed_read(buf2 ||= "") or return
+        buf << buf2
       end
 
       env[CLIENT_IO] = client

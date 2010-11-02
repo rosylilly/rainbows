@@ -3,7 +3,7 @@
 module Rainbows::Fiber::Rev::Methods
   class Watcher < Rev::IOWatcher
     def initialize(fio, flag)
-      @f = fio.f || Fiber.current
+      @f = Fiber.current
       super(fio, flag)
       attach(Rev::Loop.default)
     end
@@ -15,30 +15,23 @@ module Rainbows::Fiber::Rev::Methods
     alias on_writable on_readable
   end
 
-  def initialize(*args)
-    @f = Fiber.current
-    super(*args)
-    @r = @w = false
-  end
-
   def close
-    @w.detach if @w
-    @r.detach if @r
-    @r = @w = false
+    @w.detach if defined?(@w) && @w.attached?
+    @r.detach if defined?(@r) && @r.attached?
     super
   end
 
   def wait_writable
-    @w ||= Watcher.new(self, :w)
+    @w = Watcher.new(self, :w) unless defined?(@w)
     @w.enable unless @w.enabled?
     Fiber.yield
     @w.disable
   end
 
   def wait_readable
-    @r ||= Watcher.new(self, :r)
+    @r = Watcher.new(self, :r) unless defined?(@r)
     @r.enable unless @r.enabled?
-    KATO << @f
+    KATO << Fiber.current
     Fiber.yield
     @r.disable
   end

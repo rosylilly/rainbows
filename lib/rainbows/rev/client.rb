@@ -42,6 +42,19 @@ module Rainbows
         super(buf)
       end
 
+      def on_readable
+        buf = @_io.kgio_tryread(16384)
+        case buf
+        when :wait_readable
+        when nil # eof
+          close
+        else
+          on_read buf
+        end
+      rescue Errno::ECONNRESET
+        close
+      end
+
       # queued, optional response bodies, it should only be unpollable "fast"
       # devices where read(2) is uninterruptable.  Unfortunately, NFS and ilk
       # are also part of this.  We'll also stick DeferredResponse bodies in

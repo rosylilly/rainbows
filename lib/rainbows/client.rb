@@ -1,9 +1,9 @@
 # -*- encoding: binary -*-
 # :enddoc:
 
-require 'rainbows/read_timeout'
+require 'rainbows/timed_read'
 
 class Rainbows::Client < Kgio::Socket
-  include Rainbows::ReadTimeout
+  include Rainbows::TimedRead
 end
 Kgio.accept_class = Rainbows::Client

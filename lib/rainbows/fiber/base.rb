@@ -56,19 +56,6 @@ module Rainbows::Fiber::Base
     max.nil? || max > (now + 1) ? 1 : max - now
   end
 
-  def wait_headers_readable(client)
-    io = client.to_io
-    expire = nil
-    begin
-      return io.recv_nonblock(1, Socket::MSG_PEEK)
-    rescue Errno::EAGAIN
-      return if expire && expire < Time.now
-      expire ||= Time.now + G.kato
-      client.wait_readable
-      retry
-    end
-  end
-
   def process(client)
     G.cur += 1
     process_client(client)
