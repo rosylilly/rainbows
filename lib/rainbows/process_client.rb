@@ -21,6 +21,7 @@ module Rainbows::ProcessClient
     hp = HttpParser.new
     client.kgio_read!(16384, buf = hp.buf)
     remote_addr = client.kgio_addr
+    alive = false
 
     begin # loop
       until env = hp.parse
@@ -43,12 +44,12 @@ module Rainbows::ProcessClient
       if hp.headers?
         headers = HH.new(headers)
         range = make_range!(env, status, headers) and status = range.shift
-        env = hp.keepalive? && G.alive
-        headers[CONNECTION] = env ? KEEP_ALIVE : CLOSE
+        alive = hp.keepalive? && G.alive
+        headers[CONNECTION] = alive ? KEEP_ALIVE : CLOSE
         client.write(response_header(status, headers))
       end
       write_body(client, body, range)
-    end while env && hp.reset.nil?
+    end while alive && hp.reset.nil?
   # if we get any error, try to write something back to the client
   # assuming we haven't closed the socket, but don't get hung up
   # if the socket is already closed or broken.  We'll always ensure
