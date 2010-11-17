@@ -51,7 +51,7 @@ module Rainbows::Revactor
 
       env[CLIENT_IO] = client
       env[RACK_INPUT] = 0 == hp.content_length ?
-               NULL_IO : TeeInput.new(TeeSocket.new(client), hp)
+               NULL_IO : Unicorn::TeeInput.new(TeeSocket.new(client), hp)
       env[REMOTE_ADDR] = remote_addr
       status, headers, body = app.call(env.update(RACK_DEFAULTS))
 

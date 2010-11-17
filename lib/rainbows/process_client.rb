@@ -6,7 +6,7 @@ module Rainbows::ProcessClient
   HttpParser = Unicorn::HttpParser
   NULL_IO = Unicorn::HttpRequest::NULL_IO
   RACK_INPUT = Unicorn::HttpRequest::RACK_INPUT
-  TeeInput = Rainbows::TeeInput
+  TeeInput = Unicorn::TeeInput
   include Rainbows::Const
 
   # once a client is accepted, it is processed in its entirety here
