@@ -18,7 +18,7 @@ module Rainbows::Fiber::Body # :nodoc:
       begin
         offset += (n = sock.sendfile_nonblock(body, offset, count))
       rescue Errno::EAGAIN
-        client.wait_writable
+        client.kgio_wait_writable
         retry
       rescue EOFError
         break

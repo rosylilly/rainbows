@@ -25,7 +25,7 @@ module Rainbows::Fiber::IO::Methods
     super
   end
 
-  def wait_readable
+  def kgio_wait_readable
     fd = fileno
     @f = Fiber.current
     RD[fd] = self
@@ -33,7 +33,7 @@ module Rainbows::Fiber::IO::Methods
     RD[fd] = nil
   end
 
-  def wait_writable
+  def kgio_wait_writable
     fd = fileno
     @f = Fiber.current
     WR[fd] = self

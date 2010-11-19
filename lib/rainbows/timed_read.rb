@@ -3,7 +3,7 @@
 module Rainbows::TimedRead
   G = Rainbows::G # :nodoc:
 
-  def wait_readable
+  def kgio_wait_readable
     IO.select([self], nil, nil, G.kato)
   end
 
@@ -15,7 +15,7 @@ module Rainbows::TimedRead
       when :wait_readable
         return if expire && expire < Time.now
         expire ||= Time.now + G.kato
-        wait_readable
+        kgio_wait_readable
       else
         return rv
       end

@@ -53,7 +53,7 @@ class Rainbows::Fiber::IO
         when String
           buf = rv
         when :wait_writable
-          wait_writable
+          kgio_wait_writable
         end
       end while true
     else
@@ -61,7 +61,7 @@ class Rainbows::Fiber::IO
         (rv = @to_io.write_nonblock(buf)) == buf.bytesize and return
         buf = byte_slice(buf, rv..-1)
       rescue Errno::EAGAIN
-        wait_writable
+        kgio_wait_writable
       end while true
     end
   end
@@ -83,7 +83,7 @@ class Rainbows::Fiber::IO
         when :wait_readable
           return if expire && expire < Time.now
           expire ||= Time.now + G.kato
-          wait_readable
+          kgio_wait_readable
         else
           return rv
         end
@@ -94,7 +94,7 @@ class Rainbows::Fiber::IO
       rescue Errno::EAGAIN
         return if expire && expire < Time.now
         expire ||= Time.now + G.kato
-        wait_readable
+        kgio_wait_readable
       end while true
     end
   end
@@ -107,7 +107,7 @@ class Rainbows::Fiber::IO
         when nil
           raise EOFError, "end of file reached", []
         when :wait_readable
-          wait_readable
+          kgio_wait_readable
         else
           return rv
         end
@@ -116,7 +116,7 @@ class Rainbows::Fiber::IO
       begin
         return @to_io.read_nonblock(length, buf)
       rescue Errno::EAGAIN
-        wait_readable
+        kgio_wait_readable
       end while true
     end
   end
@@ -141,7 +141,9 @@ end
 require 'rainbows/fiber/io/methods'
 require 'rainbows/fiber/io/compat'
 Rainbows::Client.__send__(:include, Rainbows::Fiber::IO::Methods)
-Rainbows::Fiber::IO.__send__(:include, Rainbows::Fiber::IO::Compat)
-Rainbows::Fiber::IO.__send__(:include, Rainbows::Fiber::IO::Methods)
-Kgio.wait_readable = :wait_readable
-Kgio.wait_writable = :wait_writable
+class Rainbows::Fiber::IO
+  include Rainbows::Fiber::IO::Compat
+  include Rainbows::Fiber::IO::Methods
+  alias_method :wait_readable, :kgio_wait_readable
+  alias_method :wait_writable, :kgio_wait_writable
+end

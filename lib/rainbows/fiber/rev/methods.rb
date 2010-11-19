@@ -21,14 +21,14 @@ module Rainbows::Fiber::Rev::Methods
     super
   end
 
-  def wait_writable
+  def kgio_wait_writable
     @w = Watcher.new(self, :w) unless defined?(@w)
     @w.enable unless @w.enabled?
     Fiber.yield
     @w.disable
   end
 
-  def wait_readable
+  def kgio_wait_readable
     @r = Watcher.new(self, :r) unless defined?(@r)
     @r.enable unless @r.enabled?
     KATO << Fiber.current
