@@ -22,6 +22,7 @@ t_begin "stops a regular request" && {
 	rm -f $tmp
 	dbgcat curl_err
 	dbgcat curl_out
+	grep 413 $curl_err
 	test -e $ok
 }
 
@@ -32,6 +33,7 @@ t_begin "stops a large chunked request" && {
 	  http://$listen/ > $curl_out 2> $curl_err || > $ok
 	dbgcat curl_err
 	dbgcat curl_out
+	grep 413 $curl_err
 	test -e $ok
 }
 

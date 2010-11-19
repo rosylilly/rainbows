@@ -8,6 +8,7 @@ class Rainbows::MaxBody::RewindableWrapper < Rainbows::MaxBody::Wrapper
 
   def rewind
     @limit = @orig_limit
+    @rbuf = ''
     @input.rewind
   end
 
