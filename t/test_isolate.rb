@@ -16,7 +16,7 @@ $stdout.reopen($stderr)
 Isolate.now!(opts) do
   gem 'rack', '1.1.0' # Cramp currently requires ~> 1.1.0
   gem 'kgio', '2.0.0'
-  gem 'unicorn', '3.0.0pre2'
+  gem 'unicorn', '3.0.0'
   gem 'kcar', '0.1.1'
 
   if engine == "ruby"
