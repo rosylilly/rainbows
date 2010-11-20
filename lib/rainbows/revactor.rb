@@ -64,12 +64,12 @@ module Rainbows::Revactor
       if hp.headers?
         headers = HH.new(headers)
         range = make_range!(env, status, headers) and status = range.shift
-        env = hp.keepalive? && G.alive && G.kato > 0
+        env = hp.next? && G.alive && G.kato > 0
         headers[CONNECTION] = env ? KEEP_ALIVE : CLOSE
         client.write(response_header(status, headers))
       end
       write_body(client, body, range)
-    end while env && hp.reset.nil?
+    end while env
   rescue ::Revactor::TCP::ReadError
   rescue => e
     Rainbows::Error.write(io, e)

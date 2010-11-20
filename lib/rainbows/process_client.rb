@@ -40,12 +40,12 @@ module Rainbows::ProcessClient
       if hp.headers?
         headers = HH.new(headers)
         range = make_range!(env, status, headers) and status = range.shift
-        alive = hp.keepalive? && G.alive
+        alive = hp.next? && G.alive
         headers[CONNECTION] = alive ? KEEP_ALIVE : CLOSE
         client.write(response_header(status, headers))
       end
       write_body(client, body, range)
-    end while alive && hp.reset.nil?
+    end while alive
   # if we get any error, try to write something back to the client
   # assuming we haven't closed the socket, but don't get hung up
   # if the socket is already closed or broken.  We'll always ensure
