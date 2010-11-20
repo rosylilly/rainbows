@@ -43,6 +43,7 @@ module Rainbows::Revactor
     end
     hp = Unicorn::HttpParser.new
     buf = hp.buf
+    alive = false
 
     begin
       until env = hp.parse
@@ -64,12 +65,12 @@ module Rainbows::Revactor
       if hp.headers?
         headers = HH.new(headers)
         range = make_range!(env, status, headers) and status = range.shift
-        env = hp.next? && G.alive && G.kato > 0
-        headers[CONNECTION] = env ? KEEP_ALIVE : CLOSE
+        alive = hp.next? && G.alive && G.kato > 0
+        headers[CONNECTION] = alive ? KEEP_ALIVE : CLOSE
         client.write(response_header(status, headers))
       end
       write_body(client, body, range)
-    end while env
+    end while alive
   rescue ::Revactor::TCP::ReadError
   rescue => e
     Rainbows::Error.write(io, e)
