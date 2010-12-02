@@ -43,6 +43,19 @@ module Rainbows::EvCore
     rv
   end
 
+  def prepare_request_body
+    # since we don't do streaming input, we have no choice but
+    # to take over 100-continue handling from the Rack application
+    if @env[HTTP_EXPECT] =~ /\A100-continue\z/i
+      write(EXPECT_100_RESPONSE)
+      @env.delete(HTTP_EXPECT)
+    end
+    @input = CapInput.new(@hp.content_length, self)
+    @hp.filter_body(@buf2 = "", @buf)
+    @input << @buf2
+    on_read("")
+  end
+
   # TeeInput doesn't map too well to this right now...
   def on_read(data)
     case @state
@@ -50,21 +63,11 @@ module Rainbows::EvCore
       @buf << data
       @hp.parse or return
       @state = :body
-      len = @hp.content_length
-      if len == 0
+      if 0 == @hp.content_length
         @input = NULL_IO
         app_call # common case
       else # nil or len > 0
-        # since we don't do streaming input, we have no choice but
-        # to take over 100-continue handling from the Rack application
-        if @env[HTTP_EXPECT] =~ /\A100-continue\z/i
-          write(EXPECT_100_RESPONSE)
-          @env.delete(HTTP_EXPECT)
-        end
-        @input = CapInput.new(len, self)
-        @hp.filter_body(@buf2 = "", @buf)
-        @input << @buf2
-        on_read("")
+        prepare_request_body
       end
     when :body
       if @hp.body_eof?
