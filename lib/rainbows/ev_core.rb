@@ -26,6 +26,9 @@ module Rainbows::EvCore
     @state = :close
   end
 
+  def want_more
+  end
+
   def handle_error(e)
     msg = Rainbows::Error.response(e) and write(msg)
     ensure
@@ -62,7 +65,7 @@ module Rainbows::EvCore
     case @state
     when :headers
       @buf << data
-      @hp.parse or return
+      @hp.parse or return want_more
       @state = :body
       if 0 == @hp.content_length
         @input = NULL_IO
@@ -72,8 +75,13 @@ module Rainbows::EvCore
       end
     when :body
       if @hp.body_eof?
-        @state = :trailers
-        on_read(data)
+        if @hp.content_length
+          @input.rewind
+          app_call
+        else
+          @state = :trailers
+          on_read(data)
+        end
       elsif data.size > 0
         @hp.filter_body(@buf2, @buf << data)
         @input << @buf2
@@ -83,6 +91,8 @@ module Rainbows::EvCore
       if @hp.trailers(@env, @buf << data)
         @input.rewind
         app_call
+      else
+        want_more
       end
     end
     rescue => e

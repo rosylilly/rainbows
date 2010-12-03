@@ -16,6 +16,10 @@ module Rainbows
         @deferred = nil
       end
 
+      def want_more
+        enable unless enabled?
+      end
+
       def quit
         super
         close if @deferred.nil? && @_write_buffer.empty?
@@ -143,13 +147,13 @@ module Rainbows
         when :close
           close if @_write_buffer.empty?
         when :headers
-          if @hp.parse
-            app_call
-          else
+          if @buf.empty?
             unless enabled?
               enable
               KATO[self] = Time.now
             end
+          else
+            on_read("")
           end
         end
         rescue => e
