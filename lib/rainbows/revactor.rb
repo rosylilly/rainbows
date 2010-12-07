@@ -46,13 +46,14 @@ module Rainbows::Revactor
     alive = false
 
     begin
+      ts = nil
       until env = hp.parse
         buf << client.read(*rd_args)
       end
 
       env[CLIENT_IO] = client
       env[RACK_INPUT] = 0 == hp.content_length ?
-               NULL_IO : Unicorn::TeeInput.new(TeeSocket.new(client), hp)
+               NULL_IO : Unicorn::TeeInput.new(ts = TeeSocket.new(client), hp)
       env[REMOTE_ADDR] = remote_addr
       status, headers, body = app.call(env.update(RACK_DEFAULTS))
 
@@ -68,6 +69,7 @@ module Rainbows::Revactor
         alive = hp.next? && G.alive && G.kato > 0
         headers[CONNECTION] = alive ? KEEP_ALIVE : CLOSE
         client.write(response_header(status, headers))
+        alive && ts and buf << ts.leftover
       end
       write_body(client, body, range)
     end while alive
@@ -153,6 +155,10 @@ module Rainbows::Revactor
       # IO::Buffer is used internally by Rev which Revactor is based on
       # so we'll always have it available
       @socket, @rbuf = socket, IO::Buffer.new
+    end
+
+    def leftover
+      @rbuf.read
     end
 
     # Revactor socket reads always return an unspecified amount,

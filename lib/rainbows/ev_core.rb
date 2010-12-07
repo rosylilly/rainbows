@@ -86,6 +86,8 @@ module Rainbows::EvCore
         @hp.filter_body(@buf2, @buf << data)
         @input << @buf2
         on_read("")
+      else
+        want_more
       end
     when :trailers
       if @hp.trailers(@env, @buf << data)
