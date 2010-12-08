@@ -5,7 +5,7 @@ t_plan 7 "ensure worker follows master to death"
 t_begin "setup" && {
 	rtmpfiles curl_err curl_out
 	rainbows_setup
-        echo timeout 3 >> $unicorn_config
+	echo timeout 3 >> $unicorn_config
 	rainbows -D -c $unicorn_config worker-follows-master-to-death.ru
 	rainbows_wait_start
 }

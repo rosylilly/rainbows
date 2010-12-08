@@ -4,7 +4,7 @@ t_plan 11 "rack.input pipelining test"
 
 t_begin "setup and startup" && {
 	rainbows_setup $model
-        rtmpfiles req
+	rtmpfiles req
 	rainbows -D sha1.ru -c $unicorn_config
 	body=hello
 	body_size=$(printf $body | wc -c)

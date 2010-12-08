@@ -5,8 +5,8 @@ t_plan 12 "heartbeat/timeout test for $model"
 
 t_begin "setup and startup" && {
 	rainbows_setup $model
-        echo timeout 3 >> $unicorn_config
-        echo preload_app true >> $unicorn_config
+	echo timeout 3 >> $unicorn_config
+	echo preload_app true >> $unicorn_config
 	rainbows -D heartbeat-timeout.ru -c $unicorn_config
 	rainbows_wait_start
 }

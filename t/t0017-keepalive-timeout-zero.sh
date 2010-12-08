@@ -4,7 +4,7 @@ t_plan 6 "keepalive_timeout 0 tests for $model"
 
 t_begin "setup and start" && {
 	rainbows_setup $model 2 0
-        grep 'keepalive_timeout 0' $unicorn_config
+	grep 'keepalive_timeout 0' $unicorn_config
 	rainbows -D env.ru -c $unicorn_config
 	rainbows_wait_start
 }
