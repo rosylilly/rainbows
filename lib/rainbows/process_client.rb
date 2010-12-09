@@ -1,12 +1,11 @@
 # -*- encoding: binary -*-
 # :enddoc:
+require 'rainbows/rack_input'
 module Rainbows::ProcessClient
   G = Rainbows::G
   include Rainbows::Response
   HttpParser = Unicorn::HttpParser
-  NULL_IO = Unicorn::HttpRequest::NULL_IO
-  RACK_INPUT = Unicorn::HttpRequest::RACK_INPUT
-  TeeInput = Unicorn::TeeInput
+  include Rainbows::RackInput
   include Rainbows::Const
 
   # once a client is accepted, it is processed in its entirety here
@@ -25,9 +24,7 @@ module Rainbows::ProcessClient
         buf << buf2
       end
 
-      env[CLIENT_IO] = client
-      env[RACK_INPUT] = 0 == hp.content_length ?
-                        NULL_IO : TeeInput.new(client, hp)
+      set_input(env, hp, client)
       env[REMOTE_ADDR] = remote_addr
       status, headers, body = APP.call(env.update(RACK_DEFAULTS))
 

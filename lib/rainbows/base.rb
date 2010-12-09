@@ -18,6 +18,7 @@ module Rainbows::Base
     super(worker)
     Rainbows::Response.setup(self.class)
     Rainbows::MaxBody.setup
+    Rainbows::RackInput.setup
     G.tmp = worker.tmp
 
     listeners = Rainbows::HttpServer::LISTENERS

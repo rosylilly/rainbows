@@ -53,7 +53,7 @@ module Rainbows::Revactor
 
       env[CLIENT_IO] = client
       env[RACK_INPUT] = 0 == hp.content_length ?
-               NULL_IO : Unicorn::TeeInput.new(ts = TeeSocket.new(client), hp)
+               NULL_IO : IC.new(ts = TeeSocket.new(client), hp)
       env[REMOTE_ADDR] = remote_addr
       status, headers, body = app.call(env.update(RACK_DEFAULTS))
 
@@ -87,6 +87,7 @@ module Rainbows::Revactor
     init_worker_process(worker)
     require 'rainbows/revactor/body'
     self.class.__send__(:include, Rainbows::Revactor::Body)
+    self.class.const_set(:IC, Unicorn::HttpRequest.input_class)
     RD_ARGS[:timeout] = G.kato if G.kato > 0
     nr = 0
     limit = worker_connections
