@@ -30,60 +30,60 @@ require 'thread'
 # Timed-out requests will cause this middleware to return with a
 # "408 Request Timeout" response.
 
-class Rainbows::ThreadTimeout < Struct.new(:app, :timeout,
-                                           :threshold, :watchdog,
-                                           :active, :lock)
+class Rainbows::ThreadTimeout
 
   # :stopdoc:
   class ExecutionExpired < ::Exception
   end
 
   def initialize(app, opts)
-    timeout = opts[:timeout]
-    Numeric === timeout or
-      raise TypeError, "timeout=#{timeout.inspect} is not numeric"
+    @timeout = opts[:timeout]
+    Numeric === @timeout or
+      raise TypeError, "timeout=#{@timeout.inspect} is not numeric"
 
-    if threshold = opts[:threshold]
-      Integer === threshold or
-        raise TypeError, "threshold=#{threshold.inspect} is not an integer"
-      threshold == 0 and
+    if @threshold = opts[:threshold]
+      Integer === @threshold or
+        raise TypeError, "threshold=#{@threshold.inspect} is not an integer"
+      @threshold == 0 and
         raise ArgumentError, "threshold=0 does not make sense"
-      threshold < 0 and
-        threshold += Rainbows::G.server.worker_connections
+      @threshold < 0 and
+        @threshold += Rainbows::G.server.worker_connections
     end
-    super(app, timeout, threshold, nil, {}, Mutex.new)
+    @app = app
+    @active = {}
+    @lock = Mutex.new
   end
 
   def call(env)
-    lock.synchronize do
-      start_watchdog unless watchdog
-      active[Thread.current] = Time.now + timeout
+    @lock.synchronize do
+      start_watchdog unless @watchdog
+      @active[Thread.current] = Time.now + @timeout
     end
     begin
-      app.call(env)
+      @app.call(env)
     ensure
-      lock.synchronize { active.delete(Thread.current) }
+      @lock.synchronize { @active.delete(Thread.current) }
     end
     rescue ExecutionExpired
       [ 408, { 'Content-Type' => 'text/plain', 'Content-Length' => '0' }, [] ]
   end
 
   def start_watchdog
-    self.watchdog = Thread.new do
+    @watchdog = Thread.new do
       begin
-        if next_wake = lock.synchronize { active.values }.min
+        if next_wake = @lock.synchronize { @active.values }.min
           next_wake -= Time.now
           sleep(next_wake) if next_wake > 0
         else
-          sleep(timeout)
+          sleep(@timeout)
         end
 
         # "active.size" is atomic in MRI 1.8 and 1.9
-        next if threshold && active.size < threshold
+        next if @threshold && @active.size < @threshold
 
         now = Time.now
-        lock.synchronize do
-          active.delete_if do |thread, time|
+        @lock.synchronize do
+          @active.delete_if do |thread, time|
             time >= now and thread.raise(ExecutionExpired).nil?
           end
         end
