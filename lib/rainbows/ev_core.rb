@@ -108,8 +108,12 @@ module Rainbows::EvCore
     raise IOError, msg, []
   end
 
-  MAX_BODY = Unicorn::Const::MAX_BODY
   TmpIO = Unicorn::TmpIO
+
+  def io_for(bytes)
+    bytes <= CBB ? StringIO.new("") : TmpIO.new
+  end
+
   def mkinput
     max = Rainbows.max_bytes
     len = @hp.content_length
@@ -117,9 +121,13 @@ module Rainbows::EvCore
       if max && (len > max)
         err_413("Content-Length too big: #{len} > #{max}")
       end
-      len <= MAX_BODY ? StringIO.new("") : TmpIO.new
+      io_for(len)
     else
-      max ? CapInput.new(TmpIO.new, self) : TmpIO.new
+      max ? CapInput.new(io_for(max), self, max) : TmpIO.new
     end
+  end
+
+  def self.setup
+    const_set :CBB, Unicorn::TeeInput.client_body_buffer_size
   end
 end

@@ -31,6 +31,7 @@ module Rainbows
         Server.const_set(:MAX, @worker_connections)
         Server.const_set(:CL, mod.const_get(:Client))
         EvCore.const_set(:APP, G.server.app)
+        Rainbows::EvCore.setup
         Heartbeat.new(1, true).attach(rloop)
         LISTENERS.map! { |s| Server.new(s).attach(rloop) }
         rloop.run

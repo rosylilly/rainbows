@@ -1,8 +1,9 @@
 # -*- encoding: binary -*-
 # :enddoc:
 class Rainbows::EvCore::CapInput
-  def initialize(io, client)
-    @io, @client, @bytes_left = io, client, Rainbows.max_bytes
+
+  def initialize(io, client, max)
+    @io, @client, @bytes_left = io, client, max
   end
 
   def <<(buf)

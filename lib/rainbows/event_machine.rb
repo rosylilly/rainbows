@@ -199,6 +199,7 @@ module Rainbows::EventMachine
     Server.const_set(:MAX, worker_connections + LISTENERS.size)
     Server.const_set(:CL, client_class)
     client_class.const_set(:APP, G.server.app)
+    Rainbows::EvCore.setup
     EM.run {
       conns = EM.instance_variable_get(:@conns) or
         raise RuntimeError, "EM @conns instance variable not accessible!"
