@@ -98,3 +98,9 @@ For older versions of Rails, the following config.ru will work:
 
 One thing to watch out for is that RAILS_ENV will not be set in the
 environment for you, thus we set it to match RACK_ENV.
+
+=== I'm using threads and Rails is misbehaving!
+
+If you use any of the threaded concurrency models, you will need to use
+{config.threadsafe!}[http://m.onkey.org/thread-safety-for-your-rails]
+in your config/environments/$RAILS_ENV.rb
