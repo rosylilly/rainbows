@@ -30,25 +30,16 @@ t_begin "8 sleepy requests do not time out" && {
 	test xHI = x"$(sort < $curl_out | uniq)"
 }
 
-t_begin "9 sleepy requests do time out" && {
+t_begin "9 sleepy requests, some time out" && {
 	> $curl_err
 	> $curl_out
 	for i in 1 2 3 4 5 6 7 8 9
 	do
-		rtmpfiles curl_err_$i
 		curl -sSf --no-buffer \
-		  http://$listen/3 2>> ${curl_err}_${i} >> $curl_out &
+		  http://$listen/3 2>> $curl_err >> $curl_out &
 	done
 	wait
-	if test -s $curl_out
-	then
-		dbgcat curl_out
-		die "$curl_out should be empty"
-	fi
-	for i in 1 2 3 4 5 6 7 8 9
-	do
-		grep 408 ${curl_err}_${i}
-	done
+	grep 408 $curl_err
 }
 
 t_begin "kill server" && {

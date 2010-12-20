@@ -90,7 +90,7 @@ class Rainbows::ThreadTimeout
         now = Time.now
         @lock.synchronize do
           @active.delete_if do |thread, time|
-            time >= now and thread.raise(ExecutionExpired).nil?
+            now >= time and thread.raise(ExecutionExpired).nil?
           end
         end
       end while true
