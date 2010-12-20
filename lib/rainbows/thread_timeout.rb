@@ -73,7 +73,13 @@ class Rainbows::ThreadTimeout
       begin
         if next_wake = @lock.synchronize { @active.values }.min
           next_wake -= Time.now
-          sleep(next_wake) if next_wake > 0
+
+          # because of the lack of GVL-releasing syscalls in this branch
+          # of the thread loop, we need Thread.pass to ensure other threads
+          # get scheduled appropriately under 1.9.  This is likely a threading
+          # bug in 1.9 that warrants further investigation when we're in a
+          # better mood.
+          next_wake > 0 ? sleep(next_wake) : Thread.pass
         else
           sleep(@timeout)
         end
