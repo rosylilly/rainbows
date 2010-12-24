@@ -9,32 +9,24 @@ manifest = File.readlines('.manifest').map! { |x| x.chomp! }
 test_files = manifest.grep(%r{\Atest/unit/test_.*\.rb\z}).map do |f|
   File.readlines(f).grep(/\bfork\b/).empty? ? f : nil
 end.compact
+require 'wrongdoc'
+extend Wrongdoc::Gemspec
+name, summary, title = readme_metadata
 
 Gem::Specification.new do |s|
   s.name = %q{rainbows}
-  s.version = ENV["VERSION"]
+  s.version = ENV["VERSION"].dup
 
-  s.authors = ["Rainbows! hackers"]
+  s.authors = ["#{name} hackers"]
   s.date = Time.now.utc.strftime('%Y-%m-%d')
-  s.description = File.read("README").split(/\n\n/)[1]
+  s.description = readme_description
   s.email = %q{rainbows-talk@rubyforge.org}
   s.executables = %w(rainbows)
-
-  s.extra_rdoc_files = File.readlines('.document').map! do |x|
-    x.chomp!
-    if File.directory?(x)
-      manifest.grep(%r{\A#{x}/})
-    elsif File.file?(x)
-      x
-    else
-      nil
-    end
-  end.flatten.compact
-
+  s.extra_rdoc_files = extra_rdoc_files(manifest)
   s.files = manifest
-  s.homepage = %q{http://rainbows.rubyforge.org/}
-  s.summary = %q{Unicorn for sleepy apps and slow clients}
-  s.rdoc_options = [ "-t", "Rainbows! #{s.summary}" ]
+  s.homepage = Wrongdoc.config[:rdoc_url]
+  s.summary = summary
+  s.rdoc_options = rdoc_options
   s.require_paths = %w(lib)
   s.rubyforge_project = %q{rainbows}
 
@@ -46,6 +38,7 @@ Gem::Specification.new do |s|
   # we need Unicorn for the HTTP parser and process management
   s.add_dependency(%q<unicorn>, ["~> 3.1.0"])
   s.add_development_dependency(%q<isolate>, "~> 3.0.0")
+  s.add_development_dependency(%q<wrongdoc>, "~> 1.0.1")
 
   # optional runtime dependencies depending on configuration
   # see t/test_isolate.rb for the exact versions we've tested with
