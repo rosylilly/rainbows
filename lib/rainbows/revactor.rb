@@ -27,7 +27,7 @@ module Rainbows::Revactor
 
   include Rainbows::Base
   LOCALHOST = Kgio::LOCALHOST
-  TCP = ::Revactor::TCP::Socket
+  TCP = Revactor::TCP::Socket
 
   # once a client is accepted, it is processed in its entirety here
   # in 3 easy steps: read request, call app, write app response
@@ -73,7 +73,7 @@ module Rainbows::Revactor
       end
       write_body(client, body, range)
     end while alive
-  rescue ::Revactor::TCP::ReadError
+  rescue Revactor::TCP::ReadError
   rescue => e
     Rainbows::Error.write(io, e)
   ensure
@@ -136,13 +136,13 @@ module Rainbows::Revactor
     LISTENERS.map do |s|
       case s
       when TCPServer
-        l = ::Revactor::TCP.listen(s, nil)
-        [ l, T[:tcp_closed, ::Revactor::TCP::Socket],
-          T[:tcp_connection, l, ::Revactor::TCP::Socket] ]
+        l = Revactor::TCP.listen(s, nil)
+        [ l, T[:tcp_closed, Revactor::TCP::Socket],
+          T[:tcp_connection, l, Revactor::TCP::Socket] ]
       when UNIXServer
-        l = ::Revactor::UNIX.listen(s)
-        [ l, T[:unix_closed, ::Revactor::UNIX::Socket ],
-          T[:unix_connection, l, ::Revactor::UNIX::Socket] ]
+        l = Revactor::UNIX.listen(s)
+        [ l, T[:unix_closed, Revactor::UNIX::Socket ],
+          T[:unix_connection, l, Revactor::UNIX::Socket] ]
       end
     end
   end

@@ -9,7 +9,7 @@ module Rainbows::Revactor::Body
   if IO.method_defined?(:sendfile_nonblock)
     def write_body_file(client, body, range)
       sock = client.instance_variable_get(:@_io)
-      pfx = ::Revactor::TCP::Socket === client ? :tcp : :unix
+      pfx = Revactor::TCP::Socket === client ? :tcp : :unix
       write_complete = T[:"#{pfx}_write_complete", client]
       closed = T[:"#{pfx}_closed", client]
       offset, count = range ? range : [ 0, body.stat.size ]

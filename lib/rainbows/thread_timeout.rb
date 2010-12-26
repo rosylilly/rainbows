@@ -33,7 +33,7 @@ require 'thread'
 class Rainbows::ThreadTimeout
 
   # :stopdoc:
-  class ExecutionExpired < ::Exception
+  class ExecutionExpired < Exception
   end
 
   def initialize(app, opts)

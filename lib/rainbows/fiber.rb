@@ -24,8 +24,8 @@ module Rainbows::Fiber
   # right?).  Calling this directly is deprecated, use
   # Rainbows.sleep(seconds) instead.
   def self.sleep(seconds)
-    ZZ[::Fiber.current] = Time.now + seconds
-    ::Fiber.yield
+    ZZ[Fiber.current] = Time.now + seconds
+    Fiber.yield
   end
 
   autoload :Base, 'rainbows/fiber/base'
