@@ -3,8 +3,8 @@
 require 'thread'
 require 'rainbows/rev/master'
 
-RUBY_VERSION =~ %r{\A1\.8} && Rev::VERSION < "0.3.2" and
-  warn "Rev (< 0.3.2) and Threads do not mix well under Ruby 1.8"
+RUBY_VERSION =~ %r{\A1\.8} and
+  warn "Rev and Threads do not mix well under Ruby 1.8"
 
 module Rainbows
   module Rev
