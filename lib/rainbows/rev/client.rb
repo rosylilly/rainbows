@@ -125,9 +125,8 @@ class Rainbows::Rev::Client < ::Rev::IO
     @env[REMOTE_ADDR] = @_io.kgio_addr
     response = APP.call(@env.update(RACK_DEFAULTS))
 
-    rev_write_response(response, alive = @hp.keepalive? && G.alive)
+    rev_write_response(response, alive = @hp.next? && G.alive)
     return quit unless alive && :close != @state
-    @hp.reset
     @state = :headers
     disable if enabled?
   end

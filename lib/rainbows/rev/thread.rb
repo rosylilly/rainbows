@@ -20,11 +20,10 @@ module Rainbows
 
       # this is only called in the master thread
       def response_write(response)
-        alive = @hp.keepalive? && G.alive
+        alive = @hp.next? && G.alive
         rev_write_response(response, alive)
         return quit unless alive && :close != @state
 
-        @hp.reset
         @state = :headers
       end
 

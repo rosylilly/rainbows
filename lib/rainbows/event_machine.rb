@@ -91,10 +91,9 @@ module Rainbows::EventMachine
       # long-running async response
       (response.nil? || -1 == response[0]) and return @state = :close
 
-      alive = @hp.keepalive? && G.alive && G.kato > 0
+      alive = @hp.next? && G.alive && G.kato > 0
       em_write_response(response, alive)
       if alive
-        @hp.reset
         @state = :headers
         if @buf.empty?
           set_comm_inactivity_timeout(G.kato)
