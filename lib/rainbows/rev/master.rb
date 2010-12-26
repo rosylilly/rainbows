@@ -1,7 +1,6 @@
 # -*- encoding: binary -*-
 # :enddoc:
-require 'rainbows/rev'
-
+require 'thread'
 class Rainbows::Rev::Master < Rev::IOWatcher
 
   def initialize(queue)

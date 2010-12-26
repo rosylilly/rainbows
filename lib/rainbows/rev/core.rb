@@ -1,9 +1,5 @@
 # -*- encoding: binary -*-
 # :enddoc:
-require 'rev'
-Rev::VERSION >= '0.3.0' or abort 'rev >= 0.3.0 is required'
-require 'rainbows/rev/heartbeat'
-require 'rainbows/rev/server'
 module Rainbows::Rev::Core
   include Rainbows::Base
 

@@ -1,7 +1,6 @@
 # -*- encoding: binary -*-
 require 'eventmachine'
 EM::VERSION >= '0.12.10' or abort 'eventmachine 0.12.10 is required'
-require 'rainbows/ev_core'
 
 # Implements a basic single-threaded event model with
 # {EventMachine}[http://rubyeventmachine.com/].  It is capable of

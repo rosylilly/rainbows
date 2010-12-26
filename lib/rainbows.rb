@@ -46,6 +46,7 @@ module Rainbows
   autoload :DevFdResponse, 'rainbows/dev_fd_response'
   autoload :MaxBody, 'rainbows/max_body'
   autoload :QueuePool, 'rainbows/queue_pool'
+  autoload :EvCore, 'rainbows/ev_core'
 
   class << self
 

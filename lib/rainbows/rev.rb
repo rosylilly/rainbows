@@ -1,4 +1,6 @@
 # -*- encoding: binary -*-
+require 'rev'
+Rev::VERSION >= '0.3.0' or abort 'rev >= 0.3.0 is required'
 
 # Implements a basic single-threaded event model with
 # {Rev}[http://rev.rubyforge.org/].  It is capable of handling
@@ -30,11 +32,16 @@ module Rainbows::Rev
     CONN.compare_by_identity
     KATO.compare_by_identity
   end
+
+  autoload :Master, 'rainbows/rev/master'
+  autoload :ThreadClient, 'rainbows/rev/thread_client'
+  autoload :DeferredChunkResponse, 'rainbows/rev/deferred_chunk_response'
   # :startdoc:
 end
 # :enddoc:
+require 'rainbows/rev/heartbeat'
+require 'rainbows/rev/server'
 require 'rainbows/rev/core'
 require 'rainbows/rev/deferred_response'
-require 'rainbows/rev/deferred_chunk_response'
 require 'rainbows/rev/client'
 Rainbows::Rev.__send__ :include, Rainbows::Rev::Core

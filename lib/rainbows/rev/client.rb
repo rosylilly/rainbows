@@ -1,6 +1,5 @@
 # -*- encoding: binary -*-
 # :enddoc:
-require 'rainbows/ev_core'
 class Rainbows::Rev::Client < ::Rev::IO
   include Rainbows::EvCore
   G = Rainbows::G

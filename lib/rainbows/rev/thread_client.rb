@@ -1,7 +1,5 @@
 # -*- encoding: binary -*-
 # :enddoc:
-require 'thread'
-require 'rainbows/rev/master'
 
 RUBY_VERSION =~ %r{\A1\.8} and
   warn "Rev and Threads do not mix well under Ruby 1.8"
