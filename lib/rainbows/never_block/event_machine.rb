@@ -1,8 +1,13 @@
 # -*- encoding: binary -*-
 # :enddoc:
-module Rainbows
-  module NeverBlock
-    class Client < Rainbows::EventMachine::Client
+class Rainbows::NeverBlock::Client < Rainbows::EventMachine::Client
+  def app_call
+    POOL.spawn do
+      begin
+        super
+      rescue => e
+        handle_error(e)
+      end
     end
   end
 end
