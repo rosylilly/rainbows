@@ -48,12 +48,15 @@ man html:
 ChangeLog: GIT-VERSION-FILE .wrongdoc.yml
 	wrongdoc prepare
 
+manifest: ChangeLog GIT-VERSION-FILE
+	$(RM) -f .manifest
+	$(MAKE) .manifest
+
 .manifest:
 	(git ls-files && for i in $@ $(pkg_extra) ; do echo $$i; done) | \
 	  LC_ALL=C sort > $@+
 	cmp $@+ $@ || mv $@+ $@
 	$(RM) $@+
-
 
 doc: .document man html .wrongdoc.yml
 	$(MAKE) -C Documentation comparison.html
