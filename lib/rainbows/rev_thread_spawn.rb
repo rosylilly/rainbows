@@ -1,5 +1,5 @@
 # -*- encoding: binary -*-
-require 'rainbows/rev/thread'
+require 'rainbows/rev/thread_client'
 
 module Rainbows
 
