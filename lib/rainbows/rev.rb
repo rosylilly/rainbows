@@ -1,6 +1,4 @@
 # -*- encoding: binary -*-
-require 'rainbows/rev/core'
-require 'rainbows/rev/client'
 
 # Implements a basic single-threaded event model with
 # {Rev}[http://rev.rubyforge.org/].  It is capable of handling
@@ -21,7 +19,6 @@ require 'rainbows/rev/client'
 # temporary file before the application is entered.
 
 module Rainbows::Rev
-
   # :stopdoc:
   # keep-alive timeout scoreboard
   KATO = {}
@@ -33,9 +30,11 @@ module Rainbows::Rev
     CONN.compare_by_identity
     KATO.compare_by_identity
   end
-
-  include Rainbows::Rev::Core
   # :startdoc:
 end
+# :enddoc:
+require 'rainbows/rev/core'
+require 'rainbows/rev/client'
+Rainbows::Rev.__send__ :include, Rainbows::Rev::Core
 require 'rainbows/rev/deferred_response'
 require 'rainbows/rev/deferred_chunk_response'
