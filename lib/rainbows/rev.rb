@@ -34,7 +34,7 @@ module Rainbows::Rev
 end
 # :enddoc:
 require 'rainbows/rev/core'
-require 'rainbows/rev/client'
-Rainbows::Rev.__send__ :include, Rainbows::Rev::Core
 require 'rainbows/rev/deferred_response'
 require 'rainbows/rev/deferred_chunk_response'
+require 'rainbows/rev/client'
+Rainbows::Rev.__send__ :include, Rainbows::Rev::Core
