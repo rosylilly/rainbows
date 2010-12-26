@@ -1,6 +1,6 @@
 # -*- encoding: binary -*-
 # :enddoc:
-class Rainbows::Rev::Server < ::Rev::IO
+class Rainbows::Rev::Server < Rev::IO
   CONN = Rainbows::Rev::CONN
   # CL and MAX will be defined in the corresponding worker loop
 

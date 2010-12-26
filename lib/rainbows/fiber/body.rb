@@ -11,7 +11,7 @@ module Rainbows::Fiber::Body # :nodoc:
   }
 
   # the sendfile 1.0.0+ gem includes IO#sendfile_nonblock
-  if ::IO.method_defined?(:sendfile_nonblock)
+  if IO.method_defined?(:sendfile_nonblock)
     def write_body_file(client, body, range)
       sock, n = client.to_io, nil
       offset, count = range ? range : [ 0, body.stat.size ]

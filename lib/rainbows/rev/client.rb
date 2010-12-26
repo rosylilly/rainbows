@@ -1,6 +1,6 @@
 # -*- encoding: binary -*-
 # :enddoc:
-class Rainbows::Rev::Client < ::Rev::IO
+class Rainbows::Rev::Client < Rev::IO
   include Rainbows::EvCore
   G = Rainbows::G
   SF = Rainbows::StreamFile
@@ -25,7 +25,7 @@ class Rainbows::Rev::Client < ::Rev::IO
     close if @deferred.nil? && @_write_buffer.empty?
   end
 
-  # override the ::Rev::IO#write method try to write directly to the
+  # override the Rev::IO#write method try to write directly to the
   # kernel socket buffers to avoid an extra userspace copy if
   # possible.
   def write(buf)

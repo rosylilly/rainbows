@@ -12,7 +12,7 @@ module Rainbows::Rev::Core
     Rainbows::Rev::Client.__send__(:include, Rainbows::Rev::Sendfile)
     init_worker_process(worker)
     mod = Rainbows.const_get(@use)
-    rloop = Rainbows::Rev::Server.const_set(:LOOP, ::Rev::Loop.default)
+    rloop = Rainbows::Rev::Server.const_set(:LOOP, Rev::Loop.default)
     Rainbows::Rev::Client.const_set(:LOOP, rloop)
     Rainbows::Rev::Server.const_set(:MAX, @worker_connections)
     Rainbows::Rev::Server.const_set(:CL, mod.const_get(:Client))
