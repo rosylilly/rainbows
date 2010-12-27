@@ -60,7 +60,7 @@ module Rainbows
       case G.server.use
       when :FiberPool, :FiberSpawn
         Rainbows::Fiber.sleep(nr)
-      when :RevFiberSpawn
+      when :RevFiberSpawn, :CoolioFiberSpawn
         Rainbows::Fiber::Rev::Sleeper.new(nr)
       when :Revactor
         Actor.sleep(nr)
@@ -98,12 +98,16 @@ module Rainbows
     :Rev => 50,
     :RevThreadSpawn => 50,
     :RevThreadPool => 50,
+    :RevFiberSpawn => 50,
+    :Coolio => 50,
+    :CoolioThreadSpawn => 50,
+    :CoolioThreadPool => 50,
+    :CoolioFiberSpawn => 50,
     :EventMachine => 50,
     :FiberSpawn => 50,
     :FiberPool => 50,
     :ActorSpawn => 50,
     :NeverBlock => 50,
-    :RevFiberSpawn => 50,
   }.each do |model, _|
     u = model.to_s.gsub(/([a-z0-9])([A-Z0-9])/) { "#{$1}_#{$2.downcase!}" }
     autoload model, "rainbows/#{u.downcase!}"

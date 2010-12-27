@@ -23,7 +23,7 @@ Isolate.now!(opts) do
     gem 'sendfile', '1.0.0' # next Rubinius should support this
 
     gem 'iobuffer', '0.1.3'
-    gem 'rev', '0.3.2'
+    gem 'cool.io', '1.0.0'
 
     gem 'eventmachine', '0.12.10'
     gem 'sinatra', '1.0.0'
@@ -41,4 +41,9 @@ Isolate.now!(opts) do
 end
 
 $stdout.reopen(old_out)
-puts Dir["#{path}/gems/*-*/lib"].map { |x| File.expand_path(x) }.join(':')
+
+# don't load the old Rev if it exists, Cool.io 1.0.0 is compatible with it,
+# even for everything Revactor uses.
+dirs = Dir["#{path}/gems/*-*/lib"]
+dirs.delete_if { |x| x =~ %r{/rev-[\d\.]+/lib} }
+puts dirs.map { |x| File.expand_path(x) }.join(':')

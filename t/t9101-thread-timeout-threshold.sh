@@ -1,7 +1,9 @@
 #!/bin/sh
 . ./test-lib.sh
 case $model in
-ThreadSpawn|ThreadPool|RevThreadSpawn|RevThreadPool) ;;
+ThreadSpawn|ThreadPool) ;;
+RevThreadSpawn|RevThreadPool) ;;
+CoolioThreadSpawn|CoolioThreadPool) ;;
 *) t_info "$0 is only compatible with Thread*"; exit 0 ;;
 esac
 

@@ -53,7 +53,9 @@ class Rainbows::MaxBody
   def self.setup # :nodoc:
     Rainbows.max_bytes or return
     case Rainbows::G.server.use
-    when :Rev, :EventMachine, :NeverBlock, :RevThreadSpawn, :RevThreadPool
+    when :Rev, :Coolio, :EventMachine, :NeverBlock,
+         :RevThreadSpawn, :RevThreadPool,
+         :CoolioThreadSpawn, :CoolioThreadPool
       return
     end
 

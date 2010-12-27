@@ -200,6 +200,7 @@ req_curl_chunked_upload_err_check () {
 
 case $model in
 Rev) require_check rev Rev::VERSION ;;
+Coolio) require_check coolio Coolio::VERSION ;;
 Revactor) require_check revactor Revactor::VERSION ;;
 EventMachine) require_check eventmachine EventMachine::VERSION ;;
 esac

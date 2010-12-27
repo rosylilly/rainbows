@@ -88,7 +88,8 @@ class Rainbows::AppPool < Struct.new(:pool, :re)
     # concurrency models
     self.re ||= begin
       case env["rainbows.model"]
-      when :FiberSpawn, :FiberPool, :Revactor, :NeverBlock, :RevFiberSpawn
+      when :FiberSpawn, :FiberPool, :Revactor, :NeverBlock,
+           :RevFiberSpawn, :CoolioFiberSpawn
         self.pool = Rainbows::Fiber::Queue.new(pool)
       end
       true

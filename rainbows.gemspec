@@ -49,6 +49,9 @@ Gem::Specification.new do |s|
   # Revactor depends on Rev, too, 0.3.0 got the ability to attach IOs
   # s.add_dependency(%q<rev>, [">= 0.3.2"])
   #
+  # Cool.io is the new Rev, but it doesn't work with Revactor
+  # s.add_dependency(%q<cool.io>, [">= 1.0"])
+  #
   # Rev depends on IOBuffer, which got faster in 0.1.3
   # s.add_dependency(%q<iobuffer>, [">= 0.1.3"])
   #

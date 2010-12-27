@@ -1,6 +1,8 @@
 #!/bin/sh
 . ./test-lib.sh
-skip_models EventMachine NeverBlock Rev RevThreadSpawn RevThreadPool
+skip_models EventMachine NeverBlock
+skip_models Rev RevThreadSpawn RevThreadPool
+skip_models Coolio CoolioThreadSpawn CoolioThreadPool
 
 t_plan 4 "rewindable_input toggled to true"
 
