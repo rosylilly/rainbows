@@ -31,7 +31,6 @@ module Rainbows::Fiber::Rev::Methods
   def kgio_wait_readable
     @r = Watcher.new(self, :r) unless defined?(@r)
     @r.enable unless @r.enabled?
-    KATO << Fiber.current
     Fiber.yield
     @r.disable
   end

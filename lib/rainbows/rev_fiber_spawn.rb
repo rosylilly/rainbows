@@ -22,8 +22,6 @@ module Rainbows::RevFiberSpawn
     Rainbows::Fiber::Base.setup(Server, nil)
     Server.const_set(:APP, G.server.app)
     Heartbeat.new(1, true).attach(Rev::Loop.default)
-    kato = Kato.new.attach(Rev::Loop.default)
-    Rainbows::Fiber::Rev::Methods.const_set(:KATO, kato)
     LISTENERS.map! { |s| Server.new(s).attach(Rev::Loop.default) }
     Rev::Loop.default.run
   end
