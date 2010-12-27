@@ -8,7 +8,12 @@
 module Rainbows::Fiber::IO::Methods
   RD = Rainbows::Fiber::RD
   WR = Rainbows::Fiber::WR
+  ZZ = Rainbows::Fiber::ZZ
   attr_accessor :f
+
+  def read_expire
+    ZZ[Fiber.current] = super
+  end
 
   # for wrapping output response bodies
   def each(&block)
@@ -30,6 +35,7 @@ module Rainbows::Fiber::IO::Methods
     @f = Fiber.current
     RD[fd] = self
     Fiber.yield
+    ZZ.delete @f
     RD[fd] = nil
   end
 

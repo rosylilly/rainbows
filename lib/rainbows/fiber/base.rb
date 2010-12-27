@@ -18,11 +18,10 @@ module Rainbows::Fiber::Base
   # for one second (returned by the schedule_sleepers method) which
   # will cause it.
   def schedule(&block)
-    ret = begin
+    begin
       G.tick
-      RD.compact.each { |c| c.f.resume } # attempt to time out idle clients
       t = schedule_sleepers
-      select(RD.compact.concat(LISTENERS), WR.compact, nil, t) or return
+      ret = select(RD.compact.concat(LISTENERS), WR.compact, nil, t)
     rescue Errno::EINTR
       retry
     rescue Errno::EBADF, TypeError
@@ -30,15 +29,15 @@ module Rainbows::Fiber::Base
       raise
     end or return
 
-    # active writers first, then _all_ readers for keepalive timeout
-    ret[1].concat(RD.compact).each { |c| c.f.resume }
+    # active writers first, then readers
+    ret[1].concat(RD.compact & ret[0]).each { |c| c.f.resume }
 
     # accept is an expensive syscall, filter out listeners we don't want
     (ret[0] & LISTENERS).each(&block)
   end
 
-  # wakes up any sleepers that need to be woken and
-  # returns an interval to IO.select on
+  # wakes up any sleepers or keepalive-timeout violators that need to be
+  # woken and returns an interval to IO.select on
   def schedule_sleepers
     max = nil
     now = Time.now

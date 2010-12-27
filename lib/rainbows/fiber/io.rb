@@ -82,7 +82,7 @@ class Rainbows::Fiber::IO
         case rv = @to_io.kgio_tryread(16384, buf)
         when :wait_readable
           return if expire && expire < Time.now
-          expire ||= Time.now + G.kato
+          expire ||= read_expire
           kgio_wait_readable
         else
           return rv
@@ -93,7 +93,7 @@ class Rainbows::Fiber::IO
         return @to_io.read_nonblock(16384, buf)
       rescue Errno::EAGAIN
         return if expire && expire < Time.now
-        expire ||= Time.now + G.kato
+        expire ||= read_expire
         kgio_wait_readable
       end while true
     end
