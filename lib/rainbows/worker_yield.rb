@@ -1,3 +1,4 @@
+# -*- encoding: binary -*-
 # :enddoc:
 module Rainbows::WorkerYield
 

@@ -1,4 +1,5 @@
 # -*- encoding: binary -*-
+# :enddoc:
 # used to wrap a BasicSocket to use with +q+ for all writes
 # this is compatible with IO.select
 class Rainbows::WriterThreadSpawn::Client < Struct.new(:to_io, :q, :thr)

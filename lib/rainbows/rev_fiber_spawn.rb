@@ -1,6 +1,8 @@
 # -*- encoding: binary -*-
 require 'rainbows/fiber/rev'
 
+# CoolioFiberSpawn is the new version of this, use that instead.
+#
 # A combination of the Rev and FiberSpawn models.  This allows Ruby
 # 1.9 Fiber-based concurrency for application processing while
 # exposing a synchronous execution model and using scalable network

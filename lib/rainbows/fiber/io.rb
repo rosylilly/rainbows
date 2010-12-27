@@ -18,7 +18,7 @@ class Rainbows::Fiber::IO
   end
   # :startdoc:
 
-  # needed to write errors with
+  # no longer used internally within Rainbows!, only for compatibility
   def write_nonblock(buf)
     @to_io.write_nonblock(buf)
   end

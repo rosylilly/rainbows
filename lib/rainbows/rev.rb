@@ -8,6 +8,8 @@ rescue LoadError
 end
 require 'rev' if defined?(Coolio)
 
+# Coolio is the new version of this, use that instead.
+#
 # Implements a basic single-threaded event model with
 # {Rev}[http://rev.rubyforge.org/].  It is capable of handling
 # thousands of simultaneous client connections, but with only a

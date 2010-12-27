@@ -1,5 +1,7 @@
 # -*- encoding: binary -*-
 
+# CoolioThreadPool is the new version of this, use that instead.
+#
 # A combination of the Rev and ThreadPool models.  This allows Ruby
 # Thread-based concurrency for application processing.  It DOES NOT
 # expose a streamable "rack.input" for upload processing within the
