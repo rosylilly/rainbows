@@ -54,7 +54,7 @@ module Rainbows::ThreadPool
       # all working off the same socket could be a thundering herd
       # problem.  On the other hand, a thundering herd may not
       # even incur as much overhead as an extra Mutex#synchronize
-      ret = IO.select(LISTENERS, nil, nil, 1) and ret[0].each do |s|
+      ret = select(LISTENERS) and ret[0].each do |s|
         s = s.kgio_tryaccept and process_client(s)
       end
     rescue Errno::EINTR
