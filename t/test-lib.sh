@@ -126,7 +126,7 @@ EOF
 		if test $# -ge 1
 		then
 			echo "  use :$1"
-			test $# -eq 2 && echo "  worker_connections $2"
+			test $# -ge 2 && echo "  worker_connections $2"
 			if test $# -eq 3
 			then
 				echo "  keepalive_timeout $3"
