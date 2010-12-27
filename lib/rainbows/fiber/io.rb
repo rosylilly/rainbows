@@ -59,19 +59,17 @@ class Rainbows::Fiber::IO
     else
       begin
         (rv = @to_io.write_nonblock(buf)) == buf.bytesize and return
-        buf = byte_slice(buf, rv..-1)
+        buf = byte_slice(buf, rv)
       rescue Errno::EAGAIN
         kgio_wait_writable
       end while true
     end
   end
 
-  def byte_slice(buf, range) # :nodoc:
-    if buf.encoding != Encoding::BINARY
-      buf.dup.force_encoding(Encoding::BINARY)[range]
-    else
-      buf[range]
-    end
+  def byte_slice(buf, start) # :nodoc:
+    buf.encoding == Encoding::BINARY or
+      buf = buf.dup.force_encoding(Encoding::BINARY)
+    buf.slice(start, buf.size)
   end
 
   # used for reading headers (respecting keepalive_timeout)
