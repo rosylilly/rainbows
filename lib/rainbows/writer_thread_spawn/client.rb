@@ -4,6 +4,7 @@
 class Rainbows::WriterThreadSpawn::Client < Struct.new(:to_io, :q, :thr)
   include Rainbows::Response
   include Rainbows::SocketProxy
+  include Rainbows::WorkerYield
 
   CUR = {} # :nodoc:
 
@@ -17,12 +18,10 @@ class Rainbows::WriterThreadSpawn::Client < Struct.new(:to_io, :q, :thr)
   end
 
   def queue_writer
-    # not using Thread.pass here because that spins the CPU during
-    # I/O wait and will eat cycles from other worker processes.
     until CUR.size < MAX
       CUR.delete_if { |t,_|
         t.alive? ? t.join(0) : true
-      }.size >= MAX and sleep(0.01)
+      }.size >= MAX and worker_yield
     end
 
     q = Queue.new

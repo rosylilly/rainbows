@@ -113,6 +113,7 @@ module Rainbows
   autoload :StreamFile, 'rainbows/stream_file'
   autoload :HttpResponse, 'rainbows/http_response' # deprecated
   autoload :ThreadTimeout, 'rainbows/thread_timeout'
+  autoload :WorkerYield, 'rainbows/worker_yield'
 end
 
 require 'rainbows/error'

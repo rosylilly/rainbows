@@ -18,6 +18,7 @@ module Rainbows
 
   module ThreadSpawn
     include Base
+    include Rainbows::WorkerYield
 
     def accept_loop(klass) #:nodoc:
       lock = Mutex.new
@@ -26,16 +27,7 @@ module Rainbows
         klass.new(l) do |l|
           begin
             if lock.synchronize { G.cur >= limit }
-              # Sleep if we're busy, another less busy worker process may
-              # take it for us if we sleep. This is gross but other options
-              # still suck because they require expensive/complicated
-              # synchronization primitives for _every_ case, not just this
-              # unlikely one.  Since this case is (or should be) uncommon,
-              # just busy wait when we have to.
-              # We don't use Thread.pass because it needlessly spins the
-              # CPU during I/O wait, CPU cycles that can be better used
-              # by other worker _processes_.
-              sleep(0.01)
+              worker_yield
             elsif c = l.kgio_accept
               klass.new(c) do |c|
                 begin
