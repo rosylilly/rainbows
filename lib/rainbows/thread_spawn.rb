@@ -1,54 +1,52 @@
 # -*- encoding: binary -*-
 require 'thread'
-module Rainbows
 
-  # Spawns a new thread for every client connection we accept().  This
-  # model is recommended for platforms like Ruby 1.8 where spawning new
-  # threads is inexpensive.
-  #
-  # This model should provide a high level of compatibility with all
-  # Ruby implementations, and most libraries and applications.
-  # Applications running under this model should be thread-safe
-  # but not necessarily reentrant.
-  #
-  # If you're connecting to external services and need to perform DNS
-  # lookups, consider using the "resolv-replace" library which replaces
-  # parts of the core Socket package with concurrent DNS lookup
-  # capabilities
+# Spawns a new thread for every client connection we accept().  This
+# model is recommended for platforms like Ruby 1.8 where spawning new
+# threads is inexpensive.
+#
+# This model should provide a high level of compatibility with all
+# Ruby implementations, and most libraries and applications.
+# Applications running under this model should be thread-safe
+# but not necessarily reentrant.
+#
+# If you're connecting to external services and need to perform DNS
+# lookups, consider using the "resolv-replace" library which replaces
+# parts of the core Socket package with concurrent DNS lookup
+# capabilities
 
-  module ThreadSpawn
-    include Base
-    include Rainbows::WorkerYield
+module Rainbows::ThreadSpawn
+  include Rainbows::Base
+  include Rainbows::WorkerYield
 
-    def accept_loop(klass) #:nodoc:
-      lock = Mutex.new
-      limit = worker_connections
-      LISTENERS.each do |l|
-        klass.new(l) do |l|
-          begin
-            if lock.synchronize { G.cur >= limit }
-              worker_yield
-            elsif c = l.kgio_accept
-              klass.new(c) do |c|
-                begin
-                  lock.synchronize { G.cur += 1 }
-                  process_client(c)
-                ensure
-                  lock.synchronize { G.cur -= 1 }
-                end
+  def accept_loop(klass) #:nodoc:
+    lock = Mutex.new
+    limit = worker_connections
+    LISTENERS.each do |l|
+      klass.new(l) do |l|
+        begin
+          if lock.synchronize { G.cur >= limit }
+            worker_yield
+          elsif c = l.kgio_accept
+            klass.new(c) do |c|
+              begin
+                lock.synchronize { G.cur += 1 }
+                process_client(c)
+              ensure
+                lock.synchronize { G.cur -= 1 }
               end
             end
-          rescue => e
-            Error.listen_loop(e)
-          end while G.alive
-        end
+          end
+        rescue => e
+          Rainbows::Error.listen_loop(e)
+        end while G.alive
       end
-      sleep 1 while G.tick || lock.synchronize { G.cur > 0 }
     end
+    sleep 1 while G.tick || lock.synchronize { G.cur > 0 }
+  end
 
-    def worker_loop(worker) #:nodoc:
-      init_worker_process(worker)
-      accept_loop(Thread)
-    end
+  def worker_loop(worker) #:nodoc:
+    init_worker_process(worker)
+    accept_loop(Thread)
   end
 end
