@@ -42,6 +42,7 @@ EOF
 }
 
 t_begin "reload to avoid race condition" && {
+	curl -sSf http://$listen/ >/dev/null
 	kill -HUP $rainbows_pid
 	test xSTART = x"$(cat $fifo)"
 }
