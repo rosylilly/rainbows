@@ -23,7 +23,6 @@ models += WriterThreadPool
 models += WriterThreadSpawn
 models += ThreadPool
 models += ThreadSpawn
-models += Rev
 models += Coolio
 models += EventMachine
 models += NeverBlock
@@ -35,9 +34,6 @@ ifeq ($(RUBY_ENGINE),ruby)
     models += Revactor
     models += FiberSpawn
     models += FiberPool
-    models += RevThreadPool
-    models += RevThreadSpawn
-    models += RevFiberSpawn
     models += CoolioThreadPool
     models += CoolioThreadSpawn
     models += CoolioFiberSpawn

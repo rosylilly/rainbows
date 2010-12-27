@@ -1,11 +1,6 @@
 # -*- encoding: binary -*-
 # :enddoc:
-begin
-  require 'coolio'
-rescue LoadError
-  require 'rev'
-end
-require 'rev' if defined?(Coolio)
+require 'rainbows/coolio_support'
 require 'rainbows/fiber'
 require 'rainbows/fiber/io'
 

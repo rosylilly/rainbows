@@ -21,19 +21,19 @@ suck; differently.
 
 For network concurrency, models we currently support are:
 
-* {RevFiberSpawn}[link:Rainbows/RevFiberSpawn.html]
-* {Revactor}[link:Rainbows/Revactor.html]
-* {ThreadPool}[link:Rainbows/ThreadPool.html]
-* {Rev}[link:Rainbows/Rev.html]
-* {ThreadSpawn}[link:Rainbows/ThreadSpawn.html]
+* {Coolio}[link:Rainbows/Coolio.html]
 * {EventMachine}[link:Rainbows/EventMachine.html]
-* {RevThreadSpawn}[link:Rainbows/RevThreadSpawn.html]
 * {FiberSpawn}[link:Rainbows/FiberSpawn.html]
 * {FiberPool}[link:Rainbows/FiberPool.html]
 * {NeverBlock}[link:Rainbows/NeverBlock.html]
-* {RevThreadPool}[link:Rainbows/RevThreadPool.html]
+* {Revactor}[link:Rainbows/Revactor.html]
+* {ThreadPool}[link:Rainbows/ThreadPool.html]
+* {ThreadSpawn}[link:Rainbows/ThreadSpawn.html]
 * {WriterThreadPool}[link:Rainbows/WriterThreadPool.html]
 * {WriterThreadSpawn}[link:Rainbows/WriterThreadSpawn.html]
+* {CoolioFiberSpawn}[link:Rainbows/CoolioFiberSpawn.html]
+* {CoolioThreadPool}[link:Rainbows/CoolioThreadPool.html]
+* {CoolioThreadSpawn}[link:Rainbows/CoolioThreadSpawn.html]
 
 We have {many more on the way}[link:TODO.html] for handling network
 concurrency.  Additionally, we also use multiple processes (managed by
