@@ -22,7 +22,7 @@ module Rainbows::Fiber::Base
       G.tick
       RD.compact.each { |c| c.f.resume } # attempt to time out idle clients
       t = schedule_sleepers
-      Kernel.select(RD.compact.concat(LISTENERS), WR.compact, nil, t) or return
+      select(RD.compact.concat(LISTENERS), WR.compact, nil, t) or return
     rescue Errno::EINTR
       retry
     rescue Errno::EBADF, TypeError
