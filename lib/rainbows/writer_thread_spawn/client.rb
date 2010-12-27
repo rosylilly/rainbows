@@ -7,6 +7,15 @@ class Rainbows::WriterThreadSpawn::Client < Struct.new(:to_io, :q, :thr)
 
   CUR = {} # :nodoc:
 
+  def self.quit
+    g = Rainbows::G
+    CUR.delete_if do |t,q|
+      q << nil
+      g.tick
+      t.alive? ? t.join(0.01) : true
+    end until CUR.empty?
+  end
+
   def queue_writer
     # not using Thread.pass here because that spins the CPU during
     # I/O wait and will eat cycles from other worker processes.

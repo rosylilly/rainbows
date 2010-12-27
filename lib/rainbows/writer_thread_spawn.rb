@@ -32,12 +32,8 @@ module Rainbows::WriterThreadSpawn
 
   def worker_loop(worker)  # :nodoc:
     Client.const_set(:MAX, worker_connections)
-    super(worker) # accept loop from Unicorn
-    Client::CUR.delete_if do |t,q|
-      q << nil
-      G.tick
-      t.alive? ? t.join(0.01) : true
-    end until Client::CUR.empty?
+    super # accept loop from Unicorn
+    Client.quit
   end
   # :startdoc:
 end
