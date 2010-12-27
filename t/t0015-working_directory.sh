@@ -6,7 +6,7 @@ then
 fi
 . ./test-lib.sh
 
-t_plan 5 "config.ru inside alt working_directory"
+t_plan 6 "config.ru inside alt working_directory"
 
 t_begin "setup and start" && {
 	rainbows_setup
@@ -39,6 +39,11 @@ EOF
 	# rely on --daemonize switch, no & or -D
 	rainbows -c $unicorn_config
 	rainbows_wait_start
+}
+
+t_begin "reload to avoid race condition" && {
+	kill -HUP $rainbows_pid
+	test xSTART = x"$(cat $fifo)"
 }
 
 t_begin "hit with curl" && {
