@@ -38,7 +38,7 @@ module Rainbows::Response
     range_class = body_class = klass
     case Rainbows::Const::RACK_DEFAULTS['rainbows.model']
     when :WriterThreadSpawn
-      body_class = Rainbows::WriterThreadSpawn::MySocket
+      body_class = Rainbows::WriterThreadSpawn::Client
       range_class = Rainbows::HttpServer
     when :EventMachine, :NeverBlock
       range_class = nil # :<

@@ -20,24 +20,6 @@ module Rainbows::WriterThreadPool
   # :stopdoc:
   include Rainbows::Base
 
-  # used to wrap a BasicSocket to use with +q+ for all writes
-  # this is compatible with IO.select
-  class QueueSocket < Struct.new(:to_io, :q) # :nodoc:
-    include Rainbows::SocketProxy
-
-    def write(buf)
-      q << [ to_io, buf ]
-    end
-
-    def close
-      q << [ to_io, :close ]
-    end
-
-    def closed?
-      false
-    end
-  end
-
   @@nr = 0
   @@q = nil
 
@@ -47,7 +29,7 @@ module Rainbows::WriterThreadPool
 
   def process_client(client) # :nodoc:
     @@nr += 1
-    super(QueueSocket.new(client, @@q[@@nr %= @@q.size]))
+    super(Client.new(client, @@q[@@nr %= @@q.size]))
   end
 
   def init_worker_process(worker)
@@ -82,3 +64,5 @@ module Rainbows::WriterThreadPool
   end
   # :startdoc:
 end
+# :enddoc:
+require 'rainbows/writer_thread_pool/client'
