@@ -23,25 +23,7 @@ module Rainbows::WriterThreadPool
   # used to wrap a BasicSocket to use with +q+ for all writes
   # this is compatible with IO.select
   class QueueSocket < Struct.new(:to_io, :q) # :nodoc:
-    def kgio_addr
-      to_io.kgio_addr
-    end
-
-    def kgio_read(size, buf = "")
-      to_io.kgio_read(size, buf)
-    end
-
-    def kgio_read!(size, buf = "")
-      to_io.kgio_read!(size, buf)
-    end
-
-    def kgio_trywrite(buf)
-      to_io.kgio_trywrite(buf)
-    end
-
-    def timed_read(buf)
-      to_io.timed_read(buf)
-    end
+    include Rainbows::SocketProxy
 
     def write(buf)
       q << [ to_io, buf ]

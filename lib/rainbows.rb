@@ -47,6 +47,7 @@ module Rainbows
   autoload :MaxBody, 'rainbows/max_body'
   autoload :QueuePool, 'rainbows/queue_pool'
   autoload :EvCore, 'rainbows/ev_core'
+  autoload :SocketProxy, 'rainbows/socket_proxy'
 
   class << self
 

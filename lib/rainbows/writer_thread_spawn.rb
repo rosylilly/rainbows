@@ -28,26 +28,7 @@ module Rainbows::WriterThreadSpawn
   # this is compatible with IO.select
   class MySocket < Struct.new(:to_io, :q, :thr)  # :nodoc: all
     include Rainbows::Response
-
-    def kgio_addr
-      to_io.kgio_addr
-    end
-
-    def kgio_read(size, buf = "")
-      to_io.kgio_read(size, buf)
-    end
-
-    def kgio_read!(size, buf = "")
-      to_io.kgio_read!(size, buf)
-    end
-
-    def kgio_trywrite(buf)
-      to_io.kgio_trywrite(buf)
-    end
-
-    def timed_read(buf)
-      to_io.timed_read(buf)
-    end
+    include Rainbows::SocketProxy
 
     def queue_writer
       # not using Thread.pass here because that spins the CPU during
