@@ -29,7 +29,11 @@ class Rainbows::DevFdResponse < Struct.new(:app)
     status, headers, body = response = app.call(env)
 
     # totally uninteresting to us if there's no body
-    return response if STATUS_WITH_NO_ENTITY_BODY.include?(status)
+    if STATUS_WITH_NO_ENTITY_BODY.include?(status.to_i) ||
+       File === body ||
+       (body.respond_to?(:to_path) && File.file?(body.to_path))
+      return response
+    end
 
     io = body.to_io if body.respond_to?(:to_io)
     io ||= File.open(body.to_path) if body.respond_to?(:to_path)
