@@ -13,6 +13,7 @@ module Rainbows::Configurator
   #     worker_connections 400
   #     keepalive_timeout 0 # zero disables keepalives entirely
   #     client_max_body_size 5*1024*1024 # 5 megabytes
+  #     keepalive_requests 666 # default:100
   #   end
   #
   #   # the rest of the Unicorn configuration
@@ -33,6 +34,14 @@ module Rainbows::Configurator
   # The default +client_max_body_size+ is 1 megabyte (1024 * 1024 bytes),
   # setting this to +nil+ will disable body size checks and allow any
   # size to be specified.
+  #
+  # The default +keepalive_requests+ is 100, meaning a client may
+  # complete 100 keepalive requests after the initial request before
+  # \Rainbows! forces a disconnect.  Lowering this can improve
+  # load-balancing characteristics as it forces HTTP/1.1 clients to
+  # reconnect after the specified number of requests, hopefully to a
+  # less busy host or worker process.  This may also be used to mitigate
+  # denial-of-service attacks that use HTTP pipelining.
   def Rainbows!(&block)
     block_given? or raise ArgumentError, "Rainbows! requires a block"
     Rainbows::HttpServer.setup(block)

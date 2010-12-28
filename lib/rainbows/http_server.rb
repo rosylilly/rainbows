@@ -90,8 +90,14 @@ class Rainbows::HttpServer < Unicorn::HttpServer
 
   def keepalive_timeout(nr)
     (Integer === nr && nr >= 0) or
-      raise ArgumentError, "keepalive must be a non-negative Integer"
+      raise ArgumentError, "keepalive_timeout must be a non-negative Integer"
     G.kato = nr
+  end
+
+  def keepalive_requests(nr)
+    Integer === nr or
+      raise ArgumentError, "keepalive_requests must be a non-negative Integer"
+    Unicorn::HttpRequest.keepalive_requests = nr
   end
 
   def client_max_body_size(nr)
