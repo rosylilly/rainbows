@@ -24,7 +24,13 @@ module Rainbows::WriterThreadPool
   @@q = nil
 
   def async_write_body(qclient, body, range)
-    qclient.q << [ qclient.to_io, :body, body, range ]
+    if body.respond_to?(:close)
+      Rainbows::SyncClose.new(body) do |body|
+        qclient.q << [ qclient.to_io, :body, body, range ]
+      end
+    else
+      qclient.q << [ qclient.to_io, :body, body, range ]
+    end
   end
 
   def process_client(client) # :nodoc:

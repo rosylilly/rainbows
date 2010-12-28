@@ -74,6 +74,7 @@ class Rainbows::Rev::Client < Rev::IO
   end
 
   def next!
+    attached? or return
     @deferred = nil
     enable_write_watcher
   end

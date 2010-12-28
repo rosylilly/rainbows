@@ -13,7 +13,7 @@ module Rainbows::Fiber::Body # :nodoc:
   # the sendfile 1.0.0+ gem includes IO#sendfile_nonblock
   if IO.method_defined?(:sendfile_nonblock)
     def write_body_file(client, body, range)
-      sock, n = client.to_io, nil
+      sock, n, body = client.to_io, nil, body_to_io(body)
       offset, count = range ? range : [ 0, body.stat.size ]
       begin
         offset += (n = sock.sendfile_nonblock(body, offset, count))
@@ -23,6 +23,8 @@ module Rainbows::Fiber::Body # :nodoc:
       rescue EOFError
         break
       end while (count -= n) > 0
+      ensure
+        close_if_private(body)
     end
   else
     ALIASES[:write_body] = :write_body_each

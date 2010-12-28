@@ -14,7 +14,7 @@ class Rainbows::Rev::DeferredResponse < Rev::IO
   end
 
   def on_close
-    @client.next! if @client.attached? # attached? is false if write fails
     @body.respond_to?(:close) and @body.close
+    @client.next!
   end
 end

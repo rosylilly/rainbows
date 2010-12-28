@@ -16,11 +16,13 @@ class Rainbows::EventMachine::Client < EM::Connection
     # (often a static file), we do not attempt to process another
     # request on the same connection until the first is complete
     if @body
-      @buf << data
-      @_io.shutdown(Socket::SHUT_RD) if @buf.size > 0x1c000
-      EM.next_tick { receive_data('') }
+      if data
+        @buf << data
+        @_io.shutdown(Socket::SHUT_RD) if @buf.size > 0x1c000
+      end
+      EM.next_tick { receive_data(nil) } unless @buf.empty?
     else
-      on_read(data)
+      on_read(data || "") if (@buf.size > 0) || data
     end
   end
 
@@ -43,15 +45,16 @@ class Rainbows::EventMachine::Client < EM::Connection
     # long-running async response
     (response.nil? || -1 == response[0]) and return @state = :close
 
-    alive = @hp.next? && G.alive && G.kato > 0
-    em_write_response(response, alive)
-    if alive
+    if @hp.next? && G.alive && G.kato > 0
       @state = :headers
+      em_write_response(response, true)
       if @buf.empty?
         set_comm_inactivity_timeout(G.kato)
-      else
-        EM.next_tick { receive_data('') }
+      elsif @body.nil?
+        EM.next_tick { receive_data(nil) }
       end
+    else
+      em_write_response(response, false)
     end
   end
 
@@ -84,7 +87,7 @@ class Rainbows::EventMachine::Client < EM::Connection
         @body.callback do
           body.close if body.respond_to?(:close)
           @body = nil
-          alive ? receive_data('') : quit
+          alive ? receive_data(nil) : quit
         end
         return
       elsif st.socket? || st.pipe?
@@ -100,6 +103,10 @@ class Rainbows::EventMachine::Client < EM::Connection
     write(response_header(status, headers)) if headers
     write_body_each(self, body)
     quit unless alive
+  end
+
+  def next!
+    @hp.keepalive? ? receive_data(@body = nil) : quit
   end
 
   def unbind

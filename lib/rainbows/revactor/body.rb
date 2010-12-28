@@ -8,6 +8,7 @@ module Rainbows::Revactor::Body
 
   if IO.method_defined?(:sendfile_nonblock)
     def write_body_file(client, body, range)
+      body = body_to_io(body)
       sock = client.instance_variable_get(:@_io)
       pfx = Revactor::TCP::Socket === client ? :tcp : :unix
       write_complete = T[:"#{pfx}_write_complete", client]
@@ -29,6 +30,8 @@ module Rainbows::Revactor::Body
       rescue EOFError
         break
       end while (count -= n) > 0
+      ensure
+        close_if_private(body)
     end
   else
     ALIASES[:write_body] = :write_body_each

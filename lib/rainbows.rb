@@ -118,6 +118,7 @@ module Rainbows
   autoload :HttpResponse, 'rainbows/http_response' # deprecated
   autoload :ThreadTimeout, 'rainbows/thread_timeout'
   autoload :WorkerYield, 'rainbows/worker_yield'
+  autoload :SyncClose, 'rainbows/sync_close'
 end
 
 require 'rainbows/error'

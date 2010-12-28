@@ -32,8 +32,14 @@ module Rainbows::Response::Body # :nodoc:
 
   FD_MAP = Rainbows::FD_MAP
 
+  class F < File; end
+
+  def close_if_private(io)
+    io.close if F === io
+  end
+
   def io_for_fd(fd)
-    FD_MAP.delete(fd) || IO.new(fd)
+    FD_MAP.delete(fd) || F.for_fd(fd)
   end
 
   # to_io is not part of the Rack spec, but make an exception here
@@ -47,13 +53,16 @@ module Rainbows::Response::Body # :nodoc:
       # try to take advantage of Rainbows::DevFdResponse, calling File.open
       # is a last resort
       path = body.to_path
-      path =~ %r{\A/dev/fd/(\d+)\z} ? io_for_fd($1.to_i) : File.open(path)
+      path =~ %r{\A/dev/fd/(\d+)\z} ? io_for_fd($1.to_i) : F.open(path)
     end
   end
 
   if IO.method_defined?(:sendfile_nonblock)
     def write_body_file(sock, body, range)
-      range ? sock.sendfile(body, range[0], range[1]) : sock.sendfile(body, 0)
+      io = body_to_io(body)
+      range ? sock.sendfile(io, range[0], range[1]) : sock.sendfile(io, 0)
+      ensure
+        close_if_private(io)
     end
   end
 
@@ -70,8 +79,6 @@ module Rainbows::Response::Body # :nodoc:
     # pread() semantics
     def write_body_stream(sock, body, range)
       IO.copy_stream(body, sock)
-      ensure
-        body.respond_to?(:close) and body.close
     end
   else
     # fall back to body#each, which is a Rack standard
@@ -79,27 +86,19 @@ module Rainbows::Response::Body # :nodoc:
   end
 
   if method_defined?(:write_body_file)
-
     # middlewares/apps may return with a body that responds to +to_path+
     def write_body_path(sock, body, range)
-      inp = body_to_io(body)
-      if inp.stat.file?
-        begin
-          write_body_file(sock, inp, range)
-        ensure
-          inp.close if inp != body
-        end
-      else
-        write_body_stream(sock, inp, range)
-      end
+      stat = File.stat(body.to_path)
+      stat.file? ? write_body_file(sock, body, range) :
+                   write_body_stream(sock, body, range)
       ensure
-        body.respond_to?(:close) && inp != body and body.close
+        body.respond_to?(:close) and body.close
     end
   elsif method_defined?(:write_body_stream)
     def write_body_path(sock, body, range)
-      write_body_stream(sock, inp = body_to_io(body), range)
+      write_body_stream(sock, body, range)
       ensure
-        body.respond_to?(:close) && inp != body and body.close
+        body.respond_to?(:close) and body.close
     end
   end
 

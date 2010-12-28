@@ -23,7 +23,11 @@ module Rainbows::WriterThreadSpawn
   include Rainbows::Base
 
   def write_body(my_sock, body, range) # :nodoc:
-    my_sock.queue_body(body, range)
+    if body.respond_to?(:close)
+      Rainbows::SyncClose.new(body) { |body| my_sock.queue_body(body, range) }
+    else
+      my_sock.queue_body(body, range)
+    end
   end
 
   def process_client(client) # :nodoc:
