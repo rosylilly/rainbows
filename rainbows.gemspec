@@ -1,14 +1,6 @@
 # -*- encoding: binary -*-
-
 ENV["VERSION"] or abort "VERSION= must be specified"
 manifest = File.readlines('.manifest').map! { |x| x.chomp! }
-
-# don't bother with tests that fork, not worth our time to get working
-# with `gem check -t` ... (of course we care for them when testing with
-# GNU make when they can run in parallel)
-test_files = manifest.grep(%r{\Atest/unit/test_.*\.rb\z}).map do |f|
-  File.readlines(f).grep(/\bfork\b/).empty? ? f : nil
-end.compact
 require 'wrongdoc'
 extend Wrongdoc::Gemspec
 name, summary, title = readme_metadata

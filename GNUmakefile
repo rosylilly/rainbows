@@ -9,9 +9,6 @@ GIT-VERSION-FILE: .FORCE-GIT-VERSION-FILE
 	@./GIT-VERSION-GEN
 -include GIT-VERSION-FILE
 -include local.mk
-ifeq ($(DLEXT),) # "so" for Linux
-  DLEXT := $(shell $(RUBY) -rrbconfig -e 'puts Config::CONFIG["DLEXT"]')
-endif
 ifeq ($(RUBY_VERSION),)
   RUBY_VERSION := $(shell $(RUBY) -e 'puts RUBY_VERSION')
 endif
@@ -44,6 +41,8 @@ clean:
 
 man html:
 	$(MAKE) -C Documentation install-$@
+
+pkg_extra := GIT-VERSION-FILE ChangeLog LATEST NEWS $(man1_paths)
 
 ChangeLog: GIT-VERSION-FILE .wrongdoc.yml
 	wrongdoc prepare
