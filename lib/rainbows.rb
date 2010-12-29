@@ -54,14 +54,14 @@ module Rainbows
     # Sleeps the current application dispatch.  This will pick the
     # optimal method to sleep depending on the concurrency model chosen
     # (which may still suck and block the entire process).  Using this
-    # with the basic :Rev or :EventMachine models is not recommended.
+    # with the basic :Coolio or :EventMachine models is not recommended.
     # This should be used within your Rack application.
     def sleep(nr)
       case G.server.use
       when :FiberPool, :FiberSpawn
         Rainbows::Fiber.sleep(nr)
       when :RevFiberSpawn, :CoolioFiberSpawn
-        Rainbows::Fiber::Rev::Sleeper.new(nr)
+        Rainbows::Fiber::Coolio::Sleeper.new(nr)
       when :Revactor
         Actor.sleep(nr)
       else

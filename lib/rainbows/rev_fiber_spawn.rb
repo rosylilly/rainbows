@@ -1,5 +1,5 @@
 # -*- encoding: binary -*-
-require 'rainbows/fiber/rev'
+Rainbows.const_set(:RevFiberSpawn, Rainbows::CoolioFiberSpawn)
 
 # CoolioFiberSpawn is the new version of this, use that instead.
 #
@@ -10,19 +10,4 @@ require 'rainbows/fiber/rev'
 # being Sunshowers-compatible.  Applications are strongly advised to
 # wrap all slow IO objects (sockets, pipes) using the
 # Rainbows::Fiber::IO or a Rev-compatible class whenever possible.
-module Rainbows::RevFiberSpawn
-
-  include Rainbows::Base
-  include Rainbows::Fiber::Rev
-
-  def worker_loop(worker) # :nodoc:
-    Rainbows::Response.setup(Server)
-    init_worker_process(worker)
-    Server.const_set(:MAX, @worker_connections)
-    Rainbows::Fiber::Base.setup(Server, nil)
-    Server.const_set(:APP, G.server.app)
-    Heartbeat.new(1, true).attach(Rev::Loop.default)
-    LISTENERS.map! { |s| Server.new(s).attach(Rev::Loop.default) }
-    Rev::Loop.default.run
-  end
-end
+module Rainbows::RevFiberSpawn; end

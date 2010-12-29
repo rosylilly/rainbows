@@ -1,7 +1,7 @@
 # -*- encoding: binary -*-
 # :enddoc:
-class Rainbows::Rev::Server < Rev::IO
-  CONN = Rainbows::Rev::CONN
+class Rainbows::Coolio::Server < Coolio::IO
+  CONN = Rainbows::Coolio::CONN
   # CL and MAX will be defined in the corresponding worker loop
 
   def on_readable

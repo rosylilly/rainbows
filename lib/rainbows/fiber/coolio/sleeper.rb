@@ -1,11 +1,11 @@
 # -*- encoding: binary -*-
 # :enddoc:
-class Rainbows::Fiber::Rev::Sleeper < Rev::TimerWatcher
+class Rainbows::Fiber::Coolio::Sleeper < Coolio::TimerWatcher
 
   def initialize(seconds)
     @f = Fiber.current
     super(seconds, false)
-    attach(Rev::Loop.default)
+    attach(Coolio::Loop.default)
     Fiber.yield
   end
 

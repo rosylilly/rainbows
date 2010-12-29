@@ -1,9 +1,9 @@
 # -*- encoding: binary -*-
 # :enddoc:
 #
-# this is class is specific to Rev for writing large static files
+# this is class is specific to Coolio for writing large static files
 # or proxying IO-derived objects
-class Rainbows::Rev::DeferredResponse < Rev::IO
+class Rainbows::Coolio::DeferredResponse < Coolio::IO
   def initialize(io, client, body)
     super(io)
     @client, @body = client, body

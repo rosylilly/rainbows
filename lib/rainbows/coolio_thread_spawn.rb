@@ -1,8 +1,4 @@
 # -*- encoding: binary -*-
-# :stopdoc:
-Rainbows.const_set(:CoolioThreadSpawn, Rainbows::RevThreadSpawn)
-# :startdoc:
-
 # A combination of the Coolio and ThreadSpawn models.  This allows Ruby
 # Thread-based concurrency for application processing.  It DOES NOT
 # expose a streamable "rack.input" for upload processing within the
@@ -17,4 +13,15 @@ Rainbows.const_set(:CoolioThreadSpawn, Rainbows::RevThreadSpawn)
 #
 # This concurrency model is designed for Ruby 1.9, and Ruby 1.8
 # users are NOT advised to use this due to high CPU usage.
-module Rainbows::CoolioThreadSpawn; end
+module Rainbows::CoolioThreadSpawn
+  include Rainbows::Coolio::Core
+
+  def init_worker_process(worker) # :nodoc:
+    super
+    master = Rainbows::Coolio::Master.new(Queue.new)
+    master.attach(Coolio::Loop.default)
+    Client.const_set(:MASTER, master)
+  end
+end
+# :enddoc:
+require 'rainbows/coolio_thread_spawn/client'

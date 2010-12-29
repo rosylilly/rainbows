@@ -1,8 +1,9 @@
 # -*- encoding: binary -*-
 # :enddoc:
 #
-# this is class is specific to Rev for proxying IO-derived objects
-class Rainbows::Rev::DeferredChunkResponse < Rainbows::Rev::DeferredResponse
+# this is class is specific to Coolio for proxying IO-derived objects
+class Rainbows::Coolio::DeferredChunkResponse <
+      Rainbows::Coolio::DeferredResponse
   def on_read(data)
     @client.write("#{data.size.to_s(16)}\r\n")
     @client.write(data)

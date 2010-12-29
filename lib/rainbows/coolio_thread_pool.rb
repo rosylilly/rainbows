@@ -1,7 +1,4 @@
 # -*- encoding: binary -*-
-# :stopdoc:
-Rainbows.const_set(:CoolioThreadPool, Rainbows::RevThreadSpawn)
-# :startdoc:
 
 # A combination of the Coolio and ThreadPool models.  This allows Ruby
 # Thread-based concurrency for application processing.  It DOES NOT
@@ -17,4 +14,44 @@ Rainbows.const_set(:CoolioThreadPool, Rainbows::RevThreadSpawn)
 #
 # This concurrency model is designed for Ruby 1.9, and Ruby 1.8
 # users are NOT advised to use this due to high CPU usage.
-module Rainbows::CoolThreadPool; end
+module Rainbows::CoolioThreadPool
+  # :stopdoc:
+  DEFAULTS = {
+    :pool_size => 20, # same default size as ThreadPool (w/o Coolio)
+  }
+  #:startdoc:
+
+  def self.setup # :nodoc:
+    o = Rainbows::O
+    DEFAULTS.each { |k,v| o[k] ||= v }
+    Integer === o[:pool_size] && o[:pool_size] > 0 or
+      raise ArgumentError, "pool_size must a be an Integer > 0"
+  end
+  include Rainbows::Coolio::Core
+
+  def init_worker_threads(master, queue) # :nodoc:
+    Rainbows::O[:pool_size].times.map do
+      Thread.new do
+        begin
+          client = queue.pop
+          master << [ client, client.app_response ]
+        rescue => e
+          Rainbows::Error.listen_loop(e)
+        end while true
+      end
+    end
+  end
+
+  def init_worker_process(worker) # :nodoc:
+    super
+    cloop = Coolio::Loop.default
+    master = Rainbows::Coolio::Master.new(Queue.new).attach(cloop)
+    queue = Client.const_set(:QUEUE, Queue.new)
+    threads = init_worker_threads(master, queue)
+    Watcher.new(threads).attach(cloop)
+    logger.info "CoolioThreadPool pool_size=#{Rainbows::O[:pool_size]}"
+  end
+end
+# :enddoc:
+require 'rainbows/coolio_thread_pool/client'
+require 'rainbows/coolio_thread_pool/watcher'

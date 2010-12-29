@@ -1,6 +1,6 @@
 # -*- encoding: binary -*-
 # :enddoc:
-module Rainbows::Rev::Sendfile
+module Rainbows::Coolio::Sendfile
   if IO.method_defined?(:sendfile_nonblock)
     def rev_sendfile(sf) # +sf+ is a Rainbows::StreamFile object
       sf.offset += (n = @_io.sendfile_nonblock(sf, sf.offset, sf.count))

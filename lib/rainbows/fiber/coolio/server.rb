@@ -1,6 +1,6 @@
 # -*- encoding: binary -*-
 # :enddoc:
-class Rainbows::Fiber::Rev::Server < Rev::IOWatcher
+class Rainbows::Fiber::Coolio::Server < Coolio::IOWatcher
   G = Rainbows::G
   include Rainbows::ProcessClient
 

@@ -1,7 +1,5 @@
 # -*- encoding: binary -*-
-# :stopdoc:
-Rainbows.const_set(:Coolio, Rainbows::Rev)
-# :startdoc:
+require 'rainbows/coolio_support'
 
 # Implements a basic single-threaded event model with
 # {Cool.io}[http://coolio.github.com/].  It is capable of handling
@@ -20,4 +18,28 @@ Rainbows.const_set(:Coolio, Rainbows::Rev)
 # allows the Rack application to process data as it arrives.  This
 # means "rack.input" will be fully buffered in memory or to a
 # temporary file before the application is entered.
-module Rainbows::Coolio; end
+module Rainbows::Coolio
+  # :stopdoc:
+  # keep-alive timeout scoreboard
+  KATO = {}
+
+  # all connected clients
+  CONN = {}
+
+  if {}.respond_to?(:compare_by_identity)
+    CONN.compare_by_identity
+    KATO.compare_by_identity
+  end
+
+  autoload :Master, 'rainbows/coolio/master'
+  autoload :ThreadClient, 'rainbows/coolio/thread_client'
+  autoload :DeferredChunkResponse, 'rainbows/coolio/deferred_chunk_response'
+  # :startdoc:
+end
+# :enddoc:
+require 'rainbows/coolio/heartbeat'
+require 'rainbows/coolio/server'
+require 'rainbows/coolio/core'
+require 'rainbows/coolio/deferred_response'
+require 'rainbows/coolio/client'
+Rainbows::Coolio.__send__ :include, Rainbows::Coolio::Core

@@ -1,5 +1,5 @@
 # -*- encoding: binary -*-
-require 'rainbows/coolio_support'
+Rainbows.const_set(:Rev, Rainbows::Coolio)
 # Coolio is the new version of this, use that instead.
 #
 # Implements a basic single-threaded event model with
@@ -19,29 +19,4 @@ require 'rainbows/coolio_support'
 # allows the Rack application to process data as it arrives.  This
 # means "rack.input" will be fully buffered in memory or to a
 # temporary file before the application is entered.
-
-module Rainbows::Rev
-  # :stopdoc:
-  # keep-alive timeout scoreboard
-  KATO = {}
-
-  # all connected clients
-  CONN = {}
-
-  if {}.respond_to?(:compare_by_identity)
-    CONN.compare_by_identity
-    KATO.compare_by_identity
-  end
-
-  autoload :Master, 'rainbows/rev/master'
-  autoload :ThreadClient, 'rainbows/rev/thread_client'
-  autoload :DeferredChunkResponse, 'rainbows/rev/deferred_chunk_response'
-  # :startdoc:
-end
-# :enddoc:
-require 'rainbows/rev/heartbeat'
-require 'rainbows/rev/server'
-require 'rainbows/rev/core'
-require 'rainbows/rev/deferred_response'
-require 'rainbows/rev/client'
-Rainbows::Rev.__send__ :include, Rainbows::Rev::Core
+module Rainbows::Rev; end

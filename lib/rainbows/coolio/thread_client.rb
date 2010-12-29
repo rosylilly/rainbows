@@ -2,9 +2,9 @@
 # :enddoc:
 
 RUBY_VERSION =~ %r{\A1\.8} and
-  warn "Rev and Threads do not mix well under Ruby 1.8"
+  warn "Coolio and Threads do not mix well under Ruby 1.8"
 
-class Rainbows::Rev::ThreadClient < Rainbows::Rev::Client
+class Rainbows::Coolio::ThreadClient < Rainbows::Coolio::Client
   def app_call
     KATO.delete(self)
     disable if enabled?
@@ -15,7 +15,7 @@ class Rainbows::Rev::ThreadClient < Rainbows::Rev::Client
   # this is only called in the master thread
   def response_write(response)
     alive = @hp.next? && G.alive
-    rev_write_response(response, alive)
+    coolio_write_response(response, alive)
     return quit unless alive && :close != @state
 
     @state = :headers

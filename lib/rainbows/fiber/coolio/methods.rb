@@ -1,11 +1,11 @@
 # -*- encoding: binary -*-
 # :enddoc:
-module Rainbows::Fiber::Rev::Methods
-  class Watcher < Rev::IOWatcher
+module Rainbows::Fiber::Coolio::Methods
+  class Watcher < Coolio::IOWatcher
     def initialize(fio, flag)
       @f = Fiber.current
       super(fio, flag)
-      attach(Rev::Loop.default)
+      attach(Coolio::Loop.default)
     end
 
     def on_readable
@@ -43,5 +43,5 @@ end
   Rainbows::Fiber::IO::Socket,
   Rainbows::Fiber::IO::Pipe
 ].each do |klass|
-  klass.__send__(:include, Rainbows::Fiber::Rev::Methods)
+  klass.__send__(:include, Rainbows::Fiber::Coolio::Methods)
 end

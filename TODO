@@ -24,11 +24,11 @@ care about.
   (those who do not require streaming input can use
   {rack-fiber_pool}[http://github.com/mperham/rack-fiber_pool])
 
-* RevFiberPool
+* CoolioFiberPool
 
 * ThreadPoolRevFiber{Spawn,Pool}: just because
 
-* Rev + callcc - current Rev model with callcc (should work with MBARI)
+* Coolio + callcc - current Coolio model with callcc (should work with MBARI)
 
 * Omnibus - haven't looked into it, probably like Revactor with 1.8?
 

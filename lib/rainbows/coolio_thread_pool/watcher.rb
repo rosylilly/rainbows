@@ -1,6 +1,6 @@
 # -*- encoding: binary -*-
 # :enddoc:
-class Rainbows::RevThreadPool::Watcher < Rev::TimerWatcher
+class Rainbows::CoolioThreadPool::Watcher < Coolio::TimerWatcher
   G = Rainbows::G
 
   def initialize(threads)

@@ -1,6 +1,6 @@
 # -*- encoding: binary -*-
 # :enddoc:
-class Rainbows::Fiber::Rev::Heartbeat < Rev::TimerWatcher
+class Rainbows::Fiber::Coolio::Heartbeat < Coolio::TimerWatcher
   G = Rainbows::G
 
   # ZZ gets populated by read_expire in rainbows/fiber/io/methods

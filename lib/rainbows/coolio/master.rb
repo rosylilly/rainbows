@@ -1,7 +1,7 @@
 # -*- encoding: binary -*-
 # :enddoc:
 require 'thread'
-class Rainbows::Rev::Master < Rev::IOWatcher
+class Rainbows::Coolio::Master < Coolio::IOWatcher
 
   def initialize(queue)
     @reader, @writer = Kgio::Pipe.new

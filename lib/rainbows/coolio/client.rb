@@ -1,13 +1,13 @@
 # -*- encoding: binary -*-
 # :enddoc:
-class Rainbows::Rev::Client < Rev::IO
+class Rainbows::Coolio::Client < Coolio::IO
   include Rainbows::EvCore
   G = Rainbows::G
   SF = Rainbows::StreamFile
-  CONN = Rainbows::Rev::CONN
-  KATO = Rainbows::Rev::KATO
-  DeferredResponse = Rainbows::Rev::DeferredResponse
-  DeferredChunkResponse = Rainbows::Rev::DeferredChunkResponse
+  CONN = Rainbows::Coolio::CONN
+  KATO = Rainbows::Coolio::KATO
+  DeferredResponse = Rainbows::Coolio::DeferredResponse
+  DeferredChunkResponse = Rainbows::Coolio::DeferredChunkResponse
 
   def initialize(io)
     CONN[self] = false
@@ -25,7 +25,7 @@ class Rainbows::Rev::Client < Rev::IO
     close if @deferred.nil? && @_write_buffer.empty?
   end
 
-  # override the Rev::IO#write method try to write directly to the
+  # override the Coolio::IO#write method try to write directly to the
   # kernel socket buffers to avoid an extra userspace copy if
   # possible.
   def write(buf)
@@ -86,13 +86,13 @@ class Rainbows::Rev::Client < Rev::IO
   # used for streaming sockets and pipes
   def stream_response(status, headers, io, body)
     c = stream_response_headers(status, headers) if headers
-    # we only want to attach to the Rev::Loop belonging to the
+    # we only want to attach to the Coolio::Loop belonging to the
     # main thread in Ruby 1.9
     io = (c ? DeferredChunkResponse : DeferredResponse).new(io, self, body)
     defer_body(io.attach(LOOP))
   end
 
-  def rev_write_response(response, alive)
+  def coolio_write_response(response, alive)
     status, headers, body = response
     headers = @hp.headers? ? HH.new(headers) : nil
 
@@ -125,7 +125,7 @@ class Rainbows::Rev::Client < Rev::IO
     @env[REMOTE_ADDR] = @_io.kgio_addr
     response = APP.call(@env.update(RACK_DEFAULTS))
 
-    rev_write_response(response, alive = @hp.next? && G.alive)
+    coolio_write_response(response, alive = @hp.next? && G.alive)
     return quit unless alive && :close != @state
     @state = :headers
     disable if enabled?

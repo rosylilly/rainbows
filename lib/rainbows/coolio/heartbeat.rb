@@ -1,13 +1,13 @@
 # -*- encoding: binary -*-
 # :enddoc:
 # This class handles the Unicorn fchmod heartbeat mechanism
-# in Rev-based concurrency models to prevent the master
+# in Coolio-based concurrency models to prevent the master
 # process from killing us unless we're blocked.  This class
 # will also detect and execute the graceful exit if triggered
 # by SIGQUIT
-class Rainbows::Rev::Heartbeat < Rev::TimerWatcher
-  KATO = Rainbows::Rev::KATO
-  CONN = Rainbows::Rev::CONN
+class Rainbows::Coolio::Heartbeat < Coolio::TimerWatcher
+  KATO = Rainbows::Coolio::KATO
+  CONN = Rainbows::Coolio::CONN
   G = Rainbows::G
 
   def on_timer
