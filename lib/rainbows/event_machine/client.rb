@@ -91,11 +91,11 @@ class Rainbows::EventMachine::Client < EM::Connection
         end
         return
       elsif st.socket? || st.pipe?
-        @body = io = body_to_io(body)
+        io = body_to_io(@body = body)
         chunk = stream_response_headers(status, headers) if headers
         m = chunk ? Rainbows::EventMachine::ResponseChunkPipe :
                     Rainbows::EventMachine::ResponsePipe
-        return EM.watch(io, m, self, alive, body).notify_readable = true
+        return EM.watch(io, m, self).notify_readable = true
       end
       # char or block device... WTF? fall through to body.each
     end
@@ -106,6 +106,7 @@ class Rainbows::EventMachine::Client < EM::Connection
   end
 
   def next!
+    @body.close if @body.respond_to?(:close)
     @hp.keepalive? ? receive_data(@body = nil) : quit
   end
 
