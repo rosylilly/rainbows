@@ -33,13 +33,13 @@ module Rainbows::Coolio
 
   autoload :Master, 'rainbows/coolio/master'
   autoload :ThreadClient, 'rainbows/coolio/thread_client'
-  autoload :DeferredChunkResponse, 'rainbows/coolio/deferred_chunk_response'
+  autoload :ResponsePipe, 'rainbows/coolio/response_pipe'
+  autoload :ResponseChunkPipe, 'rainbows/coolio/response_chunk_pipe'
   # :startdoc:
 end
 # :enddoc:
 require 'rainbows/coolio/heartbeat'
 require 'rainbows/coolio/server'
 require 'rainbows/coolio/core'
-require 'rainbows/coolio/deferred_response'
 require 'rainbows/coolio/client'
 Rainbows::Coolio.__send__ :include, Rainbows::Coolio::Core

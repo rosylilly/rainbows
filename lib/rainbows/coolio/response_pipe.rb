@@ -3,7 +3,7 @@
 #
 # this is class is specific to Coolio for writing large static files
 # or proxying IO-derived objects
-class Rainbows::Coolio::DeferredResponse < Coolio::IO
+class Rainbows::Coolio::ResponsePipe < Coolio::IO
   def initialize(io, client, body)
     super(io)
     @client, @body = client, body

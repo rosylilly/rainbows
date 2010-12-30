@@ -6,8 +6,8 @@ class Rainbows::Coolio::Client < Coolio::IO
   SF = Rainbows::StreamFile
   CONN = Rainbows::Coolio::CONN
   KATO = Rainbows::Coolio::KATO
-  DeferredResponse = Rainbows::Coolio::DeferredResponse
-  DeferredChunkResponse = Rainbows::Coolio::DeferredChunkResponse
+  ResponsePipe = Rainbows::Coolio::ResponsePipe
+  ResponseChunkPipe = Rainbows::Coolio::ResponseChunkPipe
 
   def initialize(io)
     CONN[self] = false
@@ -61,7 +61,7 @@ class Rainbows::Coolio::Client < Coolio::IO
 
   # queued, optional response bodies, it should only be unpollable "fast"
   # devices where read(2) is uninterruptable.  Unfortunately, NFS and ilk
-  # are also part of this.  We'll also stick DeferredResponse bodies in
+  # are also part of this.  We'll also stick ResponsePipe bodies in
   # here to prevent connections from being closed on us.
   def defer_body(io)
     @deferred = io
@@ -88,7 +88,7 @@ class Rainbows::Coolio::Client < Coolio::IO
     c = stream_response_headers(status, headers) if headers
     # we only want to attach to the Coolio::Loop belonging to the
     # main thread in Ruby 1.9
-    io = (c ? DeferredChunkResponse : DeferredResponse).new(io, self, body)
+    io = (c ? ResponseChunkPipe : ResponsePipe).new(io, self, body)
     defer_body(io.attach(LOOP))
   end
 
@@ -133,7 +133,7 @@ class Rainbows::Coolio::Client < Coolio::IO
 
   def on_write_complete
     case @deferred
-    when DeferredResponse then return
+    when ResponsePipe then return
     when NilClass # fall through
     else
       begin
@@ -172,7 +172,7 @@ class Rainbows::Coolio::Client < Coolio::IO
 
   def close_deferred
     case @deferred
-    when DeferredResponse, NilClass
+    when ResponsePipe, NilClass
     else
       begin
         @deferred.close
