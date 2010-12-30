@@ -19,6 +19,8 @@ class Rainbows::Coolio::ThreadClient < Rainbows::Coolio::Client
     return quit unless alive && :close != @state
 
     @state = :headers
+    rescue => e
+      handle_error(e)
   end
 
   # fails-safe application dispatch, we absolutely cannot
