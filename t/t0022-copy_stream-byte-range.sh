@@ -41,16 +41,21 @@ t_begin "setup and startup" && {
 
 check_content_range () {
 	# Content-Range: bytes #{offset}-#{offset+count-1}/#{clen}
-	awk -F/ -v E=0 -v size=$random_blob_size '
-	$2 == size && /^< Content-Range: bytes [0-9]+-[0-9]+\// {
-		split($1, a, /-/);
-		if (a[1] < size) {
-			E = 0;
-			exit(0);
-		}
-	}
-	END { exit(E) }
-	' < $err
+	d='\([0-9]\+\)'
+	start= end= size=
+	eval $(< $err sed -n -e \
+	  "s/^< Content-Range: bytes $d-$d\/$d"'.*$/start=\1 end=\2 size=\3/p')
+	test -n "$start"
+	test -n "$end"
+	test -n "$size"
+
+	# ensure we didn't screw up the sed invocation
+	expect="< Content-Range: bytes $start-$end/$size"
+	test x"$(grep -F "$expect" $err)" = x"$(grep '^< Content-Range:' $err)"
+
+	test $start -le $end
+	test $end -lt $size
+	grep 'Range:' $err
 }
 
 t_begin "read random blob sha1s" && {
@@ -113,19 +118,19 @@ t_begin "no fence post errors" && {
 }
 
 t_begin "head range matches" && {
-	sha1="$(curl -sSfv $range_head $url | rsha1)"
+	sha1="$(curl -sSfv 2>$err $range_head $url | rsha1)"
 	check_content_range
 	test x"$sha1_head" = x"$sha1"
 }
 
 t_begin "tail range matches" && {
-	sha1="$(curl -sSf $range_tail $url | rsha1)"
+	sha1="$(curl -sSfv 2>$err $range_tail $url | rsha1)"
 	check_content_range
 	test x"$sha1_tail" = x"$sha1"
 }
 
 t_begin "mid range matches" && {
-	sha1="$(curl -sSf $range_mid $url | rsha1)"
+	sha1="$(curl -sSfv 2>$err $range_mid $url | rsha1)"
 	check_content_range
 	test x"$sha1_mid" = x"$sha1"
 }
