@@ -58,26 +58,28 @@ module Rainbows::Response::Body # :nodoc:
   end
 
   if IO.method_defined?(:sendfile_nonblock)
-    def write_body_file(sock, body, range)
+    def write_body_file_sendfile(sock, body, range)
       io = body_to_io(body)
       range ? sock.sendfile(io, range[0], range[1]) : sock.sendfile(io, 0)
       ensure
         close_if_private(io)
     end
+    ALIASES[:write_body_file] = :write_body_file_sendfile
   end
 
   if IO.respond_to?(:copy_stream)
-    unless method_defined?(:write_body_file)
+    unless method_defined?(:write_body_file_sendfile)
       # try to use sendfile() via IO.copy_stream, otherwise pread()+write()
-      def write_body_file(sock, body, range)
+      def write_body_file_copy_stream(sock, body, range)
         range ? IO.copy_stream(body, sock, range[1], range[0]) :
                 IO.copy_stream(body, sock, nil, 0)
       end
+      ALIASES[:write_body_file] = :write_body_file_copy_stream
     end
 
     # only used when body is a pipe or socket that can't handle
     # pread() semantics
-    def write_body_stream(sock, body, range)
+    def write_body_stream(sock, body)
       IO.copy_stream(body, sock)
     end
   else
@@ -85,18 +87,11 @@ module Rainbows::Response::Body # :nodoc:
     ALIASES[:write_body_stream] = :write_body_each
   end
 
-  if method_defined?(:write_body_file)
+  if ALIASES[:write_body_file]
     # middlewares/apps may return with a body that responds to +to_path+
     def write_body_path(sock, body, range)
-      stat = File.stat(body.to_path)
-      stat.file? ? write_body_file(sock, body, range) :
-                   write_body_stream(sock, body, range)
-      ensure
-        body.respond_to?(:close) and body.close
-    end
-  elsif method_defined?(:write_body_stream)
-    def write_body_path(sock, body, range)
-      write_body_stream(sock, body, range)
+      File.file?(body.to_path) ? write_body_file(sock, body, range) :
+                                 write_body_stream(sock, body)
       ensure
         body.respond_to?(:close) and body.close
     end
@@ -106,7 +101,7 @@ module Rainbows::Response::Body # :nodoc:
     def write_body(client, body, range)
       body.respond_to?(:to_path) ?
         write_body_path(client, body, range) :
-        write_body_each(client, body, range)
+        write_body_each(client, body)
     end
   else
     ALIASES[:write_body] = :write_body_each
