@@ -14,6 +14,7 @@ t_begin "byte-range setup vars" && {
 }
 
 check_content_range () {
+	grep '^< HTTP/1\.1 206 Partial Content' $err
 	grep 'Range:' $err
 	# Content-Range: bytes #{offset}-#{offset+count-1}/#{clen}
 	d='\([0-9]\+\)'

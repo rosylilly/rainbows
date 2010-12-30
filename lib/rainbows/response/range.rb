@@ -27,7 +27,7 @@ module Rainbows::Response::Range
       count = clen if count > clen
       headers[Content_Length] = count.to_s
       headers[Content_Range] = "bytes #{offset}-#{offset+count-1}/#{clen}"
-      [ status, offset, count ]
+      [ 206, offset, count ]
     end
     # nil if no status
   end
