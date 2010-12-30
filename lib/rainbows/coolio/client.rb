@@ -125,7 +125,7 @@ class Rainbows::Coolio::Client < Coolio::IO
     @env[REMOTE_ADDR] = @_io.kgio_addr
     response = APP.call(@env.update(RACK_DEFAULTS))
 
-    coolio_write_response(response, alive = @hp.next? && G.alive)
+    coolio_write_response(response, alive = @hp.next?)
     return quit unless alive && :close != @state
     @state = :headers
     disable if enabled?

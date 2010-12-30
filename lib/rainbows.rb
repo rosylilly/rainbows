@@ -19,6 +19,7 @@ module Rainbows
 
     def quit!
       self.alive = false
+      Rainbows::HttpParser.quit
       self.expire ||= Time.now + (server.timeout * 2.0)
       server.class.const_get(:LISTENERS).map! { |s| s.close rescue nil }
       false
@@ -36,6 +37,7 @@ module Rainbows
   # :startdoc:
 
   require 'rainbows/const'
+  require 'rainbows/http_parser'
   require 'rainbows/http_server'
   require 'rainbows/response'
   require 'rainbows/client'

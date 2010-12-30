@@ -6,7 +6,7 @@ module Rainbows::EvCore
   include Rainbows::Response
   G = Rainbows::G
   NULL_IO = Unicorn::HttpRequest::NULL_IO
-  HttpParser = Unicorn::HttpParser
+  HttpParser = Rainbows::HttpParser
   autoload :CapInput, 'rainbows/ev_core/cap_input'
 
   # Apps may return this Rack response: AsyncResponse = [ -1, {}, [] ]

@@ -4,7 +4,7 @@ require 'rainbows/rack_input'
 module Rainbows::ProcessClient
   G = Rainbows::G
   include Rainbows::Response
-  HttpParser = Unicorn::HttpParser
+  HttpParser = Rainbows::HttpParser
   include Rainbows::RackInput
   include Rainbows::Const
 
@@ -37,8 +37,7 @@ module Rainbows::ProcessClient
       if hp.headers?
         headers = HH.new(headers)
         range = make_range!(env, status, headers) and status = range.shift
-        alive = hp.next? && G.alive
-        headers[CONNECTION] = alive ? KEEP_ALIVE : CLOSE
+        headers[CONNECTION] = (alive = hp.next?) ? KEEP_ALIVE : CLOSE
         client.write(response_header(status, headers))
       end
       write_body(client, body, range)

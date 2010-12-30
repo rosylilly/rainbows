@@ -42,7 +42,7 @@ module Rainbows::Revactor
     else
       LOCALHOST
     end
-    hp = Unicorn::HttpParser.new
+    hp = Rainbows::HttpParser.new
     buf = hp.buf
     alive = false
 
@@ -67,8 +67,7 @@ module Rainbows::Revactor
       if hp.headers?
         headers = HH.new(headers)
         range = make_range!(env, status, headers) and status = range.shift
-        alive = hp.next? && G.alive && G.kato > 0
-        headers[CONNECTION] = alive ? KEEP_ALIVE : CLOSE
+        headers[CONNECTION] = (alive = hp.next?) ? KEEP_ALIVE : CLOSE
         client.write(response_header(status, headers))
         alive && ts and buf << ts.leftover
       end

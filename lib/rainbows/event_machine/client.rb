@@ -45,7 +45,7 @@ class Rainbows::EventMachine::Client < EM::Connection
     # long-running async response
     (response.nil? || -1 == response[0]) and return @state = :close
 
-    if @hp.next? && G.alive && G.kato > 0
+    if @hp.next?
       @state = :headers
       em_write_response(response, true)
       if @buf.empty?
