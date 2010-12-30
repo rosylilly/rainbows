@@ -31,7 +31,7 @@ module Rainbows::ThreadSpawn
             klass.new(c) do |c|
               begin
                 lock.synchronize { G.cur += 1 }
-                process_client(c)
+                c.process_loop
               ensure
                 lock.synchronize { G.cur -= 1 }
               end

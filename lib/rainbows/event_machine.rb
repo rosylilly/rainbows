@@ -44,6 +44,7 @@ module Rainbows::EventMachine
   autoload :ResponsePipe, 'rainbows/event_machine/response_pipe'
   autoload :ResponseChunkPipe, 'rainbows/event_machine/response_chunk_pipe'
   autoload :TryDefer, 'rainbows/event_machine/try_defer'
+  autoload :Client, 'rainbows/event_machine/client'
 
   include Rainbows::Base
 
@@ -89,5 +90,4 @@ module Rainbows::EventMachine
   end
 end
 # :enddoc:
-require 'rainbows/event_machine/client'
 require 'rainbows/event_machine/server'

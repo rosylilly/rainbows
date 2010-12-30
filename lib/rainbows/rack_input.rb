@@ -10,8 +10,8 @@ module Rainbows::RackInput
     const_set(:IC, Unicorn::HttpRequest.input_class)
   end
 
-  def set_input(env, hp, client)
-    env[RACK_INPUT] = 0 == hp.content_length ? NULL_IO : IC.new(client, hp)
-    env[CLIENT_IO] = client
+  def set_input(env, hp)
+    env[RACK_INPUT] = 0 == hp.content_length ? NULL_IO : IC.new(self, hp)
+    env[CLIENT_IO] = self
   end
 end

@@ -5,7 +5,7 @@
 # enough to avoid mucking with TeeInput internals.  Fortunately
 # this code is not heavily used so we can usually avoid the overhead
 # of adding a userspace buffer.
-class Rainbows::Revactor::TeeSocket
+class Rainbows::Revactor::Client::TeeSocket
   def initialize(socket)
     # IO::Buffer is used internally by Rev which Revactor is based on
     # so we'll always have it available

@@ -58,27 +58,20 @@ class Rainbows::EventMachine::Client < EM::Connection
     end
   end
 
+  # don't change this method signature, "async.callback" relies on it
   def em_write_response(response, alive = false)
     status, headers, body = response
-    if @hp.headers?
-      headers = HH.new(headers)
-      headers[CONNECTION] = alive ? KEEP_ALIVE : CLOSE
-    else
-      headers = nil
-    end
 
     if body.respond_to?(:errback) && body.respond_to?(:callback)
       @body = body
       body.callback { quit }
       body.errback { quit }
-      # async response, this could be a trickle as is in comet-style apps
-      headers[CONNECTION] = CLOSE if headers
       alive = true
     elsif body.respond_to?(:to_path)
       st = File.stat(path = body.to_path)
 
       if st.file?
-        write(response_header(status, headers)) if headers
+        write_headers(status, headers, alive)
         @body = stream_file_data(path)
         @body.errback do
           body.close if body.respond_to?(:close)
@@ -92,16 +85,14 @@ class Rainbows::EventMachine::Client < EM::Connection
         return
       elsif st.socket? || st.pipe?
         io = body_to_io(@body = body)
-        chunk = stream_response_headers(status, headers) if headers
+        chunk = stream_response_headers(status, headers, alive)
         m = chunk ? Rainbows::EventMachine::ResponseChunkPipe :
                     Rainbows::EventMachine::ResponsePipe
         return EM.watch(io, m, self).notify_readable = true
       end
       # char or block device... WTF? fall through to body.each
     end
-
-    write(response_header(status, headers)) if headers
-    write_body_each(self, body)
+    write_response(status, headers, body, alive)
     quit unless alive
   end
 

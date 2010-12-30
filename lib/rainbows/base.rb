@@ -6,9 +6,7 @@
 # not intended for production use, as keepalive with a pure prefork
 # concurrency model is extremely expensive.
 module Rainbows::Base
-
   # :stopdoc:
-  include Rainbows::ProcessClient
 
   # shortcuts...
   G = Rainbows::G
@@ -32,6 +30,10 @@ module Rainbows::Base
     [:TERM, :INT].each { |sig| trap(sig) { exit!(0) } } # instant shutdown
     Rainbows::ProcessClient.const_set(:APP, G.server.app)
     logger.info "Rainbows! #@use worker_connections=#@worker_connections"
+  end
+
+  def process_client(client)
+    client.process_loop
   end
 
   def self.included(klass) # :nodoc:

@@ -19,19 +19,11 @@ require 'thread'
 # vulnerable to slow client denial-of-service attacks.
 
 module Rainbows::WriterThreadSpawn
-  # :stopdoc:
   include Rainbows::Base
-
-  def write_body(my_sock, body, range) # :nodoc:
-    if body.respond_to?(:close)
-      Rainbows::SyncClose.new(body) { |body| my_sock.queue_body(body, range) }
-    else
-      my_sock.queue_body(body, range)
-    end
-  end
+  autoload :Client, 'rainbows/writer_thread_spawn/client'
 
   def process_client(client) # :nodoc:
-    super(Client.new(client))
+    Client.new(client).process_loop
   end
 
   def worker_loop(worker)  # :nodoc:
@@ -42,4 +34,3 @@ module Rainbows::WriterThreadSpawn
   # :startdoc:
 end
 # :enddoc:
-require 'rainbows/writer_thread_spawn/client'

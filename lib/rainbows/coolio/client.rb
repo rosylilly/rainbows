@@ -84,39 +84,37 @@ class Rainbows::Coolio::Client < Coolio::IO
   end
 
   # used for streaming sockets and pipes
-  def stream_response(status, headers, io, body)
-    c = stream_response_headers(status, headers) if headers
+  def stream_response_body(body, io, chunk)
     # we only want to attach to the Coolio::Loop belonging to the
     # main thread in Ruby 1.9
-    io = (c ? ResponseChunkPipe : ResponsePipe).new(io, self, body)
+    io = (chunk ? ResponseChunkPipe : ResponsePipe).new(io, self, body)
     defer_body(io.attach(LOOP))
   end
 
   def coolio_write_response(response, alive)
     status, headers, body = response
-    headers = @hp.headers? ? HH.new(headers) : nil
 
-    headers[CONNECTION] = alive ? KEEP_ALIVE : CLOSE if headers
     if body.respond_to?(:to_path)
       io = body_to_io(body)
       st = io.stat
 
       if st.file?
-        offset, count = 0, st.size
-        if headers
-          if range = make_range!(@env, status, headers)
-            status, offset, count = range
-          end
-          write(response_header(status, headers))
+        if respond_to?(:sendfile_range) && r = sendfile_range(status, headers)
+          status, headers, range = r
+          write_headers(status, headers, alive)
+          defer_body(SF.new(range[0], range[1], io, body)) if range
+        else
+          write_headers(status, headers, alive)
+          defer_body(SF.new(0, st.size, io, body))
         end
-        return defer_body(SF.new(offset, count, io, body))
+        return
       elsif st.socket? || st.pipe?
-        return stream_response(status, headers, io, body)
+        chunk = stream_response_headers(status, headers, alive)
+        return stream_response_body(body, io, chunk)
       end
       # char or block device... WTF? fall through to body.each
     end
-    write(response_header(status, headers)) if headers
-    write_body_each(self, body, nil)
+    write_response(status, headers, body, alive)
   end
 
   def app_call

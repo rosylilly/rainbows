@@ -1,9 +1,8 @@
 # -*- encoding: binary -*-
 # :enddoc:
 
-require 'rainbows/timed_read'
-
+# this class is used for most synchronous concurrency models
 class Rainbows::Client < Kgio::Socket
   include Rainbows::TimedRead
+  include Rainbows::ProcessClient
 end
-Kgio.accept_class = Rainbows::Client

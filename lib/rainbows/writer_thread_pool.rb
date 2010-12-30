@@ -19,30 +19,14 @@
 module Rainbows::WriterThreadPool
   # :stopdoc:
   include Rainbows::Base
+  autoload :Client, 'rainbows/writer_thread_pool/client'
 
   @@nr = 0
   @@q = nil
 
-  def async_write_body(qclient, body, range)
-    if body.respond_to?(:close)
-      Rainbows::SyncClose.new(body) do |body|
-        qclient.q << [ qclient.to_io, :body, body, range ]
-      end
-    else
-      qclient.q << [ qclient.to_io, :body, body, range ]
-    end
-  end
-
   def process_client(client) # :nodoc:
     @@nr += 1
-    super(Client.new(client, @@q[@@nr %= @@q.size]))
-  end
-
-  def init_worker_process(worker)
-    super
-    self.class.__send__(:alias_method, :sync_write_body, :write_body)
-    Rainbows::WriterThreadPool.__send__(
-                        :alias_method, :write_body, :async_write_body)
+    Client.new(client, @@q[@@nr %= @@q.size]).process_loop
   end
 
   def worker_loop(worker) # :nodoc:
@@ -51,12 +35,16 @@ module Rainbows::WriterThreadPool
     qp = (1..worker_connections).map do |n|
       Rainbows::QueuePool.new(1) do |response|
         begin
-          io, arg1, arg2, arg3 = response
-          case arg1
-          when :body then sync_write_body(io, arg2, arg3)
-          when :close then io.close unless io.closed?
+          io, arg, *rest = response
+          case arg
+          when String
+            io.kgio_write(arg)
+          when :close
+            warn "#{Thread.current} #{io} close"
+            io.close unless io.closed?
           else
-            io.write(arg1)
+            warn "#{Thread.current} #{io} #{arg}"
+            io.__send__(arg, *rest)
           end
         rescue => err
           Rainbows::Error.write(io, err)
@@ -70,5 +58,3 @@ module Rainbows::WriterThreadPool
   end
   # :startdoc:
 end
-# :enddoc:
-require 'rainbows/writer_thread_pool/client'

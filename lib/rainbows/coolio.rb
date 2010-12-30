@@ -31,6 +31,7 @@ module Rainbows::Coolio
     KATO.compare_by_identity
   end
 
+  autoload :Client, 'rainbows/coolio/client'
   autoload :Master, 'rainbows/coolio/master'
   autoload :ThreadClient, 'rainbows/coolio/thread_client'
   autoload :ResponsePipe, 'rainbows/coolio/response_pipe'
@@ -41,5 +42,4 @@ end
 require 'rainbows/coolio/heartbeat'
 require 'rainbows/coolio/server'
 require 'rainbows/coolio/core'
-require 'rainbows/coolio/client'
 Rainbows::Coolio.__send__ :include, Rainbows::Coolio::Core

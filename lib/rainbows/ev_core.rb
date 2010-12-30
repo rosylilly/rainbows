@@ -36,14 +36,15 @@ module Rainbows::EvCore
   end
 
   # returns whether to enable response chunking for autochunk models
-  def stream_response_headers(status, headers)
+  def stream_response_headers(status, headers, alive)
+    headers = Rack::Utils::HeaderHash.new(headers)
     if headers['Content-Length']
       rv = false
     else
       rv = !!(headers['Transfer-Encoding'] =~ %r{\Achunked\z}i)
       rv = false if headers.delete('X-Rainbows-Autochunk') == 'no'
     end
-    write(response_header(status, headers))
+    write_headers(status, headers, alive)
     rv
   end
 

@@ -1,54 +1,41 @@
 # -*- encoding: binary -*-
-# :enddoc:
-require 'rainbows/rack_input'
 module Rainbows::ProcessClient
-  G = Rainbows::G
   include Rainbows::Response
-  HttpParser = Rainbows::HttpParser
   include Rainbows::RackInput
   include Rainbows::Const
 
-  # once a client is accepted, it is processed in its entirety here
-  # in 3 easy steps: read request, call app, write app response
-  # this is used by synchronous concurrency models
-  #   Base, ThreadSpawn, ThreadPool
-  def process_client(client) # :nodoc:
-    hp = HttpParser.new
-    client.kgio_read!(16384, buf = hp.buf)
-    remote_addr = client.kgio_addr
-    alive = false
+  def process_loop
+    @hp = hp = Rainbows::HttpParser.new
+    kgio_read!(16384, buf = hp.buf) or return
 
     begin # loop
       until env = hp.parse
-        client.timed_read(buf2 ||= "") or return
+        timed_read(buf2 ||= "") or return
         buf << buf2
       end
 
-      set_input(env, hp, client)
-      env[REMOTE_ADDR] = remote_addr
-      status, headers, body = APP.call(env.update(RACK_DEFAULTS))
+      set_input(env, hp)
+      env[REMOTE_ADDR] = kgio_addr
+      status, headers, body = APP.call(env.merge!(RACK_DEFAULTS))
 
       if 100 == status.to_i
-        client.write(EXPECT_100_RESPONSE)
+        write(EXPECT_100_RESPONSE)
         env.delete(HTTP_EXPECT)
         status, headers, body = APP.call(env)
       end
-
-      if hp.headers?
-        headers = HH.new(headers)
-        range = make_range!(env, status, headers) and status = range.shift
-        headers[CONNECTION] = (alive = hp.next?) ? KEEP_ALIVE : CLOSE
-        client.write(response_header(status, headers))
-      end
-      write_body(client, body, range)
+      write_response(status, headers, body, alive = @hp.next?)
     end while alive
   # if we get any error, try to write something back to the client
   # assuming we haven't closed the socket, but don't get hung up
   # if the socket is already closed or broken.  We'll always ensure
   # the socket is closed at the end of this function
   rescue => e
-    Rainbows::Error.write(client, e)
+    handle_error(e)
   ensure
-    client.close unless client.closed?
+    close unless closed?
+  end
+
+  def handle_error(e)
+    Rainbows::Error.write(self, e)
   end
 end

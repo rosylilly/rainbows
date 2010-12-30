@@ -41,7 +41,7 @@ module Rainbows::ThreadPool
   def sync_worker # :nodoc:
     s = LISTENERS[0]
     begin
-      c = s.kgio_accept and process_client(c)
+      c = s.kgio_accept and c.process_loop
     rescue => e
       Rainbows::Error.listen_loop(e)
     end while G.alive
@@ -55,7 +55,7 @@ module Rainbows::ThreadPool
       # problem.  On the other hand, a thundering herd may not
       # even incur as much overhead as an extra Mutex#synchronize
       ret = select(LISTENERS) and ret[0].each do |s|
-        s = s.kgio_tryaccept and process_client(s)
+        s = s.kgio_tryaccept and s.process_loop
       end
     rescue Errno::EINTR
     rescue => e

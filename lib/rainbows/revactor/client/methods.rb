@@ -1,15 +1,10 @@
 # -*- encoding: binary -*-
 # :enddoc:
-module Rainbows::Revactor::Body
-  # TODO non-blocking splice(2) under Linux
-  ALIASES = {
-    :write_body_stream => :write_body_each
-  }
-
+module Rainbows::Revactor::Client::Methods
   if IO.method_defined?(:sendfile_nonblock)
-    def write_body_file_sendfile_revactor(client, body, range)
-      body = body_to_io(body)
-      sock = client.instance_variable_get(:@_io)
+    def write_body_file(body, range)
+      body, client = body_to_io(body), @client
+      sock = @client.instance_variable_get(:@_io)
       pfx = Revactor::TCP::Socket === client ? :tcp : :unix
       write_complete = T[:"#{pfx}_write_complete", client]
       closed = T[:"#{pfx}_closed", client]
@@ -33,14 +28,18 @@ module Rainbows::Revactor::Body
       ensure
         close_if_private(body)
     end
-    ALIASES[:write_body_file] = :write_body_file_sendfile_revactor
-  else
-    ALIASES[:write_body] = :write_body_each
+  end
+
+  def handle_error(e)
+    Revactor::TCP::ReadError === e or super
+  end
+
+  def write_response(status, headers, body, alive)
+    super(status, headers, body, alive)
+    alive && @ts and @hp.buf << @ts.leftover
   end
 
   def self.included(klass)
-    ALIASES.each do |new_method, orig_method|
-      klass.__send__(:alias_method, new_method, orig_method)
-    end
+    klass.__send__ :alias_method, :write_body_stream, :write_body_each
   end
 end

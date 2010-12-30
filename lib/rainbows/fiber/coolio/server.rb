@@ -2,7 +2,6 @@
 # :enddoc:
 class Rainbows::Fiber::Coolio::Server < Coolio::IOWatcher
   G = Rainbows::G
-  include Rainbows::ProcessClient
 
   def to_io
     @io
@@ -25,7 +24,7 @@ class Rainbows::Fiber::Coolio::Server < Coolio::IOWatcher
 
   def process(io)
     G.cur += 1
-    process_client(io)
+    io.process_loop
   ensure
     G.cur -= 1
   end

@@ -57,7 +57,7 @@ module Rainbows::Fiber::Base
 
   def process(client)
     G.cur += 1
-    process_client(client)
+    client.process_loop
   ensure
     G.cur -= 1
     ZZ.delete(client.f)
@@ -65,7 +65,7 @@ module Rainbows::Fiber::Base
 
   def self.setup(klass, app)
     require 'rainbows/fiber/body'
-    klass.__send__(:include, Rainbows::Fiber::Body)
+    Rainbows::Client.__send__(:include, Rainbows::Fiber::Body)
     self.const_set(:APP, app)
   end
 end
