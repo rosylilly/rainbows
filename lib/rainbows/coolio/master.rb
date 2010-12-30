@@ -7,15 +7,16 @@ class Rainbows::Coolio::Master < Coolio::IOWatcher
     @reader, @writer = Kgio::Pipe.new
     super(@reader)
     @queue = queue
+    @wbuf, @rbuf = "\0", "\0"
   end
 
   def <<(output)
     @queue << output
-    @writer.kgio_trywrite("\0")
+    @writer.kgio_trywrite(@wbuf)
   end
 
   def on_readable
-    if String === @reader.kgio_tryread(1)
+    if String === @reader.kgio_tryread(1, @rbuf)
       client, response = @queue.pop
       client.response_write(response)
     end
