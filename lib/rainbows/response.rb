@@ -124,7 +124,10 @@ module Rainbows::Response
         return
       a, b = $1.split(/-/)
 
-      headers = Rack::Utils::HeaderHash.new(headers)
+      # HeaderHash is quite expensive, and Rack::File currently
+      # uses a regular Ruby Hash with properly-cased headers the
+      # same way they're presented in rfc2616.
+      headers = Rack::Utils::HeaderHash.new(headers) unless Hash === headers
       clen = headers[Content_Length] or return
       size = clen.to_i
 
