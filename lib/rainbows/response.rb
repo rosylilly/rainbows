@@ -140,6 +140,8 @@ module Rainbows::Response
       end
 
       if 0 > count || offset >= size
+        headers[Content_Length] = "0"
+        headers[Content_Range] = "bytes */#{clen}"
         return 416, headers, nil
       else
         count = size if count > size
