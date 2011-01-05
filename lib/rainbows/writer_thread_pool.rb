@@ -40,10 +40,8 @@ module Rainbows::WriterThreadPool
           when String
             io.kgio_write(arg)
           when :close
-            warn "#{Thread.current} #{io} close"
             io.close unless io.closed?
           else
-            warn "#{Thread.current} #{io} #{arg}"
             io.__send__(arg, *rest)
           end
         rescue => err
