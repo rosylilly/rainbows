@@ -17,7 +17,7 @@ ThreadSpawn|WriterThreadSpawn|ThreadPool|WriterThreadPool|Base) ;;
 	;;
 esac
 
-t_plan 12 "IO.copy_stream byte range response for $model"
+t_plan 13 "IO.copy_stream byte range response for $model"
 
 t_begin "setup and startup" && {
 	rtmpfiles out err

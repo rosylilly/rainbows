@@ -17,7 +17,7 @@ EventMachine|NeverBlock)
 *) ;;
 esac
 
-t_plan 12 "sendfile byte range response for $model"
+t_plan 13 "sendfile byte range response for $model"
 
 t_begin "setup and startup" && {
 	rtmpfiles out err

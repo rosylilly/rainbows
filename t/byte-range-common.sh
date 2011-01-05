@@ -61,6 +61,27 @@ t_begin "crazy offset goes over" && {
           die "expected Content-Range: bytes */SIZE"
 }
 
+t_begin "keepalive/pipelining is supported on 416 responses" && {
+	rm -f $tmp
+	(
+		cat $fifo > $tmp &
+		printf 'GET /byte-range-common.sh HTTP/1.1\r\n'
+		printf 'Host: %s\r\n' $listen
+		printf 'Range: bytes=9999999999-9999999999\r\n\r\n'
+		printf 'GET /byte-range-common.sh HTTP/1.1\r\n'
+		printf 'Host: %s\r\n' $listen
+		printf 'Connection: close\r\n'
+		printf 'Range: bytes=0-0\r\n\r\n'
+		wait
+	) | socat - TCP:$listen > $fifo
+
+	< $tmp awk '
+/^HTTP\/1\.1 / && NR == 1 && $2 == 416 { first = $2 }
+/^HTTP\/1\.1 / && NR != 1 && $2 == 206 { second = $2 }
+END { exit((first == 416 && second == 206) ? 0 : 1) }
+	'
+}
+
 t_begin "full request matches with explicit ranges" && {
 	sha1="$(curl -v 2>$err $range_all -sSf $url | rsha1)"
 	check_content_range
