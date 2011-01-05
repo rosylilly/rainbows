@@ -27,7 +27,7 @@ class Rainbows::Coolio::ThreadClient < Rainbows::Coolio::Client
   def app_response
     begin
       @env[REMOTE_ADDR] = @_io.kgio_addr
-      APP.call(@env.update(RACK_DEFAULTS))
+      APP.call(@env.merge!(RACK_DEFAULTS))
     rescue => e
       Rainbows::Error.app(e) # we guarantee this does not raise
       [ 500, {}, [] ]

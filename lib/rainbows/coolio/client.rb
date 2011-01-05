@@ -121,7 +121,7 @@ class Rainbows::Coolio::Client < Coolio::IO
     KATO.delete(self)
     @env[RACK_INPUT] = @input
     @env[REMOTE_ADDR] = @_io.kgio_addr
-    response = APP.call(@env.update(RACK_DEFAULTS))
+    response = APP.call(@env.merge!(RACK_DEFAULTS))
 
     coolio_write_response(response, alive = @hp.next?)
     return quit unless alive && :close != @state

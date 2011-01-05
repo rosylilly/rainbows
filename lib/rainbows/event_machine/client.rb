@@ -38,7 +38,7 @@ class Rainbows::EventMachine::Client < EM::Connection
     @env[ASYNC_CALLBACK] = method(:em_write_response)
     @env[ASYNC_CLOSE] = EM::DefaultDeferrable.new
 
-    response = catch(:async) { APP.call(@env.update(RACK_DEFAULTS)) }
+    response = catch(:async) { APP.call(@env.merge!(RACK_DEFAULTS)) }
 
     # too tricky to support pipelining with :async since the
     # second (pipelined) request could be a stuck behind a
