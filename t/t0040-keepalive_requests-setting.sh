@@ -6,11 +6,6 @@ t_begin "setup and start" && {
 	rainbows_setup $model 50 666
 	rtmpfiles curl_out curl_err
 	grep 'keepalive_timeout 666' $unicorn_config
-        ed -s $unicorn_config <<EOF
-,s/listen.*/&, :tcp_nodelay => true/
-w
-EOF
-	grep nodelay $unicorn_config
 	rainbows -E none -D env.ru -c $unicorn_config
 	rainbows_wait_start
 }

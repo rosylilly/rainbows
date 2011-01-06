@@ -1,8 +1,15 @@
 # -*- encoding: binary -*-
 require 'kgio'
 require 'unicorn'
-# the value passed to TCP_DEFER_ACCEPT actually matters in Linux 2.6.32+
-Unicorn::SocketHelper::DEFAULTS[:tcp_defer_accept] = 60
+Unicorn::SocketHelper::DEFAULTS.merge!({
+  # the value passed to TCP_DEFER_ACCEPT actually matters in Linux 2.6.32+
+  :tcp_defer_accept => 60,
+
+  # keep-alive performance sucks without this due to
+  # write(headers)-write(body)-read
+  # because we always write headers and bodies with two calls
+  :tcp_nodelay => true,
+})
 
 module Rainbows
 
