@@ -47,7 +47,7 @@ class Rainbows::ThreadTimeout
       @threshold == 0 and
         raise ArgumentError, "threshold=0 does not make sense"
       @threshold < 0 and
-        @threshold += Rainbows::G.server.worker_connections
+        @threshold += Rainbows.server.worker_connections
     end
     @app = app
     @active = {}

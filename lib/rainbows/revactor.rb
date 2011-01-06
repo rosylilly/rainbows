@@ -60,7 +60,7 @@ module Rainbows::Revactor
           end
         rescue => e
           Rainbows::Error.listen_loop(e)
-        end while G.alive
+        end while Rainbows.alive
         Actor.receive do |f|
           f.when(close) {}
           f.when(actor_exit) { nr -= 1 }
@@ -68,7 +68,7 @@ module Rainbows::Revactor
       end
     end
 
-    Actor.sleep 1 while G.tick || nr > 0
+    Actor.sleep 1 while Rainbows.tick || nr > 0
     rescue Errno::EMFILE
       # ignore, let another worker process take it
   end

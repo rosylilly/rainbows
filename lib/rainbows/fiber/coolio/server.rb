@@ -1,8 +1,6 @@
 # -*- encoding: binary -*-
 # :enddoc:
 class Rainbows::Fiber::Coolio::Server < Coolio::IOWatcher
-  G = Rainbows::G
-
   def to_io
     @io
   end
@@ -18,14 +16,14 @@ class Rainbows::Fiber::Coolio::Server < Coolio::IOWatcher
   end
 
   def on_readable
-    return if G.cur >= MAX
+    return if Rainbows.cur >= MAX
     c = @io.kgio_tryaccept and Fiber.new { process(c) }.resume
   end
 
   def process(io)
-    G.cur += 1
+    Rainbows.cur += 1
     io.process_loop
   ensure
-    G.cur -= 1
+    Rainbows.cur -= 1
   end
 end

@@ -25,24 +25,24 @@ module Rainbows::ThreadSpawn
     LISTENERS.each do |l|
       klass.new(l) do |l|
         begin
-          if lock.synchronize { G.cur >= limit }
+          if lock.synchronize { Rainbows.cur >= limit }
             worker_yield
           elsif c = l.kgio_accept
             klass.new(c) do |c|
               begin
-                lock.synchronize { G.cur += 1 }
+                lock.synchronize { Rainbows.cur += 1 }
                 c.process_loop
               ensure
-                lock.synchronize { G.cur -= 1 }
+                lock.synchronize { Rainbows.cur -= 1 }
               end
             end
           end
         rescue => e
           Rainbows::Error.listen_loop(e)
-        end while G.alive
+        end while Rainbows.alive
       end
     end
-    sleep 1 while G.tick || lock.synchronize { G.cur > 0 }
+    sleep 1 while Rainbows.tick || lock.synchronize { Rainbows.cur > 0 }
   end
 
   def worker_loop(worker) #:nodoc:

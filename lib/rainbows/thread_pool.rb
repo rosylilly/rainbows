@@ -28,11 +28,11 @@ module Rainbows::ThreadPool
       Thread.new { LISTENERS.size == 1 ? sync_worker : async_worker }
     end
 
-    while G.alive
+    while Rainbows.alive
       # if any worker dies, something is serious wrong, bail
       pool.each do |thr|
-        G.tick or break
-        thr.join(1) and G.quit!
+        Rainbows.tick or break
+        thr.join(1) and Rainbows.quit!
       end
     end
     join_threads(pool)
@@ -44,7 +44,7 @@ module Rainbows::ThreadPool
       c = s.kgio_accept and c.process_loop
     rescue => e
       Rainbows::Error.listen_loop(e)
-    end while G.alive
+    end while Rainbows.alive
   end
 
   def async_worker # :nodoc:
@@ -60,13 +60,13 @@ module Rainbows::ThreadPool
     rescue Errno::EINTR
     rescue => e
       Rainbows::Error.listen_loop(e)
-    end while G.alive
+    end while Rainbows.alive
   end
 
   def join_threads(threads) # :nodoc:
-    G.quit!
+    Rainbows.quit!
     threads.delete_if do |thr|
-      G.tick
+      Rainbows.tick
       begin
         thr.run
         thr.join(0.01)

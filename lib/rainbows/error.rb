@@ -2,8 +2,6 @@
 # :enddoc:
 module Rainbows::Error
 
-  G = Rainbows::G
-
   # if we get any error, try to write something back to the client
   # assuming we haven't closed the socket, but don't get hung up
   # if the socket is already closed or broken.  We'll always ensure
@@ -20,15 +18,15 @@ module Rainbows::Error
   end
 
   def self.app(e)
-    G.server.logger.error "app error: #{e.inspect}"
-    G.server.logger.error e.backtrace.join("\n")
+    Rainbows.server.logger.error "app error: #{e.inspect}"
+    Rainbows.server.logger.error e.backtrace.join("\n")
     rescue
   end
 
   def self.listen_loop(e)
-    G.alive or return
-    G.server.logger.error "listen loop error: #{e.inspect}."
-    G.server.logger.error e.backtrace.join("\n")
+    Rainbows.alive or return
+    Rainbows.server.logger.error "listen loop error: #{e.inspect}."
+    Rainbows.server.logger.error e.backtrace.join("\n")
     rescue
   end
 

@@ -52,7 +52,7 @@ class Rainbows::MaxBody
   # if it's reconfigured
   def self.setup # :nodoc:
     Rainbows.max_bytes or return
-    case Rainbows::G.server.use
+    case Rainbows.server.use
     when :Rev, :Coolio, :EventMachine, :NeverBlock,
          :RevThreadSpawn, :RevThreadPool,
          :CoolioThreadSpawn, :CoolioThreadPool
@@ -60,7 +60,7 @@ class Rainbows::MaxBody
     end
 
     # force ourselves to the outermost middleware layer
-    Rainbows::G.server.app = self.new(Rainbows::G.server.app)
+    Rainbows.server.app = self.new(Rainbows.server.app)
   end
 
   # Rack response returned when there's an error

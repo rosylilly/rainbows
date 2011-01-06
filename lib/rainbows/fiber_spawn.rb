@@ -17,12 +17,12 @@ module Rainbows::FiberSpawn
 
     begin
       schedule do |l|
-        break if G.cur >= limit
+        break if Rainbows.cur >= limit
         io = l.kgio_tryaccept or next
         Fiber.new { process(io) }.resume
       end
     rescue => e
       Rainbows::Error.listen_loop(e)
-    end while G.alive || G.cur > 0
+    end while Rainbows.alive || Rainbows.cur > 0
   end
 end

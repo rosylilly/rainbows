@@ -13,27 +13,7 @@ Unicorn::SocketHelper::DEFAULTS.merge!({
 
 module Rainbows
 
-  # global vars because class/instance variables are confusing me :<
-  # this struct is only accessed inside workers and thus private to each
-  # G.cur may not be used in the network concurrency model
-  # :stopdoc:
-  class State < Struct.new(:alive,:m,:cur,:server,:tmp,:expire)
-    def tick
-      tmp.chmod(self.m = m == 0 ? 1 : 0)
-      exit!(2) if expire && Time.now >= expire
-      alive && server.master_pid == Process.ppid or quit!
-    end
-
-    def quit!
-      self.alive = false
-      Rainbows::HttpParser.quit
-      self.expire ||= Time.now + (server.timeout * 2.0)
-      server.class.const_get(:LISTENERS).map! { |s| s.close rescue nil }
-      false
-    end
-  end
-  G = State.new(true, 0, 0)
-  O = {}
+  O = {} # :nodoc:
   class Response416 < RangeError; end
 
   # map of numeric file descriptors to IO objects to avoid using IO.new
@@ -65,7 +45,7 @@ module Rainbows
   # with the basic :Coolio or :EventMachine models is not recommended.
   # This should be used within your Rack application.
   def self.sleep(nr)
-    case G.server.use
+    case Rainbows.server.use
     when :FiberPool, :FiberSpawn
       Rainbows::Fiber.sleep(nr)
     when :RevFiberSpawn, :CoolioFiberSpawn
@@ -86,6 +66,10 @@ module Rainbows
   # :stopdoc:
   class << self
     attr_accessor :max_bytes, :keepalive_timeout
+    attr_accessor :server
+    attr_accessor :cur # may not always be used
+    attr_reader :alive
+    attr_writer :tick_io
   end
   # :startdoc:
 
@@ -96,6 +80,25 @@ module Rainbows
   @keepalive_timeout = 5
 
   # :stopdoc:
+  @alive = true
+  @cur = 0
+  @tick_mod = 0
+  @expire = nil
+
+  def self.tick
+    @tick_io.chmod(@tick_mod = 0 == @tick_mod ? 1 : 0)
+    exit!(2) if @expire && Time.now >= @expire
+    @alive && @server.master_pid == Process.ppid or quit!
+  end
+
+  def self.quit!
+    @alive = false
+    Rainbows::HttpParser.quit
+    @expire ||= Time.now + (@server.timeout * 2.0)
+    @server.class.const_get(:LISTENERS).map! { |s| s.close rescue nil }
+    false
+  end
+
   # maps models to default worker counts, default worker count numbers are
   # pretty arbitrary and tuning them to your application and hardware is
   # highly recommended

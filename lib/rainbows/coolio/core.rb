@@ -16,7 +16,7 @@ module Rainbows::Coolio::Core
     Rainbows::Coolio::Client.const_set(:LOOP, rloop)
     Rainbows::Coolio::Server.const_set(:MAX, @worker_connections)
     Rainbows::Coolio::Server.const_set(:CL, mod.const_get(:Client))
-    Rainbows::EvCore.const_set(:APP, G.server.app)
+    Rainbows::EvCore.const_set(:APP, Rainbows.server.app)
     Rainbows::EvCore.setup
     Rainbows::Coolio::Heartbeat.new(1, true).attach(rloop)
     LISTENERS.map! { |s| Rainbows::Coolio::Server.new(s).attach(rloop) }

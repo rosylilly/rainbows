@@ -6,8 +6,6 @@ require 'thread'
 # This is NOT used for the ThreadPool class, since that class does not
 # need a userspace Queue.
 class Rainbows::QueuePool < Struct.new(:queue, :threads)
-  G = Rainbows::G
-
   def initialize(size = 20, &block)
     q = Queue.new
     self.threads = (1..size).map do
@@ -23,7 +21,7 @@ class Rainbows::QueuePool < Struct.new(:queue, :threads)
   def quit!
     threads.each { |_| queue << nil }
     threads.delete_if do |t|
-      G.tick
+      Rainbows.tick
       t.alive? ? t.join(0.01) : true
     end until threads.empty?
   end

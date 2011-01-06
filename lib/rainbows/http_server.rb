@@ -2,14 +2,12 @@
 # :enddoc:
 
 class Rainbows::HttpServer < Unicorn::HttpServer
-  G = Rainbows::G
-
   def self.setup(block)
-    G.server.instance_eval(&block)
+    Rainbows.server.instance_eval(&block)
   end
 
   def initialize(app, options)
-    G.server = self
+    Rainbows.server = self
     @logger = Unicorn::Configurator::DEFAULTS[:logger]
     rv = super(app, options)
     defined?(@use) or use(:Base)
@@ -21,7 +19,7 @@ class Rainbows::HttpServer < Unicorn::HttpServer
     Unicorn::Util.reopen_logs
     logger.info "worker=#{worker_nr} done reopening logs"
     rescue
-      G.quit! # let the master reopen and refork us
+      Rainbows.quit! # let the master reopen and refork us
   end
 
   # Add one second to the timeout since our fchmod heartbeat is less

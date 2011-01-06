@@ -19,7 +19,7 @@ module Rainbows::Fiber::Base
   # will cause it.
   def schedule(&block)
     begin
-      G.tick
+      Rainbows.tick
       t = schedule_sleepers
       ret = select(RD.compact.concat(LISTENERS), WR.compact, nil, t)
     rescue Errno::EINTR
@@ -56,10 +56,10 @@ module Rainbows::Fiber::Base
   end
 
   def process(client)
-    G.cur += 1
+    Rainbows.cur += 1
     client.process_loop
   ensure
-    G.cur -= 1
+    Rainbows.cur -= 1
     ZZ.delete(client.f)
   end
 

@@ -8,7 +8,7 @@ module Rainbows::NeverBlock::Core
     base = o[:backend].to_s.gsub!(/([a-z])([A-Z])/, '\1_\2').downcase!
     require "rainbows/never_block/#{base}"
     client_class = Rainbows::NeverBlock::Client
-    client_class.superclass.const_set(:APP, Rainbows::G.server.app)
+    client_class.superclass.const_set(:APP, Rainbows.server.app)
     client_class.const_set(:POOL, pool)
     logger.info "NeverBlock/#{o[:backend]} pool_size=#{o[:pool_size]}"
   end

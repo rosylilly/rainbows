@@ -4,7 +4,6 @@
 module Rainbows::EvCore
   include Rainbows::Const
   include Rainbows::Response
-  G = Rainbows::G
   NULL_IO = Unicorn::HttpRequest::NULL_IO
   HttpParser = Rainbows::HttpParser
   autoload :CapInput, 'rainbows/ev_core/cap_input'

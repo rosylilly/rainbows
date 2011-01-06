@@ -18,7 +18,7 @@ module Rainbows::CoolioFiberSpawn
     init_worker_process(worker)
     Server.const_set(:MAX, @worker_connections)
     Rainbows::Fiber::Base.setup(Server, nil)
-    Server.const_set(:APP, G.server.app)
+    Server.const_set(:APP, Rainbows.server.app)
     Heartbeat.new(1, true).attach(Coolio::Loop.default)
     LISTENERS.map! { |s| Server.new(s).attach(Coolio::Loop.default) }
     Coolio::Loop.default.run

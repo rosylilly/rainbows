@@ -54,10 +54,9 @@ class Rainbows::WriterThreadSpawn::Client < Struct.new(:to_io, :q, :thr)
   include Methods
 
   def self.quit
-    g = Rainbows::G
     CUR.delete_if do |t,q|
       q << nil
-      g.tick
+      Rainbows.tick
       t.alive? ? t.join(0.01) : true
     end until CUR.empty?
   end

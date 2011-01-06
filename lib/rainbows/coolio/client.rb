@@ -2,7 +2,6 @@
 # :enddoc:
 class Rainbows::Coolio::Client < Coolio::IO
   include Rainbows::EvCore
-  G = Rainbows::G
   SF = Rainbows::StreamFile
   CONN = Rainbows::Coolio::CONN
   KATO = Rainbows::Coolio::KATO
@@ -175,7 +174,7 @@ class Rainbows::Coolio::Client < Coolio::IO
       begin
         @deferred.close
       rescue => e
-        G.server.logger.error("closing #@deferred: #{e}")
+        Rainbows.server.logger.error("closing #@deferred: #{e}")
       end
       @deferred = nil
     end

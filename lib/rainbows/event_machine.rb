@@ -58,8 +58,9 @@ module Rainbows::EventMachine
   # given a INT, QUIT, or TERM signal)
   def worker_loop(worker) # :nodoc:
     init_worker_process(worker)
-    G.server.app.respond_to?(:deferred?) and
-      G.server.app = Rainbows::EventMachine::TryDefer[G.server.app]
+    server = Rainbows.server
+    server.app.respond_to?(:deferred?) and
+      server.app = TryDefer.new(server.app)
 
     # enable them both, should be non-fatal if not supported
     EM.epoll
@@ -69,14 +70,14 @@ module Rainbows::EventMachine
     max = worker_connections + LISTENERS.size
     Rainbows::EventMachine::Server.const_set(:MAX, max)
     Rainbows::EventMachine::Server.const_set(:CL, client_class)
-    client_class.const_set(:APP, G.server.app)
+    client_class.const_set(:APP, Rainbows.server.app)
     Rainbows::EvCore.setup
     EM.run {
       conns = EM.instance_variable_get(:@conns) or
         raise RuntimeError, "EM @conns instance variable not accessible!"
       Rainbows::EventMachine::Server.const_set(:CUR, conns)
       EM.add_periodic_timer(1) do
-        unless G.tick
+        unless Rainbows.tick
           conns.each_value { |c| client_class === c and c.quit }
           EM.stop if conns.empty? && EM.reactor_running?
         end
