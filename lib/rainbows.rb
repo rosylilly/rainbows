@@ -49,7 +49,6 @@ module Rainbows
   autoload :RackInput, 'rainbows/rack_input'
   autoload :Response, 'rainbows/response'
   autoload :ProcessClient, 'rainbows/process_client'
-  autoload :TimedRead, 'rainbows/timed_read'
   autoload :Client, 'rainbows/client'
   autoload :Base, 'rainbows/base'
   autoload :Sendfile, 'rainbows/sendfile'
