@@ -11,6 +11,11 @@ module Rainbows::EvCore
   # Apps may return this Rack response: AsyncResponse = [ -1, {}, [] ]
   ASYNC_CALLBACK = "async.callback".freeze
 
+  def write_async_response(response)
+    status, headers, body = response
+    write_response(status, headers, body, false)
+  end
+
   ASYNC_CLOSE = "async.close".freeze
 
   def post_init
