@@ -1,10 +1,7 @@
 # -*- encoding: binary -*-
 # :enddoc:
-require 'time' # for Time#httpdate
-
 module Rainbows::Response
-  CRLF = Unicorn::HttpResponse::CRLF
-  CODES = Unicorn::HttpResponse::CODES
+  include Unicorn::HttpResponse
   Close = "close"
   KeepAlive = "keep-alive"
 
@@ -22,7 +19,7 @@ module Rainbows::Response
     @hp.headers? or return
     status = CODES[status.to_i] || status
     buf = "HTTP/1.1 #{status}\r\n" \
-          "Date: #{Time.now.httpdate}\r\n" \
+          "Date: #{httpdate}\r\n" \
           "Status: #{status}\r\n" \
           "Connection: #{alive ? KeepAlive : Close}\r\n"
     headers.each do |key, value|
