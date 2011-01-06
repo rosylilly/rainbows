@@ -13,7 +13,15 @@ module Rainbows::EvCore
 
   def write_async_response(response)
     status, headers, body = response
-    write_response(status, headers, body, false)
+    if alive = @hp.next?
+      # we can't do HTTP keepalive without Content-Length or
+      # "Transfer-Encoding: chunked", and the async.callback stuff
+      # isn't Rack::Lint-compatible, so we have to enforce it here.
+      headers = Rack::Utils::HeaderHash.new(headers) unless Hash === headers
+      alive = headers.include?("Content-Length") ||
+              !!(%r{\Achunked\z}i =~ headers["Transfer-Encoding"])
+    end
+    write_response(status, headers, body, alive)
   end
 
   ASYNC_CLOSE = "async.close".freeze

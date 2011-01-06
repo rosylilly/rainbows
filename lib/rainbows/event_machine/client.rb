@@ -48,18 +48,7 @@ class Rainbows::EventMachine::Client < EM::Connection
     # second (pipelined) request could be a stuck behind a
     # long-running async response
     (status.nil? || -1 == status) and return @state = :close
-
-    if @hp.next?
-      @state = :headers
-      write_response(status, headers, body, true)
-      if @buf.empty?
-        set_comm_inactivity_timeout(Rainbows.keepalive_timeout)
-      elsif @body.nil?
-        EM.next_tick { receive_data(nil) }
-      end
-    else
-      write_response(status, headers, body, false)
-    end
+    write_response(status, headers, body, @hp.next?)
   end
 
   def next!
