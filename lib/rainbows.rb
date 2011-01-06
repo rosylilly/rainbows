@@ -80,13 +80,12 @@ module Rainbows
     end
 
     # :stopdoc:
-    # the default max body size is 1 megabyte (1024 * 1024 bytes)
-    @@max_bytes = 1024 * 1024
-
-    def max_bytes; @@max_bytes; end
-    def max_bytes=(nr); @@max_bytes = nr; end
+    attr_accessor :max_bytes
     # :startdoc:
   end
+
+  # the default max body size is 1 megabyte (1024 * 1024 bytes)
+  @max_bytes = 1024 * 1024
 
   # :stopdoc:
   # maps models to default worker counts, default worker count numbers are
