@@ -91,6 +91,10 @@ module Rainbows
     @alive && @server.master_pid == Process.ppid or quit!
   end
 
+  def self.cur_alive
+    @alive || @cur > 0
+  end
+
   def self.quit!
     @alive = false
     Rainbows::HttpParser.quit

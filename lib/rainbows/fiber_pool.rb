@@ -34,6 +34,6 @@ module Rainbows::FiberPool
       end
     rescue => e
       Rainbows::Error.listen_loop(e)
-    end while Rainbows.alive || Rainbows.cur > 0
+    end while Rainbows.cur_alive
   end
 end

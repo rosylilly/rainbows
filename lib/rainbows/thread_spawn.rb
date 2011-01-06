@@ -22,18 +22,19 @@ module Rainbows::ThreadSpawn
   def accept_loop(klass) #:nodoc:
     lock = Mutex.new
     limit = worker_connections
+    nr = 0
     LISTENERS.each do |l|
       klass.new(l) do |l|
         begin
-          if lock.synchronize { Rainbows.cur >= limit }
+          if lock.synchronize { nr >= limit }
             worker_yield
           elsif c = l.kgio_accept
             klass.new(c) do |c|
               begin
-                lock.synchronize { Rainbows.cur += 1 }
+                lock.synchronize { nr += 1 }
                 c.process_loop
               ensure
-                lock.synchronize { Rainbows.cur -= 1 }
+                lock.synchronize { nr -= 1 }
               end
             end
           end
@@ -42,7 +43,7 @@ module Rainbows::ThreadSpawn
         end while Rainbows.alive
       end
     end
-    sleep 1 while Rainbows.tick || lock.synchronize { Rainbows.cur > 0 }
+    sleep 1 while Rainbows.tick || lock.synchronize { nr > 0 }
   end
 
   def worker_loop(worker) #:nodoc:
