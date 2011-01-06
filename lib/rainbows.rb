@@ -59,36 +59,35 @@ module Rainbows
   autoload :EvCore, 'rainbows/ev_core'
   autoload :SocketProxy, 'rainbows/socket_proxy'
 
-  class << self
-
-    # Sleeps the current application dispatch.  This will pick the
-    # optimal method to sleep depending on the concurrency model chosen
-    # (which may still suck and block the entire process).  Using this
-    # with the basic :Coolio or :EventMachine models is not recommended.
-    # This should be used within your Rack application.
-    def sleep(nr)
-      case G.server.use
-      when :FiberPool, :FiberSpawn
-        Rainbows::Fiber.sleep(nr)
-      when :RevFiberSpawn, :CoolioFiberSpawn
-        Rainbows::Fiber::Coolio::Sleeper.new(nr)
-      when :Revactor
-        Actor.sleep(nr)
-      else
-        Kernel.sleep(nr)
-      end
+  # Sleeps the current application dispatch.  This will pick the
+  # optimal method to sleep depending on the concurrency model chosen
+  # (which may still suck and block the entire process).  Using this
+  # with the basic :Coolio or :EventMachine models is not recommended.
+  # This should be used within your Rack application.
+  def self.sleep(nr)
+    case G.server.use
+    when :FiberPool, :FiberSpawn
+      Rainbows::Fiber.sleep(nr)
+    when :RevFiberSpawn, :CoolioFiberSpawn
+      Rainbows::Fiber::Coolio::Sleeper.new(nr)
+    when :Revactor
+      Actor.sleep(nr)
+    else
+      Kernel.sleep(nr)
     end
-
-    # runs the Rainbows! HttpServer with +app+ and +options+ and does
-    # not return until the server has exited.
-    def run(app, options = {}) # :nodoc:
-      HttpServer.new(app, options).start.join
-    end
-
-    # :stopdoc:
-    attr_accessor :max_bytes, :keepalive_timeout
-    # :startdoc:
   end
+
+  # runs the Rainbows! HttpServer with +app+ and +options+ and does
+  # not return until the server has exited.
+  def self.run(app, options = {}) # :nodoc:
+    HttpServer.new(app, options).start.join
+  end
+
+  # :stopdoc:
+  class << self
+    attr_accessor :max_bytes, :keepalive_timeout
+  end
+  # :startdoc:
 
   # the default max body size is 1 megabyte (1024 * 1024 bytes)
   @max_bytes = 1024 * 1024
