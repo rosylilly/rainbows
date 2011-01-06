@@ -49,7 +49,7 @@ class Rainbows::EventMachine::Client < EM::Connection
       @state = :headers
       em_write_response(response, true)
       if @buf.empty?
-        set_comm_inactivity_timeout(G.kato)
+        set_comm_inactivity_timeout(Rainbows.keepalive_timeout)
       elsif @body.nil?
         EM.next_tick { receive_data(nil) }
       end

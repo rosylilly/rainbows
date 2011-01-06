@@ -4,11 +4,11 @@ module Rainbows::TimedRead
   G = Rainbows::G # :nodoc:
 
   def read_expire
-    Time.now + G.kato
+    Time.now + Rainbows.keepalive_timeout
   end
 
   def kgio_wait_readable
-    IO.select([self], nil, nil, G.kato)
+    IO.select([self], nil, nil, Rainbows.keepalive_timeout)
   end
 
   # used for reading headers (respecting keepalive_timeout)

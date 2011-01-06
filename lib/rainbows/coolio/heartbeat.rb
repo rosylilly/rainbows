@@ -11,7 +11,7 @@ class Rainbows::Coolio::Heartbeat < Coolio::TimerWatcher
   G = Rainbows::G
 
   def on_timer
-    if (ot = G.kato) >= 0
+    if (ot = Rainbows.keepalive_timeout) >= 0
       ot = Time.now - ot
       KATO.delete_if { |client, time| time < ot and client.timeout? }
     end

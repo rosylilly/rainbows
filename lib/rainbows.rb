@@ -17,7 +17,7 @@ module Rainbows
   # this struct is only accessed inside workers and thus private to each
   # G.cur may not be used in the network concurrency model
   # :stopdoc:
-  class State < Struct.new(:alive,:m,:cur,:kato,:server,:tmp,:expire)
+  class State < Struct.new(:alive,:m,:cur,:server,:tmp,:expire)
     def tick
       tmp.chmod(self.m = m == 0 ? 1 : 0)
       exit!(2) if expire && Time.now >= expire
@@ -32,7 +32,7 @@ module Rainbows
       false
     end
   end
-  G = State.new(true, 0, 0, 5)
+  G = State.new(true, 0, 0)
   O = {}
   class Response416 < RangeError; end
 
@@ -87,12 +87,15 @@ module Rainbows
     end
 
     # :stopdoc:
-    attr_accessor :max_bytes
+    attr_accessor :max_bytes, :keepalive_timeout
     # :startdoc:
   end
 
   # the default max body size is 1 megabyte (1024 * 1024 bytes)
   @max_bytes = 1024 * 1024
+
+  # the default keepalive_timeout is 5 seconds
+  @keepalive_timeout = 5
 
   # :stopdoc:
   # maps models to default worker counts, default worker count numbers are

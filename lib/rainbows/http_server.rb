@@ -36,7 +36,7 @@ class Rainbows::HttpServer < Unicorn::HttpServer
 
   def load_config!
     use :Base
-    G.kato = 5
+    Rainbows.keepalive_timeout = 5
     Rainbows.max_bytes = 1024 * 1024
     @worker_connections = nil
     super
@@ -91,7 +91,7 @@ class Rainbows::HttpServer < Unicorn::HttpServer
   def keepalive_timeout(nr)
     (Integer === nr && nr >= 0) or
       raise ArgumentError, "keepalive_timeout must be a non-negative Integer"
-    G.kato = nr
+    Rainbows.keepalive_timeout = nr
   end
 
   def keepalive_requests(nr)

@@ -4,7 +4,8 @@ require 'fcntl'
 class Rainbows::Revactor::Client
   autoload :TeeSocket, 'rainbows/revactor/client/tee_socket'
   RD_ARGS = {}
-  RD_ARGS[:timeout] = Rainbows::G.kato if Rainbows::G.kato > 0
+  Rainbows.keepalive_timeout > 0 and
+    RD_ARGS[:timeout] = Rainbows.keepalive_timeout
   attr_reader :kgio_addr
 
   def initialize(client)
