@@ -13,6 +13,8 @@ opts = {
 old_out = $stdout.dup
 $stdout.reopen($stderr)
 
+lock = File.open(__FILE__, "rb")
+lock.flock(File::LOCK_EX)
 Isolate.now!(opts) do
   gem 'rack', '1.2.1'
   gem 'kgio', '2.1.1'
