@@ -72,13 +72,12 @@ class Rainbows::Sendfile < Struct.new(:app)
   end
 
   # :stopdoc:
-  HH = Rack::Utils::HeaderHash
   X_SENDFILE = 'X-Sendfile'
   # :startdoc:
 
   def call(env) # :nodoc:
     status, headers, body = app.call(env)
-    headers = HH.new(headers)
+    headers = Rack::Utils::HeaderHash.new(headers) unless Hash === headers
     if path = headers.delete(X_SENDFILE)
       body = Body.new(path, headers) unless body.respond_to?(:to_path)
     end

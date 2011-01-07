@@ -39,7 +39,7 @@ class Rainbows::DevFdResponse < Struct.new(:app)
     io ||= File.open(body.to_path) if body.respond_to?(:to_path)
     return response if io.nil?
 
-    headers = HeaderHash.new(headers)
+    headers = Rack::Utils::HeaderHash.new(headers) unless Hash === headers
     st = io.stat
     fileno = io.fileno
     FD_MAP[fileno] = io

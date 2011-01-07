@@ -30,7 +30,7 @@ class ServerToken < Struct.new(:app, :token)
 
   def call(env)
     status, headers, body = app.call(env)
-    headers = Rack::Utils::HeaderHash.new(headers)
+    headers = Rack::Utils::HeaderHash.new(headers) unless Hash === headers
     headers[SERVER] = token
     [ status, headers, body ]
   end
