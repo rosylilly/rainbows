@@ -10,6 +10,7 @@ module Rainbows::EvCore
 
   # Apps may return this Rack response: AsyncResponse = [ -1, {}, [] ]
   ASYNC_CALLBACK = "async.callback".freeze
+  ASYNC_CLOSE = "async.close".freeze
 
   def write_async_response(response)
     status, headers, body = response
@@ -23,8 +24,6 @@ module Rainbows::EvCore
     end
     write_response(status, headers, body, alive)
   end
-
-  ASYNC_CLOSE = "async.close".freeze
 
   def post_init
     @hp = HttpParser.new
