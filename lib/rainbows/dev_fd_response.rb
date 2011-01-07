@@ -47,7 +47,7 @@ class Rainbows::DevFdResponse < Struct.new(:app)
       headers['Content-Length'] ||= st.size.to_s
       headers.delete('Transfer-Encoding')
     elsif st.pipe? || st.socket? # epoll-able things
-      unless headers['Content-Length']
+      unless headers.include?('Content-Length')
         if env['rainbows.autochunk']
           headers['Transfer-Encoding'] = 'chunked'
         else
