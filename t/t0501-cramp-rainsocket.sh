@@ -7,6 +7,8 @@ EventMachine) ;;
 	exit 0
 	;;
 esac
+RUBYLIB=$($RUBY test_isolate_cramp.rb):$RUBYLIB
+export RUBYLIB
 require_check cramp Cramp::VERSION
 
 t_plan 4 "WebSocket monkey patch validity test for Cramp"
