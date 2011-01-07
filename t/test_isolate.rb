@@ -27,7 +27,7 @@ Isolate.now!(opts) do
 
     gem 'eventmachine', '0.12.10'
     gem 'sinatra', '1.0.0'
-    gem 'async_sinatra', '0.2.1'
+    gem 'async_sinatra', '0.4.0'
 
     gem 'neverblock', '0.1.6.2'
   end
