@@ -16,26 +16,20 @@ $stdout.reopen($stderr)
 lock = File.open(__FILE__, "rb")
 lock.flock(File::LOCK_EX)
 Isolate.now!(opts) do
-  gem 'rack', '1.2.1'
-  gem 'kgio', '2.1.1'
-  gem 'unicorn', '3.3.0'
-  gem 'kcar', '0.1.1'
+  gem 'unicorn', '3.3.1'
+  gem 'kcar', '0.1.2'
 
   if engine == "ruby"
     gem 'sendfile', '1.0.0' # next Rubinius should support this
-
-    gem 'iobuffer', '0.1.3'
     gem 'cool.io', '1.0.0'
 
     gem 'eventmachine', '0.12.10'
-    gem 'sinatra', '1.0.0'
     gem 'async_sinatra', '0.4.0'
 
     gem 'neverblock', '0.1.6.2'
   end
 
   if defined?(::Fiber) && engine == "ruby"
-    gem 'case', '0.5'
     gem 'revactor', '0.1.5'
     gem 'rack-fiber_pool', '0.9.0'
   end
