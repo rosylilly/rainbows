@@ -18,8 +18,8 @@ module Rainbows::EvCore
       # "Transfer-Encoding: chunked", and the async.callback stuff
       # isn't Rack::Lint-compatible, so we have to enforce it here.
       headers = Rack::Utils::HeaderHash.new(headers) unless Hash === headers
-      alive = headers.include?("Content-Length") ||
-              !!(%r{\Achunked\z}i =~ headers["Transfer-Encoding"])
+      alive = headers.include?(Content_Length) ||
+              !!(%r{\Achunked\z}i =~ headers[Transfer_Encoding])
     end
     write_response(status, headers, body, alive)
   end
@@ -50,10 +50,10 @@ module Rainbows::EvCore
   # returns whether to enable response chunking for autochunk models
   def stream_response_headers(status, headers, alive)
     headers = Rack::Utils::HeaderHash.new(headers)
-    if headers['Content-Length']
+    if headers[Content_Length]
       rv = false
     else
-      rv = !!(headers['Transfer-Encoding'] =~ %r{\Achunked\z}i)
+      rv = !!(headers[Transfer_Encoding] =~ %r{\Achunked\z}i)
       rv = false if headers.delete('X-Rainbows-Autochunk') == 'no'
     end
     write_headers(status, headers, alive)

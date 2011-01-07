@@ -4,6 +4,8 @@ module Rainbows::Response
   include Unicorn::HttpResponse
   Close = "close"
   KeepAlive = "keep-alive"
+  Content_Length = "Content-Length".freeze
+  Transfer_Encoding = "Transfer-Encoding".freeze
 
   # private file class for IO objects opened by Rainbows! itself (and not
   # the app or middleware)
@@ -112,7 +114,6 @@ module Rainbows::Response
   if IO.method_defined?(:sendfile_nonblock) || IO.respond_to?(:copy_stream)
     HTTP_RANGE = 'HTTP_RANGE'
     Content_Range = 'Content-Range'.freeze
-    Content_Length = 'Content-Length'.freeze
 
     # This does not support multipart responses (does anybody actually
     # use those?)
