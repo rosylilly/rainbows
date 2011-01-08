@@ -11,7 +11,6 @@ module Rainbows::Coolio::Core
     init_worker_process(worker)
     mod = Rainbows.const_get(@use)
     rloop = Rainbows::Coolio::Server.const_set(:LOOP, Coolio::Loop.default)
-    Rainbows::Coolio::Client.const_set(:LOOP, rloop)
     Rainbows::Coolio::Server.const_set(:MAX, @worker_connections)
     Rainbows::Coolio::Server.const_set(:CL, mod.const_get(:Client))
     Rainbows::EvCore.const_set(:APP, Rainbows.server.app)

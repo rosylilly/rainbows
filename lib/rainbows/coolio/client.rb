@@ -4,6 +4,7 @@ class Rainbows::Coolio::Client < Coolio::IO
   include Rainbows::EvCore
   CONN = Rainbows::Coolio::CONN
   KATO = Rainbows::Coolio::KATO
+  LOOP = Coolio::Loop.default
 
   def initialize(io)
     CONN[self] = false
@@ -57,7 +58,7 @@ class Rainbows::Coolio::Client < Coolio::IO
 
   # allows enabling of write watcher even when read watcher is disabled
   def evloop
-    LOOP # this constant is set in when a worker starts
+    LOOP
   end
 
   def next!
