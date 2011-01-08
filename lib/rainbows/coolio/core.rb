@@ -8,8 +8,6 @@ module Rainbows::Coolio::Core
   # given a INT, QUIT, or TERM signal)
   def worker_loop(worker)
     Rainbows::Response.setup(Rainbows::Coolio::Client)
-    require 'rainbows/coolio/sendfile'
-    Rainbows::Coolio::Client.__send__(:include, Rainbows::Coolio::Sendfile)
     init_worker_process(worker)
     mod = Rainbows.const_get(@use)
     rloop = Rainbows::Coolio::Server.const_set(:LOOP, Coolio::Loop.default)
