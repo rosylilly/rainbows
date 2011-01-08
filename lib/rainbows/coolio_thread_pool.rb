@@ -16,6 +16,7 @@
 # users are NOT advised to use this due to high CPU usage.
 module Rainbows::CoolioThreadPool
   # :stopdoc:
+  autoload :Client, 'rainbows/coolio_thread_pool/client'
   DEFAULTS = {
     :pool_size => 20, # same default size as ThreadPool (w/o Coolio)
   }
@@ -53,5 +54,4 @@ module Rainbows::CoolioThreadPool
   end
 end
 # :enddoc:
-require 'rainbows/coolio_thread_pool/client'
 require 'rainbows/coolio_thread_pool/watcher'

@@ -15,6 +15,7 @@
 # users are NOT advised to use this due to high CPU usage.
 module Rainbows::CoolioThreadSpawn
   include Rainbows::Coolio::Core
+  autoload :Client, 'rainbows/coolio_thread_spawn/client'
 
   def init_worker_process(worker) # :nodoc:
     super
@@ -24,4 +25,3 @@ module Rainbows::CoolioThreadSpawn
   end
 end
 # :enddoc:
-require 'rainbows/coolio_thread_spawn/client'
