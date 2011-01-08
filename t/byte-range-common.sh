@@ -55,7 +55,7 @@ t_begin "normal full request matches" && {
 
 t_begin "crazy offset goes over" && {
 	range_insane=-r$(($random_blob_size * 2))-$(($random_blob_size * 4))
-	curl -vsS 2>$err $range_insane $url
+	curl -vsS 2>$err $range_insane $url >/dev/null
 	grep '^< HTTP/1\.[01] 416 ' $err || die "expected 416 error"
 	grep '^< Content-Range: bytes \*/'$random_blob_size $err || \
           die "expected Content-Range: bytes */SIZE"
