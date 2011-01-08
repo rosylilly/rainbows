@@ -39,16 +39,12 @@ class Rainbows::EventMachine::Client < EM::Connection
     @env[REMOTE_ADDR] = @_io.kgio_addr
     @env[ASYNC_CALLBACK] = method(:write_async_response)
     @env[ASYNC_CLOSE] = EM::DefaultDeferrable.new
-
     status, headers, body = catch(:async) {
       APP.call(@env.merge!(RACK_DEFAULTS))
     }
 
-    # too tricky to support pipelining with :async since the
-    # second (pipelined) request could be a stuck behind a
-    # long-running async response
-    (status.nil? || -1 == status) and return @state = :close
-    write_response(status, headers, body, @hp.next?)
+    (nil == status || -1 == status) or
+      write_response(status, headers, body, @hp.next?)
   end
 
   def next!
