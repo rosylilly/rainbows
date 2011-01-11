@@ -64,7 +64,7 @@ class Rainbows::Coolio::Client < Coolio::IO
   def next!
     attached? or return
     @deferred = nil
-    enable_write_watcher
+    enable_write_watcher # trigger on_write_complete
   end
 
   def timeout?
@@ -80,45 +80,59 @@ class Rainbows::Coolio::Client < Coolio::IO
     @deferred = true
   end
 
-  def coolio_write_response(response, alive)
-    status, headers, body = response
+  def write_response_path(status, headers, body, alive)
+    io = body_to_io(body)
+    st = io.stat
 
-    if body.respond_to?(:to_path)
-      io = body_to_io(body)
-      st = io.stat
-
-      if st.file?
-        return defer_file(status, headers, body, alive, io, st)
-      elsif st.socket? || st.pipe?
-        chunk = stream_response_headers(status, headers, alive)
-        return stream_response_body(body, io, chunk)
-      end
-      # char or block device... WTF? fall through to body.each
+    if st.file?
+      defer_file(status, headers, body, alive, io, st)
+    elsif st.socket? || st.pipe?
+      chunk = stream_response_headers(status, headers, alive)
+      stream_response_body(body, io, chunk)
+    else
+      # char or block device... WTF?
+      write_response(status, headers, body, alive)
     end
-    write_response(status, headers, body, alive)
+  end
+
+  def ev_write_response(status, headers, body, alive)
+    if body.respond_to?(:to_path)
+      write_response_path(status, headers, body, alive)
+    else
+      write_response(status, headers, body, alive)
+    end
+    return quit unless alive && :close != @state
+    @state = :headers
+  end
+
+  def coolio_write_async_response(response)
+    write_async_response(response)
+    @deferred = nil
   end
 
   def app_call
     KATO.delete(self)
+    disable if enabled?
     @env[RACK_INPUT] = @input
     @env[REMOTE_ADDR] = @_io.kgio_addr
-    response = APP.call(@env.merge!(RACK_DEFAULTS))
+    @env[ASYNC_CALLBACK] = method(:coolio_write_async_response)
+    status, headers, body = catch(:async) {
+      APP.call(@env.merge!(RACK_DEFAULTS))
+    }
 
-    coolio_write_response(response, alive = @hp.next?)
-    return quit unless alive && :close != @state
-    @state = :headers
-    disable if enabled?
+    (nil == status || -1 == status) ? @deferred = true :
+        ev_write_response(status, headers, body, @hp.next?)
   end
 
   def on_write_complete
     case @deferred
-    when true then return
+    when true then return # #next! will clear this bit
     when nil # fall through
     else
       begin
         return stream_file_chunk(@deferred)
       rescue EOFError # expected at file EOF
-        close_deferred
+        close_deferred # fall through
       end
     end
 
@@ -150,13 +164,14 @@ class Rainbows::Coolio::Client < Coolio::IO
   end
 
   def close_deferred
-    @deferred.respond_to?(:close) or return
-    begin
-      @deferred.close
-    rescue => e
-      Rainbows.server.logger.error("closing #@deferred: #{e}")
+    if @deferred
+      begin
+        @deferred.close if @deferred.respond_to?(:close)
+      rescue => e
+        Rainbows.server.logger.error("closing #@deferred: #{e}")
+      end
+      @deferred = nil
     end
-    @deferred = nil
   end
 
   def on_close

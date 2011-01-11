@@ -17,27 +17,45 @@ class DeferrableChunkBody
   def finish
     @body_callback.call("0\r\n\r\n")
   end
-end
+end if defined?(EventMachine)
 
 class AsyncChunkApp
   def call(env)
-    body = DeferrableChunkBody.new
-    body.callback { body.finish }
     headers = {
       'Content-Type' => 'text/plain',
       'Transfer-Encoding' => 'chunked',
     }
-    EM.next_tick {
-      env['async.callback'].call([ 200, headers, body ])
-    }
-    EM.add_timer(1) {
-      body.call "Hello "
+    delay = env["HTTP_X_DELAY"].to_i
 
-      EM.add_timer(1) {
-        body.call "World #{env['PATH_INFO']}\n"
-        body.succeed
+    case env["rainbows.model"]
+    when :EventMachine, :NeverBlock
+      body = DeferrableChunkBody.new
+      body.callback { body.finish }
+      task = lambda {
+        env['async.callback'].call([ 200, headers, body ])
+        EM.add_timer(1) {
+          body.call "Hello "
+
+          EM.add_timer(1) {
+            body.call "World #{env['PATH_INFO']}\n"
+            body.succeed
+          }
+        }
       }
-    }
+      delay == 0 ? EM.next_tick(&task) : EM.add_timer(delay, &task)
+    when :Coolio
+      # Cool.io only does one-shot responses due to the lack of the
+      # equivalent of EM::Deferrables
+      body = [ "Hello ", "World #{env['PATH_INFO']}\n", '' ].map do |chunk|
+        "#{chunk.size.to_s(16)}\r\n#{chunk}\r\n"
+      end
+
+      next_tick = Coolio::TimerWatcher.new(delay, false)
+      next_tick.on_timer { env['async.callback'].call([ 200, headers, body ]) }
+      next_tick.attach(Coolio::Loop.default)
+    else
+      raise "Not supported: #{env['rainbows.model']}"
+    end
     nil
   end
 end

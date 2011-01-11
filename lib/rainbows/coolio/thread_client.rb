@@ -14,9 +14,7 @@ class Rainbows::Coolio::ThreadClient < Rainbows::Coolio::Client
 
   # this is only called in the master thread
   def response_write(response)
-    coolio_write_response(response, alive = @hp.next?)
-    return quit unless alive && :close != @state
-    @state = :headers
+    ev_write_response(*response, @hp.next?)
     rescue => e
       handle_error(e)
   end
