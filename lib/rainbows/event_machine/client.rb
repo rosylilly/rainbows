@@ -1,7 +1,6 @@
 # -*- encoding: binary -*-
 # :enddoc:
 class Rainbows::EventMachine::Client < EM::Connection
-  attr_writer :body
   include Rainbows::EvCore
 
   def initialize(io)
