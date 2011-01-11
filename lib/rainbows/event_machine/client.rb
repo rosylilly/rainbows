@@ -5,7 +5,7 @@ class Rainbows::EventMachine::Client < EM::Connection
 
   def initialize(io)
     @_io = io
-    @body = nil
+    @deferred = nil
   end
 
   alias write send_data
@@ -14,7 +14,7 @@ class Rainbows::EventMachine::Client < EM::Connection
     # To avoid clobbering the current streaming response
     # (often a static file), we do not attempt to process another
     # request on the same connection until the first is complete
-    if @body
+    if @deferred
       if data
         @buf << data
         @_io.shutdown(Socket::SHUT_RD) if @buf.size > 0x1c000
@@ -45,16 +45,16 @@ class Rainbows::EventMachine::Client < EM::Connection
   end
 
   def deferred_errback(orig_body)
-    @body.errback do
+    @deferred.errback do
       orig_body.close if orig_body.respond_to?(:close)
       quit
     end
   end
 
   def deferred_callback(orig_body, alive)
-    @body.callback do
+    @deferred.callback do
       orig_body.close if orig_body.respond_to?(:close)
-      @body = nil
+      @deferred = nil
       alive ? receive_data(nil) : quit
     end
   end
@@ -62,7 +62,7 @@ class Rainbows::EventMachine::Client < EM::Connection
   def ev_write_response(status, headers, body, alive)
     @state = :headers if alive
     if body.respond_to?(:errback) && body.respond_to?(:callback)
-      @body = body
+      @deferred = body
       deferred_errback(body)
       deferred_callback(body, alive)
     elsif body.respond_to?(:to_path)
@@ -70,12 +70,12 @@ class Rainbows::EventMachine::Client < EM::Connection
 
       if st.file?
         write_headers(status, headers, alive)
-        @body = stream_file_data(path)
+        @deferred = stream_file_data(path)
         deferred_errback(body)
         deferred_callback(body, alive)
         return
       elsif st.socket? || st.pipe?
-        io = body_to_io(@body = body)
+        io = body_to_io(@deferred = body)
         chunk = stream_response_headers(status, headers, alive)
         m = chunk ? Rainbows::EventMachine::ResponseChunkPipe :
                     Rainbows::EventMachine::ResponsePipe
@@ -85,7 +85,7 @@ class Rainbows::EventMachine::Client < EM::Connection
     end
     write_response(status, headers, body, alive)
     if alive
-      if @body.nil?
+      if @deferred.nil?
         if @buf.empty?
           set_comm_inactivity_timeout(Rainbows.keepalive_timeout)
         else
@@ -93,18 +93,18 @@ class Rainbows::EventMachine::Client < EM::Connection
         end
       end
     else
-      quit unless @body
+      quit unless @deferred
     end
   end
 
   def next!
-    @body.close if @body.respond_to?(:close)
-    @hp.keepalive? ? receive_data(@body = nil) : quit
+    @deferred.close if @deferred.respond_to?(:close)
+    @hp.keepalive? ? receive_data(@deferred = nil) : quit
   end
 
   def unbind
     async_close = @env[ASYNC_CLOSE] and async_close.succeed
-    @body.respond_to?(:fail) and @body.fail
+    @deferred.respond_to?(:fail) and @deferred.fail
     begin
       @_io.close
     rescue Errno::EBADF
