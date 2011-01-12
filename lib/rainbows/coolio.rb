@@ -18,6 +18,9 @@ require 'rainbows/coolio_support'
 # allows the Rack application to process data as it arrives.  This
 # means "rack.input" will be fully buffered in memory or to a
 # temporary file before the application is entered.
+#
+# This model is mostly compatible with users of "async.callback" in
+# the Rack environment as long as they do not depend on EventMachine.
 module Rainbows::Coolio
   # :stopdoc:
   # keep-alive timeout scoreboard
