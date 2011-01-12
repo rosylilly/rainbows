@@ -22,6 +22,7 @@ module Rainbows::EvCore
       alive = headers.include?(Content_Length) ||
               !!(%r{\Achunked\z}i =~ headers[Transfer_Encoding])
     end
+    @deferred = nil
     ev_write_response(status, headers, body, alive)
   end
 

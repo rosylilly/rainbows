@@ -105,17 +105,12 @@ class Rainbows::Coolio::Client < Coolio::IO
     @state = :headers
   end
 
-  def coolio_write_async_response(response)
-    write_async_response(response)
-    @deferred = nil
-  end
-
   def app_call
     KATO.delete(self)
     disable if enabled?
     @env[RACK_INPUT] = @input
     @env[REMOTE_ADDR] = @_io.kgio_addr
-    @env[ASYNC_CALLBACK] = method(:coolio_write_async_response)
+    @env[ASYNC_CALLBACK] = method(:write_async_response)
     status, headers, body = catch(:async) {
       APP.call(@env.merge!(RACK_DEFAULTS))
     }

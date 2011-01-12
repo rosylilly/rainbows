@@ -9,7 +9,7 @@ Coolio|NeverBlock|EventMachine) ;;
 	;;
 esac
 
-t_plan 11 "async_chunk_app test for test for $model"
+t_plan 12 "async_chunk_app test for test for $model"
 
 CONFIG_RU=async_chunk_app.ru
 
@@ -33,6 +33,26 @@ t_begin "async.callback supports pipelining" && {
 		cat $fifo > $tmp &
 		printf 'GET /0 HTTP/1.1\r\nHost: example.com\r\n\r\n'
 		printf 'GET /1 HTTP/1.1\r\nHost: example.com\r\n\r\n'
+		printf 'GET /2 HTTP/1.0\r\nHost: example.com\r\n\r\n'
+		wait
+	) | socat - TCP:$listen > $fifo
+	t1=$(date +%s)
+	elapsed=$(( $t1 - $t0 ))
+	t_info "elapsed=$elapsed $model.$0 ($t_current)"
+	test 3 -eq "$(fgrep 'HTTP/1.1 200 OK' $tmp | wc -l)"
+	test 3 -eq "$(grep '^Hello ' $tmp | wc -l)"
+	test 3 -eq "$(grep 'World ' $tmp | wc -l)"
+}
+
+t_begin "async.callback supports delayed pipelining" && {
+	rm -f $tmp
+	t0=$(date +%s)
+	(
+		cat $fifo > $tmp &
+		printf 'GET /0 HTTP/1.1\r\nHost: example.com\r\n\r\n'
+		sleep 1
+		printf 'GET /1 HTTP/1.1\r\nHost: example.com\r\n\r\n'
+		sleep 1
 		printf 'GET /2 HTTP/1.0\r\nHost: example.com\r\n\r\n'
 		wait
 	) | socat - TCP:$listen > $fifo
