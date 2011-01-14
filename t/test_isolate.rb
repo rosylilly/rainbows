@@ -31,7 +31,7 @@ Isolate.now!(opts) do
 
   if defined?(::Fiber) && engine == "ruby"
     gem 'revactor', '0.1.5'
-    gem 'rack-fiber_pool', '0.9.0'
+    gem 'rack-fiber_pool', '0.9.1'
   end
 end
 
