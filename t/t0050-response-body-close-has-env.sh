@@ -33,6 +33,8 @@ req_pipelined () {
 
 reload () {
 	t_begin 'reloading Rainbows! to ensure writeout' && {
+		# ensure worker is loaded before HUP
+		curl -s http://$listen/ >/dev/null
 		# reload to ensure everything is flushed
 		kill -HUP $rainbows_pid
 		test xSTART = x"$(cat $fifo)"
@@ -85,7 +87,6 @@ check_log pipe
 
 t_begin "enable sendfile gem" && {
 	echo "require 'sendfile'" >> $unicorn_config
-	curl http://$listen/ >/dev/null # ensure worker is loaded before HUP
 }
 
 reload
