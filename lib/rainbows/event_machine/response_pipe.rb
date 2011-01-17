@@ -3,7 +3,7 @@
 module Rainbows::EventMachine::ResponsePipe
   # garbage avoidance, EM always uses this in a single thread,
   # so a single buffer for all clients will work safely
-  BUF = ''
+  RBUF = Rainbows::EvCore::RBUF
 
   def initialize(client)
     @client = client
@@ -11,7 +11,7 @@ module Rainbows::EventMachine::ResponsePipe
 
   def notify_readable
     begin
-      @client.write(@io.read_nonblock(16384, BUF))
+      @client.write(@io.read_nonblock(16384, RBUF))
     rescue Errno::EINTR
     rescue Errno::EAGAIN
       return

@@ -44,7 +44,7 @@ class Rainbows::Coolio::Client < Coolio::IO
   end
 
   def on_readable
-    buf = @_io.kgio_tryread(16384)
+    buf = @_io.kgio_tryread(16384, RBUF)
     case buf
     when :wait_readable
     when nil # eof
