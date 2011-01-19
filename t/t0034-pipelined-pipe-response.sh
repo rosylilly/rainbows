@@ -22,12 +22,13 @@ require "kcar"
 $stdin.binmode
 expect = ENV["random_blob_sha1"]
 kcar = Kcar::Response.new($stdin, {})
-3.times do
+3.times do |i|
 	nr = 0
 	status, headers, body = kcar.rack
 	dig = Digest::SHA1.new
 	body.each { |buf| dig << buf ; nr += buf.size }
 	sha1 = dig.hexdigest
+	warn "[#{i}] nr: #{nr}"
 	sha1 == expect or abort "mismatch: sha1=#{sha1} != expect=#{expect}"
 	body.close
 end

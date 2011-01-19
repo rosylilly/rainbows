@@ -2,7 +2,7 @@
 . ./test-lib.sh
 test -r random_blob || die "random_blob required, run with 'make $0'"
 case $model in
-*Fiber* ) ;;
+*Fiber*|Epoll) ;;
 *)
 	t_info "skipping $T since it's not compatible with $model"
 	exit 0

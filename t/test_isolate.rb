@@ -33,6 +33,8 @@ Isolate.now!(opts) do
     gem 'revactor', '0.1.5'
     gem 'rack-fiber_pool', '0.9.1'
   end
+
+  gem 'sleepy_penguin', '1.2.0'
 end
 
 $stdout.reopen(old_out)
