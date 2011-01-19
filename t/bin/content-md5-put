@@ -15,6 +15,7 @@ if ARGV.grep("--no-headers").empty?
   $stdout.write(
       "PUT / HTTP/1.1\r\n" \
       "Host: example.com\r\n" \
+      "Connection: #{ENV["Connection"] || 'close'}\r\n" \
       "Transfer-Encoding: chunked\r\n" \
       "Trailer: Content-MD5\r\n" \
       "\r\n"

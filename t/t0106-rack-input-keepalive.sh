@@ -17,6 +17,8 @@ t_begin "setup and startup" && {
 t_begin "send big pipelined chunked requests" && {
 	(
 		cat $fifo > $tmp &
+		Connection=keep-alive
+		export Connection
 		content-md5-put < random_blob
 		content-md5-put < random_blob
 		content-md5-put < random_blob
