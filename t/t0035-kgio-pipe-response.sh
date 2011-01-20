@@ -1,13 +1,6 @@
 #!/bin/sh
 . ./test-lib.sh
 test -r random_blob || die "random_blob required, run with 'make $0'"
-case $model in
-*Fiber*|Epoll) ;;
-*)
-	t_info "skipping $T since it's not compatible with $model"
-	exit 0
-	;;
-esac
 
 t_plan 10 "fast Kgio pipe response for $model"
 
