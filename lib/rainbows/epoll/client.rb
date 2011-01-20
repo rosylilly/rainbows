@@ -44,6 +44,8 @@ module Rainbows::Epoll::Client
       break
     end until :close == @state
     close unless closed?
+    rescue Errno::ECONNRESET
+      close
     rescue IOError
   end
 
