@@ -115,8 +115,10 @@ module Rainbows::EvCore
       handle_error(e)
   end
 
+  ERROR_413_RESPONSE = "HTTP/1.1 413 Request Entity Too Large\r\n\r\n"
+
   def err_413(msg)
-    write(Rainbows::Const::ERROR_413_RESPONSE)
+    write(ERROR_413_RESPONSE)
     quit
     # zip back up the stack
     raise IOError, msg, []
