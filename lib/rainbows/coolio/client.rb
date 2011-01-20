@@ -2,6 +2,7 @@
 # :enddoc:
 class Rainbows::Coolio::Client < Coolio::IO
   include Rainbows::EvCore
+  APP = Rainbows.server.app
   CONN = Rainbows::Coolio::CONN
   KATO = Rainbows::Coolio::KATO
   LOOP = Coolio::Loop.default

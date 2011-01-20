@@ -7,14 +7,11 @@ module Rainbows::Coolio::Core
   # for connections and doesn't die until the parent dies (or is
   # given a INT, QUIT, or TERM signal)
   def worker_loop(worker)
-    Rainbows::Response.setup(Rainbows::Coolio::Client)
     init_worker_process(worker)
     mod = Rainbows.const_get(@use)
     rloop = Rainbows::Coolio::Server.const_set(:LOOP, Coolio::Loop.default)
     Rainbows::Coolio::Server.const_set(:MAX, @worker_connections)
     Rainbows::Coolio::Server.const_set(:CL, mod.const_get(:Client))
-    Rainbows::EvCore.const_set(:APP, Rainbows.server.app)
-    Rainbows::EvCore.setup
     Rainbows::Coolio::Heartbeat.new(1, true).attach(rloop)
     LISTENERS.map! { |s| Rainbows::Coolio::Server.new(s).attach(rloop) }
     rloop.run

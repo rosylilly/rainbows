@@ -125,6 +125,7 @@ module Rainbows::EvCore
   end
 
   TmpIO = Unicorn::TmpIO
+  CBB = Unicorn::TeeInput.client_body_buffer_size
 
   def io_for(bytes)
     bytes <= CBB ? StringIO.new("") : TmpIO.new
@@ -141,9 +142,5 @@ module Rainbows::EvCore
     else
       max ? CapInput.new(io_for(max), self, max) : TmpIO.new
     end
-  end
-
-  def self.setup
-    const_set :CBB, Unicorn::TeeInput.client_body_buffer_size
   end
 end

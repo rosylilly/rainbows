@@ -48,11 +48,6 @@ module Rainbows::EventMachine
 
   include Rainbows::Base
 
-  def init_worker_process(worker) # :nodoc:
-    Rainbows::Response.setup(Rainbows::EventMachine::Client)
-    super
-  end
-
   # runs inside each forked worker, this sits around and waits
   # for connections and doesn't die until the parent dies (or is
   # given a INT, QUIT, or TERM signal)
@@ -71,7 +66,6 @@ module Rainbows::EventMachine
     Rainbows::EventMachine::Server.const_set(:MAX, max)
     Rainbows::EventMachine::Server.const_set(:CL, client_class)
     client_class.const_set(:APP, Rainbows.server.app)
-    Rainbows::EvCore.setup
     EM.run {
       conns = EM.instance_variable_get(:@conns) or
         raise RuntimeError, "EM @conns instance variable not accessible!"

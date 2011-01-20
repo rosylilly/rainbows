@@ -15,7 +15,6 @@ module Rainbows::Epoll
 
   def worker_loop(worker) # :nodoc:
     init_worker_process(worker)
-    Rainbows::EvCore.setup
     Rainbows::Client.__send__ :include, Client
     Server.run
   end
