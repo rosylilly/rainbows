@@ -14,12 +14,6 @@ module Rainbows::Const
     # "rainbows.autochunk" => false,
   })
 
-  # client IO object that supports reading and writing directly
-  # without filtering it through the HTTP chunk parser.
-  # Maybe we can get this renamed to "rack.io" if it becomes part
-  # of the official spec, but for now it is "hack.io"
-  CLIENT_IO = "hack.io".freeze
-
   RACK_INPUT = Unicorn::HttpRequest::RACK_INPUT
   REMOTE_ADDR = Unicorn::HttpRequest::REMOTE_ADDR
 end

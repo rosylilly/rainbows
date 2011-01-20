@@ -39,7 +39,6 @@ class Rainbows::Revactor::Client
   def set_input(env, hp)
     env[RACK_INPUT] = 0 == hp.content_length ?
                       NULL_IO : IC.new(@ts = TeeSocket.new(@client), hp)
-    env[CLIENT_IO] = @client
   end
 
   def close

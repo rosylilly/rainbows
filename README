@@ -69,7 +69,6 @@ network concurrency.
 
 \Rainbows! is mainly designed for the odd things Unicorn sucks at:
 
-* Web Sockets (via {Sunshowers}[http://rainbows.rubyforge.org/sunshowers/])
 * 3rd-party APIs (to services outside your control/LAN)
 * OpenID consumers (to providers outside your control/LAN)
 * Reverse proxy implementations with editing/censoring
