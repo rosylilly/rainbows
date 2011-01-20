@@ -15,6 +15,7 @@ module Rainbows::Epoll
 
   def worker_loop(worker) # :nodoc:
     init_worker_process(worker)
+    trap(:QUIT) { Rainbows.quit!; State::EP.close unless State::EP.closed? }
     Rainbows::Client.__send__ :include, Client
     Server.run
   end
