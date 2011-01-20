@@ -48,7 +48,7 @@ class Rainbows::DevFdResponse < Struct.new(:app)
       headers.delete('Transfer-Encoding')
     elsif st.pipe? || st.socket? # epoll-able things
       unless headers.include?('Content-Length')
-        if env['rainbows.autochunk']
+        if env['rainbows.autochunk'] && "HTTP/1.0" != env["HTTP_VERSION"]
           headers['Transfer-Encoding'] = 'chunked'
         else
           env['rainbows.autochunk'] = false
