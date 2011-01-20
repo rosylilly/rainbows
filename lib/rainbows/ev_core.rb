@@ -55,7 +55,7 @@ module Rainbows::EvCore
       rv = false
     else
       rv = !!(headers[Transfer_Encoding] =~ %r{\Achunked\z}i)
-      rv = false if headers.delete('X-Rainbows-Autochunk') == 'no'
+      rv = false unless @env["rainbows.autochunk"]
     end
     write_headers(status, headers, alive)
     rv

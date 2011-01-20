@@ -51,7 +51,7 @@ class Rainbows::DevFdResponse < Struct.new(:app)
         if env['rainbows.autochunk']
           headers['Transfer-Encoding'] = 'chunked'
         else
-          headers['X-Rainbows-Autochunk'] = 'no'
+          env['rainbows.autochunk'] = false
         end
       end
 
