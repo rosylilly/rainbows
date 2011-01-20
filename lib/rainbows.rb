@@ -14,7 +14,6 @@ Unicorn::SocketHelper::DEFAULTS.merge!({
 module Rainbows
 
   O = {} # :nodoc:
-  class Response416 < RangeError; end
 
   # map of numeric file descriptors to IO objects to avoid using IO.new
   # and potentially causing race conditions when using /dev/fd/
