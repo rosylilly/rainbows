@@ -13,7 +13,6 @@ module Rainbows::Base
     super(worker)
     Rainbows::Response.setup(self.class)
     Rainbows::MaxBody.setup
-    Rainbows::RackInput.setup
     Rainbows.tick_io = worker.tmp
 
     listeners = Rainbows::HttpServer::LISTENERS

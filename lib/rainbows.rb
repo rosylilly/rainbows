@@ -25,7 +25,6 @@ module Rainbows
   require 'rainbows/const'
   require 'rainbows/http_parser'
   require 'rainbows/http_server'
-  autoload :RackInput, 'rainbows/rack_input'
   autoload :Response, 'rainbows/response'
   autoload :ProcessClient, 'rainbows/process_client'
   autoload :Client, 'rainbows/client'

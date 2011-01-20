@@ -1,8 +1,13 @@
 # -*- encoding: binary -*-
+# :enddoc:
 module Rainbows::ProcessClient
   include Rainbows::Response
-  include Rainbows::RackInput
   include Rainbows::Const
+
+  NULL_IO = Unicorn::HttpRequest::NULL_IO
+  RACK_INPUT = Unicorn::HttpRequest::RACK_INPUT
+  CLIENT_IO = "hack.io".freeze
+  IC = Unicorn::HttpRequest.input_class
 
   def process_loop
     @hp = hp = Rainbows::HttpParser.new
@@ -37,5 +42,10 @@ module Rainbows::ProcessClient
 
   def handle_error(e)
     Rainbows::Error.write(self, e)
+  end
+
+  def set_input(env, hp)
+    env[RACK_INPUT] = 0 == hp.content_length ? NULL_IO : IC.new(self, hp)
+    env[CLIENT_IO] = self
   end
 end
