@@ -9,13 +9,7 @@ ruby) ;;
 	;;
 esac
 
-case $model in
-EventMachine|NeverBlock)
-	t_info "skipping $T since it's not compatible with $model"
-	exit 0
-	;;
-*) ;;
-esac
+skip_models EventMachine NeverBlock
 
 t_plan 13 "sendfile byte range response for $model"
 
