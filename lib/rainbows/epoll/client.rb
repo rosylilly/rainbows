@@ -13,12 +13,15 @@ module Rainbows::Epoll::Client
   KATO.compare_by_identity if KATO.respond_to?(:compare_by_identity)
   KEEPALIVE_TIMEOUT = Rainbows.keepalive_timeout
   EP = Rainbows::Epoll::EP
+  @@last_expire = Time.now
 
   def self.expire
+    return if ((now = Time.now) - @@last_expire) < 1.0
     if (ot = KEEPALIVE_TIMEOUT) >= 0
-      ot = Time.now - ot
+      ot = now - ot
       KATO.delete_if { |client, time| time < ot and client.timeout! }
     end
+    @@last_expire = now
   end
 
   # only call this once
@@ -36,7 +39,7 @@ module Rainbows::Epoll::Client
       on_read(rv)
       return if @wr_queue[0] || closed?
     when :wait_readable
-      KATO[self] = Time.now if :headers == @state
+      KATO[self] = @@last_expire if :headers == @state
       return EP.set(self, IN)
     else
       break
