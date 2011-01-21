@@ -55,7 +55,8 @@ class Rainbows::MaxBody
     case Rainbows.server.use
     when :Rev, :Coolio, :EventMachine, :NeverBlock,
          :RevThreadSpawn, :RevThreadPool,
-         :CoolioThreadSpawn, :CoolioThreadPool
+         :CoolioThreadSpawn, :CoolioThreadPool,
+         :Epoll
       return
     end
 
