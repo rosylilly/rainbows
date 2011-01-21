@@ -21,7 +21,7 @@ class Rainbows::EventMachine::Client < EM::Connection
       end
       EM.next_tick { receive_data(nil) } unless @buf.empty?
     else
-      on_read(data || "") if (@buf.size > 0) || data
+      on_read(data || Z) if (@buf.size > 0) || data
     end
   end
 

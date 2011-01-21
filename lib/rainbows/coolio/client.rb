@@ -142,7 +142,7 @@ class Rainbows::Coolio::Client < Coolio::IO
           KATO[self] = Time.now
         end
       else
-        on_read("")
+        on_read(Z)
       end
     end
     rescue => e

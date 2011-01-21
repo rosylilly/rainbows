@@ -75,7 +75,7 @@ module Rainbows::Epoll::Client
                     Rainbows::Epoll::ResponsePipe).new(io, self, body)
     return @wr_queue << pipe if @wr_queue[0]
     stream_pipe(pipe) or return
-    @wr_queue[0] or @wr_queue << ""
+    @wr_queue[0] or @wr_queue << Z
   end
 
   def ev_write_response(status, headers, body, alive)
@@ -85,7 +85,7 @@ module Rainbows::Epoll::Client
       write_response(status, headers, body, alive)
     end
     @state = alive ? :headers : :close
-    on_read("") if alive && 0 == @wr_queue.size && 0 != @buf.size
+    on_read(Z) if alive && 0 == @wr_queue.size && 0 != @buf.size
   end
 
   def epoll_run
@@ -103,7 +103,7 @@ module Rainbows::Epoll::Client
 
   def on_deferred_write_complete
     :close == @state and return close
-    0 == @buf.size ? on_readable : on_read("")
+    0 == @buf.size ? on_readable : on_read(Z)
   end
 
   def handle_error(e)

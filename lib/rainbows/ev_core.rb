@@ -8,6 +8,7 @@ module Rainbows::EvCore
   HttpParser = Rainbows::HttpParser
   autoload :CapInput, 'rainbows/ev_core/cap_input'
   RBUF = ""
+  Z = "".freeze
 
   # Apps may return this Rack response: AsyncResponse = [ -1, {}, [] ]
   ASYNC_CALLBACK = "async.callback".freeze
@@ -71,7 +72,7 @@ module Rainbows::EvCore
     @input = mkinput
     @hp.filter_body(@buf2 = "", @buf)
     @input << @buf2
-    on_read("")
+    on_read(Z)
   end
 
   # TeeInput doesn't map too well to this right now...
@@ -99,7 +100,7 @@ module Rainbows::EvCore
       elsif data.size > 0
         @hp.filter_body(@buf2, @buf << data)
         @input << @buf2
-        on_read("")
+        on_read(Z)
       else
         want_more
       end
