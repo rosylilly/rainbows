@@ -34,7 +34,7 @@ Isolate.now!(opts) do
     gem 'rack-fiber_pool', '0.9.1'
   end
 
-  gem 'sleepy_penguin', '1.2.0'
+  gem 'sleepy_penguin', '1.3.1'
 end
 
 $stdout.reopen(old_out)

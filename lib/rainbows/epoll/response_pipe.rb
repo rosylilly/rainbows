@@ -2,15 +2,13 @@
 # :enddoc:
 #
 class Rainbows::Epoll::ResponsePipe
-  include Rainbows::Epoll::State
   attr_reader :io
   alias to_io io
-  IN = SleepyPenguin::Epoll::IN | SleepyPenguin::Epoll::ET
   RBUF = Rainbows::EvCore::RBUF
+  EP = Rainbows::Epoll::EP
 
   def initialize(io, client, body)
     @io, @client, @body = io, client, body
-    @epoll_active = false
   end
 
   def epoll_run
@@ -22,7 +20,8 @@ class Rainbows::Epoll::ResponsePipe
   end
 
   def close
-    epoll_disable
+    @io or return
+    EP.delete self
     @body.respond_to?(:close) and @body.close
     @io = @body = nil
   end

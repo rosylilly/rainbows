@@ -5,16 +5,12 @@ module Rainbows::Epoll::Server
   @@nr = 0
   MAX = Rainbows.server.worker_connections
   THRESH = MAX - 1
-  include Rainbows::Epoll::State
   LISTENERS = Rainbows::HttpServer::LISTENERS
   ReRun = []
-
-  def self.extended(obj)
-    obj.instance_variable_set(:@epoll_active, false)
-  end
+  EP = Rainbows::Epoll::EP
 
   def self.run
-    LISTENERS.each { |sock| sock.extend(self).epoll_enable(IN) }
+    LISTENERS.each { |sock| EP.add(sock.extend(self), IN) }
     begin
       EP.wait(nil, 1000) { |_, obj| obj.epoll_run }
       while obj = ReRun.shift
@@ -28,16 +24,16 @@ module Rainbows::Epoll::Server
 
   # rearms all listeners when there's a free slot
   def self.decr
-    THRESH == (@@nr -= 1) and LISTENERS.each { |sock| sock.epoll_enable(IN) }
+    THRESH == (@@nr -= 1) and LISTENERS.each { |sock| EP.set(sock, IN) }
   end
 
   def epoll_run
-    return epoll_disable if @@nr >= MAX
+    return EP.delete(self) if @@nr >= MAX
     while io = kgio_tryaccept
       @@nr += 1
       # there's a chance the client never even sees epoll for simple apps
       io.epoll_once
-      return epoll_disable if @@nr >= MAX
+      return EP.delete(self) if @@nr >= MAX
     end
   end
 end

@@ -2,9 +2,7 @@
 # :enddoc:
 
 module Rainbows::Epoll::Client
-  attr_reader :wr_queue, :state, :epoll_active
 
-  include Rainbows::Epoll::State
   include Rainbows::EvCore
   APP = Rainbows.server.app
   Server = Rainbows::Epoll::Server
@@ -14,6 +12,7 @@ module Rainbows::Epoll::Client
   KATO = {}
   KATO.compare_by_identity if KATO.respond_to?(:compare_by_identity)
   KEEPALIVE_TIMEOUT = Rainbows.keepalive_timeout
+  EP = Rainbows::Epoll::EP
 
   def self.expire
     if (ot = KEEPALIVE_TIMEOUT) >= 0
@@ -25,7 +24,6 @@ module Rainbows::Epoll::Client
   # only call this once
   def epoll_once
     @wr_queue = [] # may contain String, ResponsePipe, and StreamFile objects
-    @epoll_active = false
     post_init
     epoll_run
     rescue => e
@@ -39,7 +37,7 @@ module Rainbows::Epoll::Client
       return if @wr_queue[0] || closed?
     when :wait_readable
       KATO[self] = Time.now if :headers == @state
-      return epoll_enable(IN)
+      return EP.set(self, IN)
     else
       break
     end until :close == @state
@@ -130,7 +128,7 @@ module Rainbows::Epoll::Client
       obj = rv # retry
     when :wait_writable # Strings and StreamFiles only
       @wr_queue.unshift(obj)
-      epoll_enable(OUT)
+      EP.set(self, OUT)
       return
     when :deferred
       return
@@ -148,7 +146,7 @@ module Rainbows::Epoll::Client
       when String
         buf = rv # retry
       when :wait_writable
-        epoll_enable(OUT)
+        EP.set(self, OUT)
         break # queue
       end while true
     end
@@ -197,7 +195,7 @@ module Rainbows::Epoll::Client
       stream_file(sf) or return
     end
     @wr_queue << sf
-    epoll_enable(OUT)
+    EP.set(self, OUT)
   end
 
   # this alternates between a push and pull model from the pipe -> client
@@ -207,16 +205,16 @@ module Rainbows::Epoll::Client
     when String
       if Array === write(buf)
         # client is blocked on write, client will pull from pipe later
-        pipe.epoll_disable
+        EP.delete pipe
         @wr_queue << pipe
-        epoll_enable(OUT)
+        EP.set(self, OUT)
         return :deferred
       end
       # continue looping...
     when :wait_readable
       # pipe blocked on read, let the pipe push to the client in the future
-      epoll_disable
-      pipe.epoll_enable(IN)
+      EP.delete self
+      EP.set(pipe, IN)
       return :deferred
     else # nil => EOF
       return pipe.close # nil
