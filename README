@@ -141,13 +141,13 @@ for more details.
 You can get the latest source via git from the following locations
 (these versions may not be stable):
 
-  git://git.bogomips.org/rainbows.git
+  git://bogomips.org/rainbows.git
   git://repo.or.cz/rainbows.git (mirror)
 
 You may browse the code from the web and download the latest snapshot
 tarballs here:
 
-* http://git.bogomips.org/cgit/rainbows.git (cgit)
+* http://bogomips.org/rainbows.git (cgit)
 * http://repo.or.cz/w/rainbows.git (gitweb)
 
 Inline patches (from "git format-patch") to the mailing list are

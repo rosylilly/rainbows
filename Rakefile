@@ -1,10 +1,10 @@
 # -*- encoding: binary -*-
 autoload :Gem, 'rubygems'
 autoload :Tempfile, 'tempfile'
+require 'wrongdoc'
 
-# most tasks are in the GNUmakefile which offers better parallelism
-cgit_url = "http://git.bogomips.org/cgit/rainbows.git"
-git_url = 'git://git.bogomips.org/rainbows.git'
+cgit_url = Wrongdoc.config[:cgit_url]
+git_url = Wrongdoc.config[:git_url]
 
 desc "read news article from STDIN and post to rubyforge"
 task :publish_news do
