@@ -16,7 +16,7 @@ module Rainbows::Epoll::Server
   def self.run
     LISTENERS.each { |sock| sock.extend(self).epoll_enable(IN) }
     begin
-      EP.wait(100, 1000) { |_, obj| obj.epoll_run }
+      EP.wait(nil, 1000) { |_, obj| obj.epoll_run }
       while obj = ReRun.shift
         obj.epoll_run
       end
