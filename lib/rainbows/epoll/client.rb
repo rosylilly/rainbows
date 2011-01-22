@@ -27,7 +27,7 @@ module Rainbows::Epoll::Client
   def epoll_once
     @wr_queue = [] # may contain String, ResponsePipe, and StreamFile objects
     post_init
-    epoll_run
+    on_readable
     rescue => e
       handle_error(e)
   end
