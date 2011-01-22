@@ -30,9 +30,9 @@ class Rainbows::EventMachine::Client < EM::Connection
     close_connection_after_writing
   end
 
-  def app_call
+  def app_call input
     set_comm_inactivity_timeout 0
-    @env[RACK_INPUT] = @input
+    @env[RACK_INPUT] = input
     @env[REMOTE_ADDR] = @_io.kgio_addr
     @env[ASYNC_CALLBACK] = method(:write_async_response)
     @env[ASYNC_CLOSE] = EM::DefaultDeferrable.new

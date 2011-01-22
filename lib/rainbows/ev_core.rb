@@ -83,8 +83,7 @@ module Rainbows::EvCore
       @hp.parse or return want_more
       @state = :body
       if 0 == @hp.content_length
-        @input = NULL_IO
-        app_call # common case
+        app_call NULL_IO # common case
       else # nil or len > 0
         prepare_request_body
       end
@@ -92,7 +91,7 @@ module Rainbows::EvCore
       if @hp.body_eof?
         if @hp.content_length
           @input.rewind
-          app_call
+          app_call @input
         else
           @state = :trailers
           on_read(data)
@@ -107,7 +106,7 @@ module Rainbows::EvCore
     when :trailers
       if @hp.trailers(@env, @buf << data)
         @input.rewind
-        app_call
+        app_call @input
       else
         want_more
       end

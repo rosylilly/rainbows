@@ -5,10 +5,10 @@ RUBY_VERSION =~ %r{\A1\.8} and
   warn "Coolio and Threads do not mix well under Ruby 1.8"
 
 class Rainbows::Coolio::ThreadClient < Rainbows::Coolio::Client
-  def app_call
+  def app_call input
     KATO.delete(self)
     disable if enabled?
-    @env[RACK_INPUT] = @input
+    @env[RACK_INPUT] = input
     app_dispatch # must be implemented by subclass
   end
 

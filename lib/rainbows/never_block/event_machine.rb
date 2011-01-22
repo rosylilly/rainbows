@@ -1,7 +1,7 @@
 # -*- encoding: binary -*-
 # :enddoc:
 class Rainbows::NeverBlock::Client < Rainbows::EventMachine::Client
-  def app_call
+  def app_call input
     POOL.spawn do
       begin
         super

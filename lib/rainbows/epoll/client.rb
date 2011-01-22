@@ -49,8 +49,8 @@ module Rainbows::Epoll::Client
     rescue IOError
   end
 
-  def app_call # called by on_read()
-    @env[RACK_INPUT] = @input
+  def app_call input # called by on_read()
+    @env[RACK_INPUT] = input
     @env[REMOTE_ADDR] = kgio_addr
     status, headers, body = APP.call(@env.merge!(RACK_DEFAULTS))
     ev_write_response(status, headers, body, @hp.next?)

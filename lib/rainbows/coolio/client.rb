@@ -106,10 +106,10 @@ class Rainbows::Coolio::Client < Coolio::IO
     @state = :headers
   end
 
-  def app_call
+  def app_call input
     KATO.delete(self)
     disable if enabled?
-    @env[RACK_INPUT] = @input
+    @env[RACK_INPUT] = input
     @env[REMOTE_ADDR] = @_io.kgio_addr
     @env[ASYNC_CALLBACK] = method(:write_async_response)
     status, headers, body = catch(:async) {
