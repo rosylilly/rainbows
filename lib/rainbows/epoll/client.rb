@@ -7,7 +7,6 @@ module Rainbows::Epoll::Client
   APP = Rainbows.server.app
   Server = Rainbows::Epoll::Server
   IN = SleepyPenguin::Epoll::IN | SleepyPenguin::Epoll::ET
-  INLT = SleepyPenguin::Epoll::IN
   OUT = SleepyPenguin::Epoll::OUT | SleepyPenguin::Epoll::ET
   KATO = {}
   KATO.compare_by_identity if KATO.respond_to?(:compare_by_identity)
