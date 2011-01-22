@@ -158,6 +158,10 @@ module Rainbows::Epoll::Client
   def close
     @wr_queue.each { |x| x.respond_to?(:close) and x.close rescue nil }
     super
+    on_close
+  end
+
+  def on_close
     KATO.delete(self)
     Server.decr
   end
