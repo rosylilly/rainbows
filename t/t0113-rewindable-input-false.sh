@@ -3,7 +3,7 @@
 skip_models EventMachine NeverBlock
 skip_models Rev RevThreadSpawn RevThreadPool
 skip_models Coolio CoolioThreadSpawn CoolioThreadPool
-skip_models Epoll
+skip_models Epoll XAcceptEpoll
 
 t_plan 4 "rewindable_input toggled to false"
 
