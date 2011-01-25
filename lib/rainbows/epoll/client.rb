@@ -139,7 +139,6 @@ module Rainbows::Epoll::Client
       handle_error(e)
   end
 
-  # this returns an +Array+ write buffer if blocked
   def write(buf)
     unless @wr_queue[0]
       case rv = kgio_trywrite(buf)
@@ -148,11 +147,11 @@ module Rainbows::Epoll::Client
       when String
         buf = rv # retry
       when :wait_writable
-        EP.set(self, OUT)
         break # queue
       end while true
     end
     @wr_queue << buf.dup # >3-word 1.9 strings are copy-on-write
+    EP.set(self, OUT)
   end
 
   def close
@@ -209,7 +208,8 @@ module Rainbows::Epoll::Client
   def stream_pipe(pipe)
     case buf = pipe.tryread
     when String
-      if Array === write(buf)
+      write(buf)
+      if @wr_queue[0]
         # client is blocked on write, client will pull from pipe later
         EP.delete pipe
         @wr_queue << pipe
