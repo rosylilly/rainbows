@@ -147,11 +147,11 @@ module Rainbows::Epoll::Client
       when String
         buf = rv # retry
       when :wait_writable
-        break # queue
+        @wr_queue << buf.dup # >3-word 1.9 strings are copy-on-write
+        return EP.set(self, OUT)
       end while true
     end
     @wr_queue << buf.dup # >3-word 1.9 strings are copy-on-write
-    EP.set(self, OUT)
   end
 
   def close
