@@ -137,6 +137,9 @@ class Rainbows::Coolio::Client < Coolio::IO
       close if @_write_buffer.empty?
     when :headers
       if @buf.empty?
+        buf = @_io.kgio_tryread(16384, RBUF) or return close
+        String === buf and return on_read(buf)
+        # buf == :wait_readable
         unless enabled?
           enable
           KATO[self] = Time.now
