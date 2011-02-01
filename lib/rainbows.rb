@@ -137,6 +137,7 @@ module Rainbows
   autoload :ThreadTimeout, 'rainbows/thread_timeout'
   autoload :WorkerYield, 'rainbows/worker_yield'
   autoload :SyncClose, 'rainbows/sync_close'
+  autoload :ReverseProxy, 'rainbows/reverse_proxy'
 end
 
 require 'rainbows/error'
