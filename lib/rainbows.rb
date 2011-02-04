@@ -9,6 +9,10 @@ Unicorn::SocketHelper::DEFAULTS.merge!({
   # write(headers)-write(body)-read
   # because we always write headers and bodies with two calls
   :tcp_nodelay => true,
+
+  # we always want to send our headers out ASAP since Rainbows!
+  # is designed for apps that could trickle out the body slowly
+  :tcp_nopush => false,
 })
 
 module Rainbows

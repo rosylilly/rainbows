@@ -16,7 +16,7 @@ $stdout.reopen($stderr)
 lock = File.open(__FILE__, "rb")
 lock.flock(File::LOCK_EX)
 Isolate.now!(opts) do
-  gem 'unicorn', '3.3.1'
+  gem 'unicorn', '3.4.0'
   gem 'kcar', '0.1.2'
   gem 'raindrops', '0.4.1'
 
