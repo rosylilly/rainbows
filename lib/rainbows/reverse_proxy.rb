@@ -59,7 +59,8 @@ class Rainbows::ReverseProxy
       url, cfg = *url if Array === url
       if url =~ %r{\Ahttp://}
         uri = URI.parse(url)
-        sockaddr = Socket.sockaddr_in(uri.port, uri.host)
+        host = uri.host =~ %r{\A\[([a-fA-F0-9:]+)\]\z} ? $1 : uri.host
+        sockaddr = Socket.sockaddr_in(uri.port, host)
       else
         path = url.gsub(%r{\Aunix:}, "") # nginx compat
         %r{\A~} =~ path and path = File.expand_path(path)
