@@ -35,7 +35,7 @@ Isolate.now!(opts) do
     gem 'rack-fiber_pool', '0.9.1'
   end
 
-  gem 'sleepy_penguin', '1.3.1' if RUBY_PLATFORM =~ /linux/
+  gem 'sleepy_penguin', '1.4.0' if RUBY_PLATFORM =~ /linux/
 end
 
 $stdout.reopen(old_out)

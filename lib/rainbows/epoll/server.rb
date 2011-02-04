@@ -17,6 +17,7 @@ module Rainbows::Epoll::Server
         obj.epoll_run
       end
       Rainbows::Epoll::Client.expire
+    rescue Errno::EINTR
     rescue => e
       Rainbows::Error.listen_loop(e)
     end while Rainbows.tick || @@nr > 0

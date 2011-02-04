@@ -14,7 +14,6 @@ module Rainbows::XAcceptEpoll
   def init_worker_process(worker)
     super
     Rainbows::Epoll.const_set :EP, SleepyPenguin::Epoll.new
-    trap(:QUIT) { Rainbows::Epoll.quit! }
     Rainbows::Client.__send__ :include, Client
   end
 

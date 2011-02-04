@@ -28,6 +28,7 @@ module Rainbows::XAcceptEpoll::Client
     begin
       EP.wait(nil, @timeout) { |flags, obj| obj.epoll_run }
       Rainbows::Epoll::Client.expire
+    rescue Errno::EINTR
     rescue => e
       Rainbows::Error.listen_loop(e)
     end while Rainbows.tick

@@ -12,15 +12,9 @@ module Rainbows::Epoll
   autoload :ResponsePipe, 'rainbows/epoll/response_pipe'
   autoload :ResponseChunkPipe, 'rainbows/epoll/response_chunk_pipe'
 
-  def self.quit!
-    Rainbows.quit!
-    EP.close unless EP.closed?
-  end
-
   def init_worker_process(worker)
     super
     Rainbows::Epoll.const_set :EP, SleepyPenguin::Epoll.new
-    trap(:QUIT) { Rainbows::Epoll.quit! }
     Rainbows::Client.__send__ :include, Client
   end
 
