@@ -49,6 +49,9 @@ class Rainbows::ReverseProxy
   REQUEST_URI = "REQUEST_URI"
   CRLF = "\r\n"
   TR = %w(_ -)
+  CONTENT_LENGTH = "CONTENT_LENGTH"
+  HTTP_TRANSFER_ENCODING = "HTTP_TRANSFER_ENCODING"
+  RackInput = "rack.input"
   E502 = [ 502, [ %w(Content-Length 0), %w(Content-Type text/plain) ], [] ]
 
   def initialize(opts)
@@ -130,10 +133,6 @@ class Rainbows::ReverseProxy
     @nr += 1
     @upstreams[@nr %= @upstreams.size]
   end
-
-  CONTENT_LENGTH = "CONTENT_LENGTH"
-  HTTP_TRANSFER_ENCODING = "HTTP_TRANSFER_ENCODING"
-  RackInput = "rack.input"
 
   def prepare_input!(env)
     if cl = env[CONTENT_LENGTH]
