@@ -7,10 +7,17 @@ require 'sendfile'
 # and optimized for throughput at the expense of fairness
 module Rainbows::Epoll
   include Rainbows::Base
+  ReRun = []
   autoload :Server, 'rainbows/epoll/server'
   autoload :Client, 'rainbows/epoll/client'
   autoload :ResponsePipe, 'rainbows/epoll/response_pipe'
   autoload :ResponseChunkPipe, 'rainbows/epoll/response_chunk_pipe'
+
+  def self.rerun
+    while obj = ReRun.shift
+      obj.epoll_run
+    end
+  end
 
   def init_worker_process(worker)
     super

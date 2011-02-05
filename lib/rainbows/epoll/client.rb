@@ -100,7 +100,7 @@ module Rainbows::Epoll::Client
   end
 
   def want_more
-    Server::ReRun << self
+    Rainbows::Epoll::ReRun << self
   end
 
   def on_deferred_write_complete

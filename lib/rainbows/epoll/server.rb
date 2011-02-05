@@ -6,16 +6,13 @@ module Rainbows::Epoll::Server
   MAX = Rainbows.server.worker_connections
   THRESH = MAX - 1
   LISTENERS = Rainbows::HttpServer::LISTENERS
-  ReRun = []
   EP = Rainbows::Epoll::EP
 
   def self.run
     LISTENERS.each { |sock| EP.add(sock.extend(self), IN) }
     begin
       EP.wait(nil, 1000) { |_, obj| obj.epoll_run }
-      while obj = ReRun.shift
-        obj.epoll_run
-      end
+      Rainbows::Epoll.rerun
       Rainbows::Epoll::Client.expire
     rescue Errno::EINTR
     rescue => e

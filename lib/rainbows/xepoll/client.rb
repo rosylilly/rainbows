@@ -27,6 +27,7 @@ module Rainbows::XEpoll::Client
     THREADS.each { |t| t.run }
     begin
       EP.wait(nil, @timeout) { |flags, obj| obj.epoll_run }
+      Rainbows::Epoll.rerun
       Rainbows::Epoll::Client.expire
     rescue Errno::EINTR
     rescue => e
