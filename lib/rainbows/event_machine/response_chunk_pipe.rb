@@ -9,17 +9,15 @@ module Rainbows::EventMachine::ResponseChunkPipe
   end
 
   def notify_readable
-    begin
-      data = @io.read_nonblock(16384, RBUF)
+    case data = Kgio.tryread(@io, 16384, RBUF)
+    when String
       @client.write("#{data.size.to_s(16)}\r\n")
       @client.write(data)
       @client.write("\r\n")
-    rescue Errno::EINTR
-    rescue Errno::EAGAIN
+    when :wait_readable
       return
-    rescue EOFError
-      detach
-      return
+    when nil
+      return detach
     end while true
   end
 end

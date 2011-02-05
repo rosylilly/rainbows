@@ -28,10 +28,6 @@ class Rainbows::Revactor::Client
     @client.write(buf)
   end
 
-  def write_nonblock(buf) # only used for errors
-    @client.instance_variable_get(:@_io).write_nonblock(buf)
-  end
-
   def timed_read(buf2)
     buf2.replace(@client.read(*@rd_args))
   end
@@ -39,6 +35,10 @@ class Rainbows::Revactor::Client
   def set_input(env, hp)
     env[RACK_INPUT] = 0 == hp.content_length ?
                       NULL_IO : IC.new(@ts = TeeSocket.new(@client), hp)
+  end
+
+  def to_io
+    @client.instance_variable_get(:@_io)
   end
 
   def close

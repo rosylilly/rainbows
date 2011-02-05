@@ -10,14 +10,13 @@ module Rainbows::EventMachine::ResponsePipe
   end
 
   def notify_readable
-    begin
-      @client.write(@io.read_nonblock(16384, RBUF))
-    rescue Errno::EINTR
-    rescue Errno::EAGAIN
+    case data = Kgio.tryread(@io, 16384, RBUF)
+    when String
+      @client.write(data)
+    when :wait_readable
       return
-    rescue EOFError
-      detach
-      return
+    when nil
+      return detach
     end while true
   end
 

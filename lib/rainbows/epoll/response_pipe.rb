@@ -27,11 +27,6 @@ class Rainbows::Epoll::ResponsePipe
   end
 
   def tryread
-    io = @io
-    io.respond_to?(:kgio_tryread) and return io.kgio_tryread(16384, RBUF)
-    io.read_nonblock(16384, RBUF)
-    rescue Errno::EAGAIN
-      :wait_readable
-    rescue EOFError
+    Kgio.tryread(@io, 16384, RBUF)
   end
 end

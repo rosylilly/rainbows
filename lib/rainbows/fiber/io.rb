@@ -45,78 +45,36 @@ class Rainbows::Fiber::IO
   end
 
   def write(buf)
-    if @to_io.respond_to?(:kgio_trywrite)
-      begin
-        case rv = @to_io.kgio_trywrite(buf)
-        when nil
-          return
-        when String
-          buf = rv
-        when :wait_writable
-          kgio_wait_writable
-        end
-      end while true
-    else
-      begin
-        (rv = @to_io.write_nonblock(buf)) == buf.bytesize and return
-        buf = byte_slice(buf, rv)
-      rescue Errno::EAGAIN
-        kgio_wait_writable
-      end while true
-    end
-  end
-
-  def byte_slice(buf, start) # :nodoc:
-    buf.encoding == Encoding::BINARY or
-      buf = buf.dup.force_encoding(Encoding::BINARY)
-    buf.slice(start, buf.size)
+    case rv = Kgio.trywrite(buf)
+    when String
+      buf = rv
+    when :wait_writable
+      kgio_wait_writable
+    end until nil == rv
   end
 
   # used for reading headers (respecting keepalive_timeout)
   def timed_read(buf)
     expire = nil
-    if @to_io.respond_to?(:kgio_tryread)
-      begin
-        case rv = @to_io.kgio_tryread(16384, buf)
-        when :wait_readable
-          return if expire && expire < Time.now
-          expire ||= read_expire
-          kgio_wait_readable
-        else
-          return rv
-        end
-      end while true
+    case rv = Kgio.tryread(@to_io, 16384, buf)
+    when :wait_readable
+      return if expire && expire < Time.now
+      expire ||= read_expire
+      kgio_wait_readable
     else
-      begin
-        return @to_io.read_nonblock(16384, buf)
-      rescue Errno::EAGAIN
-        return if expire && expire < Time.now
-        expire ||= read_expire
-        kgio_wait_readable
-      end while true
-    end
+      return rv
+    end while true
   end
 
   def readpartial(length, buf = "")
-    if @to_io.respond_to?(:kgio_tryread)
-      begin
-        rv = @to_io.kgio_tryread(length, buf)
-        case rv
-        when nil
-          raise EOFError, "end of file reached", []
-        when :wait_readable
-          kgio_wait_readable
-        else
-          return rv
-        end
-      end while true
+    case rv = Kgio.tryread(@to_io, length, buf)
+    when nil
+      raise EOFError, "end of file reached", []
+    when :wait_readable
+      kgio_wait_readable
     else
-      begin
-        return @to_io.read_nonblock(length, buf)
-      rescue Errno::EAGAIN
-        kgio_wait_readable
-      end while true
-    end
+      return rv
+    end while true
   end
 
   def kgio_read(*args)
