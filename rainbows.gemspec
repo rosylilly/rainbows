@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   # we need Unicorn for the HTTP parser and process management
   s.add_dependency(%q<unicorn>, ["~> 3.3"])
   s.add_development_dependency(%q<isolate>, "~> 3.0.0")
-  s.add_development_dependency(%q<wrongdoc>, "~> 1.1")
+  s.add_development_dependency(%q<wrongdoc>, "~> 1.5")
 
   # optional runtime dependencies depending on configuration
   # see t/test_isolate.rb for the exact versions we've tested with
