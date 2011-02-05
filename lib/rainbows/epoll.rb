@@ -12,11 +12,22 @@ module Rainbows::Epoll
   autoload :Client, 'rainbows/epoll/client'
   autoload :ResponsePipe, 'rainbows/epoll/response_pipe'
   autoload :ResponseChunkPipe, 'rainbows/epoll/response_chunk_pipe'
+  class << self
+    attr_writer :nr_clients
+  end
 
-  def self.rerun
-    while obj = ReRun.shift
-      obj.epoll_run
-    end
+  def self.loop
+    timeout = Rainbows.server.timeout
+    begin
+      EP.wait(nil, timeout) { |flags, obj| obj.epoll_run }
+      while obj = ReRun.shift
+        obj.epoll_run
+      end
+      Rainbows::Epoll::Client.expire
+    rescue Errno::EINTR
+    rescue => e
+      Rainbows::Error.listen_loop(e)
+    end while Rainbows.tick || @nr_clients.call > 0
   end
 
   def init_worker_process(worker)

@@ -144,6 +144,7 @@ module Rainbows
   autoload :WorkerYield, 'rainbows/worker_yield'
   autoload :SyncClose, 'rainbows/sync_close'
   autoload :ReverseProxy, 'rainbows/reverse_proxy'
+  autoload :JoinThreads, 'rainbows/join_threads'
 end
 
 require 'rainbows/error'

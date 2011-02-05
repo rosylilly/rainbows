@@ -35,7 +35,7 @@ module Rainbows::ThreadPool
         thr.join(1) and Rainbows.quit!
       end
     end
-    join_threads(pool)
+    Rainbows::JoinThreads.acceptors(pool)
   end
 
   def sync_worker # :nodoc:
