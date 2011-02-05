@@ -6,11 +6,13 @@ req_curl_chunked_upload_err_check
 t_plan 10 "rack.input client_max_body_size bigger"
 
 t_begin "setup and startup" && {
-	rtmpfiles curl_out curl_err cmbs_config
+	rtmpfiles curl_out curl_err
 	rainbows_setup $model
-	sed -e 's/client_max_body_size.*/client_max_body_size 10485760/' \
-	  < $unicorn_config > $cmbs_config
-	rainbows -D sha1-random-size.ru -c $cmbs_config
+	ed -s $unicorn_config <<EOF
+,s/client_max_body_size.*/client_max_body_size 10485760/
+w
+EOF
+	rainbows -D sha1-random-size.ru -c $unicorn_config
 	rainbows_wait_start
 }
 

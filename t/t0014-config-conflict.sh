@@ -4,7 +4,7 @@ t_plan 6 "config variables conflict with preload_app"
 
 t_begin "setup and start" && {
 	rainbows_setup
-	rtmpfiles ru rutmp
+	rtmpfiles ru
 
 	cat > $ru <<\EOF
 use Rack::ContentLength
@@ -23,8 +23,10 @@ t_begin "hit with curl" && {
 }
 
 t_begin "modify rackup file" && {
-	sed -e 's/world/WORLD/' < $ru > $rutmp
-	mv $rutmp $ru
+	ed -s $ru <<EOF
+,s/world/WORLD/
+w
+EOF
 }
 
 t_begin "reload signal succeeds" && {
