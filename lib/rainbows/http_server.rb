@@ -43,7 +43,7 @@ class Rainbows::HttpServer < Unicorn::HttpServer
 
   def ready_pipe=(v)
     # hacky hook got force Rainbows! to load modules only in workers
-    if @master_pid && @master_pid == Process.ppid
+    if defined?(@master_pid) && @master_pid == Process.ppid
       extend(Rainbows.const_get(@use))
     end
     super
