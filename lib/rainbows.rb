@@ -98,10 +98,12 @@ module Rainbows
   end
 
   def self.quit!
-    @alive = false
-    Rainbows::HttpParser.quit
-    @expire ||= Time.now + (@server.timeout * 2.0)
-    @server.class.const_get(:LISTENERS).map! { |s| s.close rescue nil }.clear
+    unless @expire
+      @alive = false
+      Rainbows::HttpParser.quit
+      @expire = Time.now + (@server.timeout * 2.0)
+      @server.class.const_get(:LISTENERS).map! { |s| s.close rescue nil }.clear
+    end
     false
   end
 
