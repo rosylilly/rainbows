@@ -56,7 +56,7 @@ class Rainbows::MaxBody
     when :Rev, :Coolio, :EventMachine, :NeverBlock,
          :RevThreadSpawn, :RevThreadPool,
          :CoolioThreadSpawn, :CoolioThreadPool,
-         :Epoll, :XAcceptEpoll
+         :Epoll, :XEpoll
       return
     end
 

@@ -124,7 +124,7 @@ module Rainbows
     :CoolioThreadPool => 50,
     :CoolioFiberSpawn => 50,
     :Epoll => 50,
-    :XAcceptEpoll => 50,
+    :XEpoll => 50,
     :EventMachine => 50,
     :FiberSpawn => 50,
     :FiberPool => 50,

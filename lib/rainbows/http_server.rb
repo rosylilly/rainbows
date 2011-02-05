@@ -72,7 +72,7 @@ class Rainbows::HttpServer < Unicorn::HttpServer
     new_defaults = {
       'rainbows.model' => (@use = model.to_sym),
       'rack.multithread' => !!(model.to_s =~ /Thread/),
-      'rainbows.autochunk' => [:Coolio,:Rev,:Epoll,:XAcceptEpoll,
+      'rainbows.autochunk' => [:Coolio,:Rev,:Epoll,:XEpoll,
                                :EventMachine,:NeverBlock].include?(@use),
     }
     Rainbows::Const::RACK_DEFAULTS.update(new_defaults)

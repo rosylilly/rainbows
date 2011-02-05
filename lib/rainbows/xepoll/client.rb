@@ -1,7 +1,7 @@
 # -*- encoding: binary -*-
 # :enddoc:
 
-module Rainbows::XAcceptEpoll::Client
+module Rainbows::XEpoll::Client
   include Rainbows::Epoll::Client
   MAX = Rainbows.server.worker_connections
   THRESH = MAX - 1

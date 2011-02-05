@@ -7,9 +7,9 @@ require 'rainbows/epoll'
 # a (hopefully) native thread.  This is recommended over Epoll for
 # Ruby 1.9 users as it can workaround accept()-scalability issues
 # on multicore machines.
-module Rainbows::XAcceptEpoll
+module Rainbows::XEpoll
   include Rainbows::Base
-  autoload :Client, 'rainbows/xaccept_epoll/client'
+  autoload :Client, 'rainbows/xepoll/client'
 
   def init_worker_process(worker)
     super
