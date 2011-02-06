@@ -6,12 +6,12 @@ require 'thread'
 # This is NOT used for the ThreadPool class, since that class does not
 # need a userspace Queue.
 class Rainbows::QueuePool < Struct.new(:queue, :threads)
-  def initialize(size = 20, &block)
+  def initialize(size = 20)
     q = Queue.new
     self.threads = (1..size).map do
       Thread.new do
         while job = q.shift
-          block.call(job)
+          yield job
         end
       end
     end

@@ -15,7 +15,7 @@ class Rainbows::EvCore::CapInput
   end
 
   def gets; @io.gets; end
-  def each(&block); @io.each(&block); end
+  def each; @io.each { |x| yield x }; end
   def size; @io.size; end
   def rewind; @io.rewind; end
   def read(*args); @io.read(*args); end

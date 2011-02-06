@@ -17,7 +17,7 @@ module Rainbows::Fiber::Base
   # schedules ones that were blocked on I/O.  At most it'll sleep
   # for one second (returned by the schedule_sleepers method) which
   # will cause it.
-  def schedule(&block)
+  def schedule
     begin
       Rainbows.tick
       t = schedule_sleepers
@@ -33,7 +33,7 @@ module Rainbows::Fiber::Base
     ret[1].concat(RD.compact & ret[0]).each { |c| c.f.resume }
 
     # accept is an expensive syscall, filter out listeners we don't want
-    (ret[0] & LISTENERS).each(&block)
+    (ret[0] & LISTENERS).each { |x| yield x }
   end
 
   # wakes up any sleepers or keepalive-timeout violators that need to be

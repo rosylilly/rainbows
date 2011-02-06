@@ -79,8 +79,8 @@ class Rainbows::DevFdResponse < Struct.new(:app)
   class Body < Struct.new(:to_io, :to_path, :orig_body)
     # called by the webserver or other middlewares if they can't
     # handle #to_path
-    def each(&block)
-      to_io.each(&block)
+    def each
+      to_io.each { |x| yield x }
     end
 
     # remain Rack::Lint-compatible for people with wonky systems :P

@@ -20,8 +20,8 @@ class Rainbows::SyncClose
     @body.to_path
   end
 
-  def each(&block)
-    @body.each(&block)
+  def each
+    @body.each { |x| yield x }
   end
 
   def to_io
