@@ -7,7 +7,7 @@ class Rainbows::MaxBody::Wrapper
     @input, @limit, @rbuf = rack_input, limit, ''
   end
 
-  def each(&block)
+  def each
     while line = gets
       yield line
     end

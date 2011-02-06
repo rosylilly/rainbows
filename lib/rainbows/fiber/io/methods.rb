@@ -16,7 +16,7 @@ module Rainbows::Fiber::IO::Methods
   end
 
   # for wrapping output response bodies
-  def each(&block)
+  def each
     if buf = kgio_read(16384)
       yield buf
       yield buf while kgio_read(16384, buf)

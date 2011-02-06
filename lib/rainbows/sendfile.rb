@@ -63,7 +63,7 @@ class Rainbows::Sendfile < Struct.new(:app)
     end
 
     # fallback in case our +to_path+ doesn't get handled for whatever reason
-    def each(&block)
+    def each
       buf = ''
       File.open(to_path) do |fp|
         yield buf while fp.read(0x4000, buf)

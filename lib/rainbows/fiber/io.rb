@@ -28,7 +28,7 @@ class Rainbows::Fiber::IO
   end
 
   # for wrapping output response bodies
-  def each(&block)
+  def each
     buf = readpartial(16384)
     yield buf
     yield buf while readpartial(16384, buf)

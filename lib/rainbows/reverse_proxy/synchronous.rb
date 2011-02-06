@@ -3,7 +3,7 @@
 module Rainbows::ReverseProxy::Synchronous
   UpstreamSocket = Rainbows::ReverseProxy::UpstreamSocket
 
-  def each_block(input, &block)
+  def each_block(input)
     buf = ""
     while input.read(16384, buf)
       yield buf

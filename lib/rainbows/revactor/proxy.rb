@@ -17,7 +17,7 @@ class Rainbows::Revactor::Proxy < Rev::IO
     end
   end
 
-  def each(&block)
+  def each
     # when yield-ing, Revactor::TCP#write may raise EOFError
     # (instead of Errno::EPIPE), so we need to limit the rescue
     # to just readpartial and let EOFErrors during yield bubble up

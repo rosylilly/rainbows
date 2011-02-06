@@ -26,7 +26,7 @@ module Rainbows::ReverseProxy::EvClient
   end
 
   class LargeBody < Tempfile
-    def each(&block)
+    def each
       buf = ""
       rewind
       while read(16384, buf)
