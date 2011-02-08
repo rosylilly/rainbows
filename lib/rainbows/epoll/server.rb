@@ -1,5 +1,5 @@
 # -*- encoding: binary -*-
-# :nodoc:
+# :enddoc:
 module Rainbows::Epoll::Server
   @@nr = 0
   Rainbows::Epoll.nr_clients = lambda { @@nr }

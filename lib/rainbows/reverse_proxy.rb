@@ -1,4 +1,5 @@
 # -*- encoding: binary -*-
+# :enddoc:
 require 'socket'
 require 'thread'
 require 'uri'

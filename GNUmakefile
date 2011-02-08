@@ -3,6 +3,11 @@ all::
 RSYNC_DEST := rubyforge.org:/var/www/gforge-projects/rainbows
 rfproject := rainbows
 rfpackage := rainbows
+
+man-rdoc: man html
+	$(MAKE) -C Documentation comparison.html
+	for i in $(man1_rdoc); do echo > $$i; done
+doc:: man-rdoc
 include pkg.mk
 ifneq ($(VERSION),)
 release::
@@ -25,10 +30,7 @@ man html:
 
 pkg_extra += $(man1_paths)
 
-man-rdoc: man html
-	$(MAKE) -C Documentation comparison.html
-	for i in $(man1_rdoc); do echo > $$i; done
-doc:: man-rdoc
+doc::
 	cat Documentation/comparison.css >> doc/rdoc.css
 	$(RM) $(man1_rdoc)
 

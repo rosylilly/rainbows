@@ -1,5 +1,5 @@
 # -*- encoding: binary -*-
-# :nodoc:
+# :enddoc:
 # This module only gets loaded on shutdown
 module Rainbows::JoinThreads
 
