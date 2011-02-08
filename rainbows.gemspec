@@ -19,9 +19,7 @@ Gem::Specification.new do |s|
   s.homepage = Wrongdoc.config[:rdoc_url]
   s.summary = summary
   s.rdoc_options = rdoc_options
-  s.require_paths = %w(lib)
   s.rubyforge_project = %q{rainbows}
-  s.test_files = []
 
   # we want a newer Rack for a valid HeaderHash#each
   s.add_dependency(%q<rack>, ['~> 1.1'])
