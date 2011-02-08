@@ -63,8 +63,8 @@ class Rainbows::HttpServer < Unicorn::HttpServer
       raise ArgumentError, "concurrency model #{model.inspect} not supported"
     args.each do |opt|
       case opt
-      when Hash; O.update(opt)
-      when Symbol; O[opt] = true
+      when Hash; Rainbows::O.update(opt)
+      when Symbol; Rainbows::O[opt] = true
       else; raise ArgumentError, "can't handle option: #{opt.inspect}"
       end
     end
