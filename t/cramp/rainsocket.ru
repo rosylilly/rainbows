@@ -1,11 +1,11 @@
 # based on examples/rainsocket.ru git://github.com/lifo/cramp
 # Rack::Lint does not like async + EM stuff, so disable it:
 #\ -E deployment
-require 'cramp/controller'
+require 'cramp'
 
-Cramp::Controller::Websocket.backend = :rainbows
+Cramp::Websocket.backend = :rainbows
 
-class WelcomeController < Cramp::Controller::Websocket
+class WelcomeController < Cramp::Websocket
   periodic_timer :send_hello_world, :every => 2
   on_data :received_data
 

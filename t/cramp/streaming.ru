@@ -4,9 +4,9 @@
 # Rack::Lint does not like async + EM stuff, so disable it:
 #\ -E deployment
 
-require 'cramp/controller'
+require 'cramp'
 
-class StreamController < Cramp::Controller::Action
+class StreamController < Cramp::Action
   periodic_timer :send_data, :every => 1
   periodic_timer :check_limit, :every => 2
 
