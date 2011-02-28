@@ -1,5 +1,6 @@
 # -*- encoding: binary -*-
 # :enddoc:
+require "io/wait"
 
 # this class is used for most synchronous concurrency models
 class Rainbows::Client < Kgio::Socket
@@ -8,7 +9,7 @@ class Rainbows::Client < Kgio::Socket
   end
 
   def kgio_wait_readable
-    IO.select([self], nil, nil, Rainbows.keepalive_timeout)
+    wait Rainbows.keepalive_timeout
   end
 
   # used for reading headers (respecting keepalive_timeout)
