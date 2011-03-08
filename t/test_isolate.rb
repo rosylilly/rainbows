@@ -17,15 +17,16 @@ lock = File.open(__FILE__, "rb")
 lock.flock(File::LOCK_EX)
 Isolate.now!(opts) do
   gem 'unicorn', '3.4.0'
-  gem 'kcar', '0.1.2'
+  gem 'kcar', '0.2.0'
   gem 'raindrops', '0.4.1'
 
   if engine == "ruby"
-    gem 'sendfile', '1.0.0' # next Rubinius should support this
+    gem 'sendfile', '1.1.0' # next Rubinius should support this
     gem 'cool.io', '1.0.0'
 
     gem 'eventmachine', '0.12.10'
-    gem 'async_sinatra', '0.4.0'
+    gem 'sinatra', '1.2.0'
+    gem 'async_sinatra', '0.5.0'
 
     gem 'neverblock', '0.1.6.2'
   end
@@ -35,7 +36,7 @@ Isolate.now!(opts) do
     gem 'rack-fiber_pool', '0.9.1'
   end
 
-  gem 'sleepy_penguin', '1.4.0' if RUBY_PLATFORM =~ /linux/
+  gem 'sleepy_penguin', '2.0.0' if RUBY_PLATFORM =~ /linux/
 end
 
 $stdout.reopen(old_out)
