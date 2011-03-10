@@ -125,11 +125,8 @@ class Rainbows::Coolio::Client < Coolio::IO
     when true then return # #next! will clear this bit
     when nil # fall through
     else
-      begin
-        return stream_file_chunk(@deferred)
-      rescue EOFError # expected at file EOF
-        close_deferred # fall through
-      end
+      return if stream_file_chunk(@deferred)
+      close_deferred # EOF, fall through
     end
 
     case @state
@@ -179,7 +176,7 @@ class Rainbows::Coolio::Client < Coolio::IO
     KATO.delete(self)
   end
 
-  if IO.method_defined?(:sendfile_nonblock)
+  if IO.method_defined?(:trysendfile)
     def defer_file(status, headers, body, alive, io, st)
       if r = sendfile_range(status, headers)
         status, headers, range = r
@@ -192,11 +189,15 @@ class Rainbows::Coolio::Client < Coolio::IO
     end
 
     def stream_file_chunk(sf) # +sf+ is a Rainbows::StreamFile object
-      sf.offset += (n = @_io.sendfile_nonblock(sf, sf.offset, sf.count))
-      0 == (sf.count -= n) and raise EOFError
-      enable_write_watcher
-      rescue Errno::EAGAIN
-        enable_write_watcher
+      case n = @_io.trysendfile(sf, sf.offset, sf.count)
+      when Integer
+        sf.offset += n
+        return if 0 == (sf.count -= n)
+      when :wait_writable
+        return enable_write_watcher
+      else
+        return
+      end while true
     end
   else
     def defer_file(status, headers, body, alive, io, st)
@@ -205,7 +206,7 @@ class Rainbows::Coolio::Client < Coolio::IO
     end
 
     def stream_file_chunk(body)
-      write(body.to_io.sysread(0x4000))
+      buf = body.to_io.read(0x4000) and write(buf)
     end
   end
 

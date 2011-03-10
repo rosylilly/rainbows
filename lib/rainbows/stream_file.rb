@@ -1,7 +1,7 @@
 # -*- encoding: binary -*-
 # :enddoc:
 
-# Used to keep track of file offsets in IO#sendfile_nonblock + evented
+# Used to keep track of file offsets in IO#trysendfile + evented
 # models.  We always maintain our own file offsets in userspace because
 # because sendfile() implementations offer pread()-like idempotency for
 # concurrency (multiple clients can read the same underlying file handle).

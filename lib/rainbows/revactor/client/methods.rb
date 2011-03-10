@@ -1,7 +1,7 @@
 # -*- encoding: binary -*-
 # :enddoc:
 module Rainbows::Revactor::Client::Methods
-  if IO.method_defined?(:sendfile_nonblock)
+  if IO.method_defined?(:trysendfile)
     def write_body_file(body, range)
       body, client = body_to_io(body), @client
       sock = @client.instance_variable_get(:@_io)
@@ -9,9 +9,11 @@ module Rainbows::Revactor::Client::Methods
       write_complete = T[:"#{pfx}_write_complete", client]
       closed = T[:"#{pfx}_closed", client]
       offset, count = range ? range : [ 0, body.stat.size ]
-      begin
-        offset += (n = sock.sendfile_nonblock(body, offset, count))
-      rescue Errno::EAGAIN
+      case n = sock.trysendfile(body, offset, count)
+      when Integer
+        offset += n
+        return if 0 == (count -= n)
+      when :wait_writable
         # The @_write_buffer is empty at this point, trigger the
         # on_readable method which in turn triggers on_write_complete
         # even though nothing was written
@@ -21,10 +23,9 @@ module Rainbows::Revactor::Client::Methods
           filter.when(write_complete) {}
           filter.when(closed) { raise Errno::EPIPE }
         end
-        retry
-      rescue EOFError
-        break
-      end while (count -= n) > 0
+      else # nil
+        return
+      end while true
       ensure
         close_if_private(body)
     end

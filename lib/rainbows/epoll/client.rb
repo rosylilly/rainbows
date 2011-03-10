@@ -183,15 +183,16 @@ module Rainbows::Epoll::Client
 
   # returns +nil+ on EOF, :wait_writable if the client blocks
   def stream_file(sf) # +sf+ is a Rainbows::StreamFile object
-    begin
-      sf.offset += (n = sendfile_nonblock(sf, sf.offset, sf.count))
+    case n = trysendfile(sf, sf.offset, sf.count)
+    when Integer
+      sf.offset += n
       0 == (sf.count -= n) and return sf.close
-    rescue Errno::EAGAIN
-      return :wait_writable
+    else
+      return n # :wait_writable or nil
+    end while true
     rescue
       sf.close
       raise
-    end while true
   end
 
   def defer_file_stream(offset, count, io, body)

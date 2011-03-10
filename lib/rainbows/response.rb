@@ -67,7 +67,7 @@ module Rainbows::Response
     end
 
     # generic response writer, used for most dynamically-generated responses
-    # and also when IO.copy_stream and/or IO#sendfile_nonblock is unavailable
+    # and also when IO.copy_stream and/or IO#trysendfile is unavailable
     def write_response(status, headers, body, alive)
       write_headers(status, headers, alive)
       write_body_each(body)
@@ -77,7 +77,7 @@ module Rainbows::Response
   end
   include Each
 
-  if IO.method_defined?(:sendfile_nonblock)
+  if IO.method_defined?(:trysendfile)
     module Sendfile
       def write_body_file(body, range)
         io = body_to_io(body)
@@ -90,7 +90,7 @@ module Rainbows::Response
   end
 
   if IO.respond_to?(:copy_stream)
-    unless IO.method_defined?(:sendfile_nonblock)
+    unless IO.method_defined?(:trysendfile)
       module CopyStream
         def write_body_file(body, range)
           range ? IO.copy_stream(body, self, range[1], range[0]) :
@@ -111,7 +111,7 @@ module Rainbows::Response
     alias write_body_stream write_body_each
   end  # ! IO.respond_to?(:copy_stream)
 
-  if IO.method_defined?(:sendfile_nonblock) || IO.respond_to?(:copy_stream)
+  if IO.method_defined?(:trysendfile) || IO.respond_to?(:copy_stream)
     HTTP_RANGE = 'HTTP_RANGE'
     Content_Range = 'Content-Range'.freeze
 
@@ -181,5 +181,5 @@ module Rainbows::Response
       end
     end
     include ToPath
-  end # IO.respond_to?(:copy_stream) || IO.method_defined?(:sendfile_nonblock)
+  end # IO.respond_to?(:copy_stream) || IO.method_defined?(:trysendfile)
 end

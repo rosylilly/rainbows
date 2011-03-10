@@ -11,7 +11,7 @@ care about.
 * allow _OPTIONAL_ splice(2) with DevFdResponse under Linux
   (splice is very broken under some older kernels)
 
-* use IO#sendfile_nonblock for EventMachine/NeverBlock
+* use IO#trysendfile for EventMachine/NeverBlock
 
 * Open file cache Rack app/middleware (idea from nginx), since sendfile
   (and IO.copy_stream) allows pread(2)-style offsets

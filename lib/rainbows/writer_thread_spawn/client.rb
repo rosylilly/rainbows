@@ -21,7 +21,7 @@ class Rainbows::WriterThreadSpawn::Client < Struct.new(:to_io, :q, :thr)
       }
     end
 
-    if IO.respond_to?(:copy_stream) || IO.method_defined?(:sendfile_nonblock)
+    if IO.respond_to?(:copy_stream) || IO.method_defined?(:trysendfile)
       def write_response(status, headers, body, alive)
         self.q ||= queue_writer
         if body.respond_to?(:close)
