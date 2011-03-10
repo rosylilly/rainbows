@@ -9,7 +9,7 @@ to simplify your deployments and only deploy one server?
 
 == {sendfile}[http://rubygems.org/gems/sendfile] RubyGem
 
-To enable the "sendfile" gem, just make sure you have 1.0.0 or later and
+To enable the "sendfile" gem, just make sure you have 1.1.0 or later and
 "require" it in your \Rainbows!/Unicorn config file (not your Rack
 config.ru):
 
@@ -26,7 +26,7 @@ config.ru):
 The sendfile gem is works for all of our concurrency models except
 NeverBlock and EventMachine (see below).
 
-The sendfile gem is less buggy than current (Ruby 1.9.2-rc2)
+The sendfile gem is less buggy than current (Ruby 1.9.2)
 IO.copy_stream and supports FreeBSD and Solaris in addition to Linux.
 This RubyGem also works under Ruby 1.8 (even with threads) and should
 work with rubinius.git, too.
@@ -40,9 +40,9 @@ their Writer* variants use the core IO.copy_stream method under Ruby
 1.9.  IO.copy_stream uses sendfile() under Linux, and a pread()/write()
 loop (implemented in C) on other systems.
 
-IO.copy_stream under Linux with Ruby 1.9.3 (and before) is also
+IO.copy_stream under Linux with Ruby 1.9.2 (and before) is also
 subject to hanging indefinitely when a client disconnected prematurely.
-This issue is fixed in Ruby trunk (July 2010).
+This issue is fixed in Ruby trunk (r28557, July 2010).
 
 \Rainbows! supports IO.copy_stream since v0.93.0
 
