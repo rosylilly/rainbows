@@ -45,7 +45,7 @@ class Rainbows::Fiber::IO
   end
 
   def write(buf)
-    case rv = Kgio.trywrite(buf)
+    case rv = Kgio.trywrite(@to_io, buf)
     when String
       buf = rv
     when :wait_writable
