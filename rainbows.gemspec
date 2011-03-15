@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.add_dependency(%q<rack>, ['~> 1.1'])
 
   # we need Unicorn for the HTTP parser and process management
-  s.add_dependency(%q<unicorn>, ["~> 3.4"])
+  s.add_dependency(%q<unicorn>, ["~> 3.5"])
   s.add_development_dependency(%q<isolate>, "~> 3.0.0")
   s.add_development_dependency(%q<wrongdoc>, "~> 1.5")
 
