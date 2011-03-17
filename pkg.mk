@@ -167,5 +167,9 @@ doc_gz: docs = $(shell find doc -type f ! -regex '^.*\.\(gif\|jpg\|png\|gz\)$$')
 doc_gz:
 	for i in $(docs); do \
 	  gzip --rsyncable -9 < $$i > $$i.gz; touch -r $$i $$i.gz; done
+check-warnings:
+	@(for i in $$(git ls-files '*.rb'|grep -v '^setup\.rb$$'); \
+	  do $(RUBY) -d -W2 -c $$i; done) | grep -v '^Syntax OK$$' || :
 
 .PHONY: all .FORCE-GIT-VERSION-FILE doc test $(test_units) manifest
+.PHONY: check-warnings
