@@ -34,8 +34,8 @@ module Rainbows::Revactor
     limit = worker_connections
     actor_exit = Case[:exit, Actor, Object]
 
-    revactorize_listeners.each do |l, close, accept|
-      Actor.spawn(l, close, accept) do |l, close, accept|
+    revactorize_listeners.each do |l,close,accept|
+      Actor.spawn do
         Actor.current.trap_exit = true
         l.controller = l.instance_variable_set(:@receiver, Actor.current)
         begin

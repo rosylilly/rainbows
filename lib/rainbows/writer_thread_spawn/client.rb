@@ -69,7 +69,7 @@ class Rainbows::WriterThreadSpawn::Client < Struct.new(:to_io, :q, :thr)
     end
 
     q = Queue.new
-    self.thr = Thread.new(to_io, q) do |io, q|
+    self.thr = Thread.new(to_io) do |io|
       while op = q.shift
         begin
           op, *rest = op

@@ -226,7 +226,7 @@ module Rainbows::Epoll::Client
     else # nil => EOF
       return pipe.close # nil
     end while true
-    rescue => e
+    rescue
       pipe.close
       raise
   end

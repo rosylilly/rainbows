@@ -24,12 +24,12 @@ module Rainbows::ThreadSpawn
     limit = worker_connections
     nr = 0
     LISTENERS.each do |l|
-      klass.new(l) do |l|
+      klass.new do
         begin
           if lock.synchronize { nr >= limit }
             worker_yield
-          elsif c = l.kgio_accept
-            klass.new(c) do |c|
+          elsif client = l.kgio_accept
+            klass.new(client) do |c|
               begin
                 lock.synchronize { nr += 1 }
                 c.process_loop

@@ -28,7 +28,7 @@ module Rainbows::NeverBlock
     DEFAULTS.each { |k,v| o[k] ||= v }
     Integer === o[:pool_size] && o[:pool_size] > 0 or
       raise ArgumentError, "pool_size must a be an Integer > 0"
-    mod = Rainbows.const_get(o[:backend])
+    Rainbows.const_get(o[:backend])
     require "never_block" # require EM first since we need a higher version
   end
 

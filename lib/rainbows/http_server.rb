@@ -9,7 +9,7 @@ class Rainbows::HttpServer < Unicorn::HttpServer
   def initialize(app, options)
     Rainbows.server = self
     @logger = Unicorn::Configurator::DEFAULTS[:logger]
-    rv = super(app, options)
+    super(app, options)
     defined?(@use) or use(:Base)
     @worker_connections ||= Rainbows::MODEL_WORKER_CONNECTIONS[@use]
   end

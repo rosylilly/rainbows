@@ -9,7 +9,7 @@ module Rainbows::XEpoll::Client
   THRESH = MAX - 1
   EP = Rainbows::Epoll::EP
   THREADS = Rainbows::HttpServer::LISTENERS.map do |sock|
-    Thread.new(sock) do |sock|
+    Thread.new do
       sleep
       begin
         if io = sock.kgio_accept
