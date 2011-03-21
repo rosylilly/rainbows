@@ -102,7 +102,7 @@ module Rainbows
       @alive = false
       Rainbows::HttpParser.quit
       @expire = Time.now + (@server.timeout * 2.0)
-      @server.class.const_get(:LISTENERS).map! { |s| s.close rescue nil }.clear
+      Unicorn::HttpServer::LISTENERS.each { |s| s.close rescue nil }.clear
     end
     false
   end
