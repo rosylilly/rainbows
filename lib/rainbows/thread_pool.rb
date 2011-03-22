@@ -1,24 +1,21 @@
 # -*- encoding: binary -*-
 
 # Implements a worker thread pool model.  This is suited for platforms
-# like Ruby 1.9, where the cost of dynamically spawning a new thread
-# for every new client connection is higher than with the ThreadSpawn
-# model.
+# like Ruby 1.9, where the cost of dynamically spawning a new thread for
+# every new client connection is higher than with the ThreadSpawn model,
+# but the cost of an idle thread is low (e.g. NPTL under Linux).
 #
-# This model should provide a high level of compatibility with all
-# Ruby implementations, and most libraries and applications.
-# Applications running under this model should be thread-safe
-# but not necessarily reentrant.
+# This model should provide a high level of compatibility with all Ruby
+# implementations, and most libraries and applications.  Applications
+# running under this model should be thread-safe but not necessarily
+# reentrant.
 #
-# Applications using this model are required to be thread-safe.
-# Threads are never spawned dynamically under this model.  If you're
-# connecting to external services and need to perform DNS lookups,
-# consider using the "resolv-replace" library which replaces parts of
-# the core Socket package with concurrent DNS lookup capabilities.
+# Applications using this model are required to be thread-safe.  Threads
+# are never spawned dynamically under this model.
 #
-# This model probably less suited for many slow clients than the
-# others and thus a lower +worker_connections+ setting is recommended.
-
+# If you're using green threads (MRI 1.8) and need to perform DNS lookups,
+# consider using the "resolv-replace" library which replaces parts of the
+# core Socket package with concurrent DNS lookup capabilities.
 module Rainbows::ThreadPool
   include Rainbows::Base
 
