@@ -48,6 +48,32 @@ class Rainbows::HttpServer < Unicorn::HttpServer
     orig == m ? super(worker) : worker_loop(worker)
   end
 
+  def spawn_missing_workers
+    # 5: std{in,out,err} + heartbeat FD + per-process listener
+    nofile = 5 + @worker_connections + LISTENERS.size
+    trysetrlimit(:RLIMIT_NOFILE, nofile)
+    super
+  end
+
+  def trysetrlimit(resource, want)
+    var = Process.const_get(resource)
+    cur, max = Process.getrlimit(var)
+    cur <= want and Process.setrlimit(var, cur = max > want ? max : want)
+    if cur == want
+      @logger.warn "#{resource} rlim_cur=#{cur} is barely enough"
+      @logger.warn "#{svc} may monopolize resources dictated by #{resource}" \
+                   " and leave none for your app"
+    end
+    rescue => e
+      @logger.error e.message
+      @logger.error "#{resource} needs to be increased to >=#{want} before" \
+                    " starting #{svc}"
+  end
+
+  def svc
+    File.basename($0)
+  end
+
   def use(*args)
     model = args.shift or return @use
     mod = begin
