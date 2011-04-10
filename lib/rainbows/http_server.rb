@@ -52,6 +52,13 @@ class Rainbows::HttpServer < Unicorn::HttpServer
     # 5: std{in,out,err} + heartbeat FD + per-process listener
     nofile = 5 + @worker_connections + LISTENERS.size
     trysetrlimit(:RLIMIT_NOFILE, nofile)
+
+    case @use
+    when :ThreadSpawn, :ThreadPool, :ActorSpawn,
+         :CoolioThreadSpawn, :RevThreadSpawn,
+         :WriterThreadPool, :WriterThreadSpawn
+      trysetrlimit(:RLIMIT_NPROC, @worker_connections + LISTENERS.size + 1)
+    end
     super
   end
 
