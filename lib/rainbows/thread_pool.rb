@@ -59,17 +59,4 @@ module Rainbows::ThreadPool
       Rainbows::Error.listen_loop(e)
     end while Rainbows.alive
   end
-
-  def join_threads(threads) # :nodoc:
-    Rainbows.quit!
-    threads.delete_if do |thr|
-      Rainbows.tick
-      begin
-        thr.run
-        thr.join(0.01)
-      rescue
-        true
-      end
-    end until threads.empty?
-  end
 end
