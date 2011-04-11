@@ -207,7 +207,8 @@ module Rainbows::Epoll::Client
   # this alternates between a push and pull model from the pipe -> client
   # to avoid having too much data in userspace on either end.
   def stream_pipe(pipe)
-    case buf = pipe.tryread
+    buf = ""
+    case buf = pipe.tryread(buf)
     when String
       write(buf)
       if @wr_queue[0]

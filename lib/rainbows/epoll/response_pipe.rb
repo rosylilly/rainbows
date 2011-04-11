@@ -4,7 +4,6 @@
 class Rainbows::Epoll::ResponsePipe
   attr_reader :io
   alias to_io io
-  RBUF = Rainbows::EvCore::RBUF
   EP = Rainbows::Epoll::EP
 
   def initialize(io, client, body)
@@ -26,7 +25,7 @@ class Rainbows::Epoll::ResponsePipe
     @io = @body = nil
   end
 
-  def tryread
-    Kgio.tryread(@io, 16384, RBUF)
+  def tryread(buf)
+    Kgio.tryread(@io, 16384, buf)
   end
 end
