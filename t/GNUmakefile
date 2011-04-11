@@ -35,7 +35,9 @@ ifeq ($(RUBY_ENGINE),ruby)
   rp := )
   ONENINE := $(shell case $(RUBY_VERSION) in 1.9.*$(rp) echo true;;esac)
   ifeq ($(ONENINE),true)
-    models += Revactor
+    ifeq ($(RUBY_VERSION),1.9.2)
+      models += Revactor
+    endif
     models += FiberSpawn
     models += FiberPool
     models += CoolioThreadPool
