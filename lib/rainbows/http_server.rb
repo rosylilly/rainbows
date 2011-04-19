@@ -41,12 +41,11 @@ class Rainbows::HttpServer < Unicorn::HttpServer
     @worker_connections ||= Rainbows::MODEL_WORKER_CONNECTIONS[@use]
   end
 
-  def ready_pipe=(v)
-    # hacky hook got force Rainbows! to load modules only in workers
-    if defined?(@master_pid) && @master_pid == Process.ppid
-      extend(Rainbows.const_get(@use))
-    end
-    super
+  def worker_loop(worker)
+    orig = method(:worker_loop)
+    extend(Rainbows.const_get(@use))
+    m = method(:worker_loop)
+    orig == m ? super(worker) : worker_loop(worker)
   end
 
   def use(*args)
