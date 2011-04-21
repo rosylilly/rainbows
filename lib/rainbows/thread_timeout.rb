@@ -93,7 +93,7 @@ class Rainbows::ThreadTimeout
           sleep(@timeout)
         else
           sec = next_expiry - Time.now
-          sec > 0.0 ? sleep(sec) : Thread.pass
+          sec > 0.0 ? sleep(sec) : Thread.pass # give other threads a chance
         end
       rescue => e
         logger.error e
