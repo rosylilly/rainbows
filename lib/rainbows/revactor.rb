@@ -3,10 +3,14 @@ require 'revactor'
 require 'fcntl'
 Revactor::VERSION >= '0.1.5' or abort 'revactor 0.1.5 is required'
 
-# Enables use of the Actor model through
-# {Revactor}[http://revactor.org] under Ruby 1.9.  It spawns one
-# long-lived Actor for every listen socket in the process and spawns a
-# new Actor for every client connection accept()-ed.
+# Enables use of the Actor model through {Revactor}[http://revactor.org]
+# under Ruby 1.9.
+#
+# \Revactor dormant upstream, so the use of this is NOT recommended for
+# new applications.
+#
+# It spawns one long-lived Actor for every listen socket in the process
+# and spawns a new Actor for every client connection accept()-ed.
 # +worker_connections+ will limit the number of client Actors we have
 # running at any one time.
 #

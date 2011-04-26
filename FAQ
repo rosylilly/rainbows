@@ -18,6 +18,9 @@ requests we service.
 === Isn't "rainbows" a branch of Unicorn?
 
 That functionality is now in the Revactor model of \Rainbows!
+However, \Revactor is not recommended since it is dormant
+upstream and requires your application (and all its libraries)
+to cooperate with \Revactor for concurrency.
 
 
 === What happened to the "gossamer" branch of Unicorn?
