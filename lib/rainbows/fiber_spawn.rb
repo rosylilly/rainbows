@@ -1,12 +1,17 @@
 # -*- encoding: binary -*-
 require 'rainbows/fiber'
 
-# Simple Fiber-based concurrency model for 1.9.  This spawns a new
-# Fiber for every incoming client connection and the root Fiber for
-# scheduling and connection acceptance.  This exports a streaming
-# "rack.input" with lightweight concurrency.  Applications are
-# strongly advised to wrap all slow IO objects (sockets, pipes) using
-# the Rainbows::Fiber::IO class whenever possible.
+# Simple Fiber-based concurrency model for 1.9.  This spawns a new Fiber
+# for every incoming client connection and the root Fiber for scheduling
+# and connection acceptance.
+#
+# This concurrency model is difficult to use with existing applications,
+# lacks third-party support, and is thus NOT recommended.
+#
+# This exports a streaming "rack.input" with lightweight concurrency.
+# Applications are strongly advised to wrap all slow IO objects
+# (sockets, pipes) using the Rainbows::Fiber::IO class whenever
+# possible.
 module Rainbows::FiberSpawn
   include Rainbows::Fiber::Base
 

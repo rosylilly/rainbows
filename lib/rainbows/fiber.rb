@@ -8,6 +8,11 @@ end
 # :startdoc:
 
 # core namespace for all things that use Fibers in \Rainbows!
+#
+# It's generally not recommended to use any of this in your applications
+# unless you're willing to accept breakage.  Most of this is very
+# difficult-to-use, fragile and we don't have much time to devote to
+# supporting these in the future.
 module Rainbows::Fiber
 
   # :stopdoc:

@@ -1,13 +1,17 @@
 # -*- encoding: binary -*-
 require 'rainbows/fiber/coolio'
 
-# A combination of the Coolio and FiberSpawn models.  This allows Ruby
-# 1.9 Fiber-based concurrency for application processing while exposing
-# a synchronous execution model and using scalable network concurrency
-# provided by Cool.io.  A streaming "rack.input" is exposed.
-# Applications are strongly advised to wrap all slow IO objects
-# (sockets, pipes) using the Rainbows::Fiber::IO or a Cool.io-compatible
-# class whenever possible.
+# A combination of the Coolio and FiberSpawn models.
+#
+# This concurrency model is difficult to use with existing applications,
+# lacks third-party support, and is thus NOT recommended.
+#
+# This allows Ruby 1.9 Fiber-based concurrency for application
+# processing while exposing a synchronous execution model and using
+# scalable network concurrency provided by Cool.io.  A streaming
+# "rack.input" is exposed.  Applications are strongly advised to wrap
+# all slow IO objects (sockets, pipes) using the Rainbows::Fiber::IO or
+# a Cool.io-compatible class whenever possible.
 module Rainbows::CoolioFiberSpawn
 
   include Rainbows::Base

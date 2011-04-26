@@ -1,13 +1,18 @@
 # -*- encoding: binary -*-
 
-# A Fiber-aware IO class, gives users the illusion of a synchronous
-# interface that yields away from the current Fiber whenever
+# A \Fiber-aware IO class, gives users the illusion of a synchronous
+# interface that yields away from the current \Fiber whenever
 # the underlying descriptor is blocked on reads or write
+#
+# It's not recommended to use any of this in your applications
+# unless you're willing to accept breakage.  Most of this is very
+# difficult-to-use, fragile and we don't have much time to devote to
+# supporting these in the future.
 #
 # This is a stable, legacy interface and should be preserved for all
 # future versions of Rainbows!  However, new apps should use
-# Rainbows::Fiber::IO::Socket or Rainbows::Fiber::IO::Pipe instead.
-
+# Rainbows::Fiber::IO::Socket or Rainbows::Fiber::IO::Pipe instead
+# (or better yet, avoid any of the Rainbows::Fiber* stuff).
 class Rainbows::Fiber::IO
   attr_accessor :to_io
 
