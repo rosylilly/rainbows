@@ -77,7 +77,7 @@ module Rainbows::Revactor
       # ignore, let another worker process take it
   end
 
-  def revactorize_listeners
+  def revactorize_listeners #:nodoc:
     LISTENERS.map do |s|
       case s
       when TCPServer
