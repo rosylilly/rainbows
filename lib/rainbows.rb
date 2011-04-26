@@ -112,11 +112,11 @@ module Rainbows
   # highly recommended
   MODEL_WORKER_CONNECTIONS = {
     :Base => 1, # this one can't change
-    :WriterThreadPool => 20,
-    :WriterThreadSpawn => 20,
+    :WriterThreadPool => 50,
+    :WriterThreadSpawn => 50,
     :Revactor => 50,
-    :ThreadSpawn => 30,
-    :ThreadPool => 20,
+    :ThreadSpawn => 50,
+    :ThreadPool => 50,
     :Rev => 50,
     :RevThreadSpawn => 50,
     :RevThreadPool => 50,
