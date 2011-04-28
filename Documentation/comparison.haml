@@ -118,6 +118,20 @@
     %td.r19 Yes
     %td.rbx Yes
     %td.slow no
+  %tr.comp_row
+    %td.mod Epoll
+    %td.tee no
+    %td.r18 Yes
+    %td.r19 Yes
+    %td.rbx Yes
+    %td.slow Yes
+  %tr.comp_row
+    %td.mod XEpoll
+    %td.tee no
+    %td.r18 Yes
+    %td.r19 Yes
+    %td.rbx Yes
+    %td.slow Yes
 %ul
   %li
     Cool.io should also work with Rubinius (though we haven't had time to test).
@@ -232,6 +246,16 @@
     %td.slowio avoid
     %td.thr Maybe
     %td.reent Maybe
+  %tr.comp_base
+    %td.mod Epoll
+    %td.slowio No
+    %td.thr No
+    %td.reent No
+  %tr.comp_base
+    %td.mod XEpoll
+    %td.slowio No
+    %td.thr No
+    %td.reent No
 %ul
   %li
     Requirements for single thread reentrancy are loose in that there is
@@ -369,6 +393,20 @@
     %td.lock no-op
     %td.async Standard Ruby in response body only
     %td.ws response body only
+  %tr.comp_row
+    %td.mod Epoll
+    %td.devfd Yes
+    %td.app_pool no-op
+    %td.lock no-op
+    %td.async DevFdResponse
+    %td.ws no
+  %tr.comp_row
+    %td.mod XEpoll
+    %td.devfd Yes
+    %td.app_pool no-op
+    %td.lock no-op
+    %td.async DevFdResponse
+    %td.ws no
 %ul
   %li
     "No!" means it's fundamentally incompatible, use an

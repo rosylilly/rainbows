@@ -1,13 +1,13 @@
 # -*- encoding: binary -*-
-# :enddoc:
 require 'raindrops'
 require 'rainbows/epoll'
 
-# Edge-triggered epoll concurrency model with blocking accept() in
-# a (hopefully) native thread.  This is recommended over Epoll for
-# Ruby 1.9 users as it can workaround accept()-scalability issues
-# on multicore machines.
+# Edge-triggered epoll concurrency model with blocking accept() in a
+# (hopefully) native thread.  This is just like Epoll, but recommended
+# for Ruby 1.9 users as it can avoid accept()-scalability issues on
+# multicore machines with many worker processes.
 module Rainbows::XEpoll
+  # :stopdoc:
   include Rainbows::Base
   autoload :Client, 'rainbows/xepoll/client'
 
@@ -21,4 +21,5 @@ module Rainbows::XEpoll
     init_worker_process(worker)
     Client.run
   end
+  # :startdoc:
 end

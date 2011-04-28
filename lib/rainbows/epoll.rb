@@ -1,11 +1,25 @@
 # -*- encoding: binary -*-
-# :enddoc:
 require 'sleepy_penguin'
 require 'sendfile'
 
-# Edge-triggered epoll concurrency model.  This is extremely unfair
-# and optimized for throughput at the expense of fairness
+# Edge-triggered epoll concurrency model using
+# {sleepy_penguin}[http://bogomips.org/sleepy_penguin/] for epoll.
+#
+# Unlike more portable options like Coolio and EventMachine, this
+# is Linux-only, but uses edge-triggering instead of level-triggering,
+# so it may perform better in some cases.  Coolio and EventMachine have
+# better library support and may be widely-used, however.
+#
+# Consider using XEpoll instead of this if you are using Ruby 1.9,
+# it will avoid accept()-scalability issues with many worker processes.
+#
+# When serving static files, this is extremely unfair and optimized
+# for throughput at the expense of fairness.  This is not an issue
+# if you're not serving static files, or if your working set is
+# small enough to aways be in your kernel page cache.  This concurrency
+# model may starve clients if you have slow disks and large static files.
 module Rainbows::Epoll
+  # :stopdoc:
   include Rainbows::Base
   ReRun = []
   autoload :Server, 'rainbows/epoll/server'
@@ -40,4 +54,5 @@ module Rainbows::Epoll
     init_worker_process(worker)
     Server.run
   end
+  # :startdoc:
 end
