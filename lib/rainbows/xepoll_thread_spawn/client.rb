@@ -8,6 +8,7 @@ module Rainbows::XEpollThreadSpawn::Client
   max = Rainbows.server.worker_connections
   ACCEPTORS = Rainbows::HttpServer::LISTENERS.map do |sock|
     Thread.new do
+      sleep
       begin
         if io = sock.kgio_accept(Rainbows::Client)
           N.incr(0, 1)
@@ -39,6 +40,7 @@ module Rainbows::XEpollThreadSpawn::Client
   end
 
   def self.loop
+    ACCEPTORS.each { |thr| thr.run }
     begin
       EP.wait(nil, 1000) { |fl, obj| obj.epoll_run }
       expire
