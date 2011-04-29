@@ -46,4 +46,25 @@ module Rainbows::ProcessClient
   def set_input(env, hp)
     env[RACK_INPUT] = 0 == hp.content_length ? NULL_IO : IC.new(self, hp)
   end
+
+  def process_pipeline(env, hp)
+    begin
+      set_input(env, hp)
+      env[REMOTE_ADDR] = kgio_addr
+      status, headers, body = APP.call(env.merge!(RACK_DEFAULTS))
+      if 100 == status.to_i
+        write(EXPECT_100_RESPONSE)
+        env.delete(HTTP_EXPECT)
+        status, headers, body = APP.call(env)
+      end
+      write_response(status, headers, body, alive = hp.next?)
+    end while alive && env = pipeline_ready(hp)
+    alive or close
+    rescue => e
+      handle_error(e)
+  end
+
+  # override this in subclass/module
+  def pipeline_ready
+  end
 end

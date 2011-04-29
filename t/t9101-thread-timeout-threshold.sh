@@ -4,6 +4,7 @@ case $model in
 ThreadSpawn|ThreadPool) ;;
 RevThreadSpawn|RevThreadPool) ;;
 CoolioThreadSpawn|CoolioThreadPool) ;;
+XEpollThreadSpawn) ;;
 *) t_info "$0 is only compatible with Thread*"; exit 0 ;;
 esac
 

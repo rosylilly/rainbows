@@ -11,6 +11,7 @@ esac
 
 case $model in
 ThreadSpawn|WriterThreadSpawn|ThreadPool|WriterThreadPool|Base) ;;
+XEpollThreadSpawn) ;;
 *)
 	t_info "skipping $T since it doesn't use IO.copy_stream"
 	exit 0

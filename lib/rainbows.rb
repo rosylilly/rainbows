@@ -132,6 +132,7 @@ module Rainbows
     :FiberPool => 50,
     :ActorSpawn => 50,
     :NeverBlock => 50,
+    :XEpollThreadSpawn => 50,
   }.each do |model, _|
     u = model.to_s.gsub(/([a-z0-9])([A-Z0-9])/) { "#{$1}_#{$2.downcase!}" }
     autoload model, "rainbows/#{u.downcase!}"
