@@ -31,9 +31,8 @@ module Rainbows::Epoll
   end
 
   def self.loop
-    timeout = Rainbows.server.timeout
     begin
-      EP.wait(nil, timeout) { |flags, obj| obj.epoll_run }
+      EP.wait(nil, 1000) { |flags, obj| obj.epoll_run }
       while obj = ReRun.shift
         obj.epoll_run
       end
