@@ -9,10 +9,11 @@ module Rainbows::XEpollThreadSpawn::Client
   ACCEPTORS = Rainbows::HttpServer::LISTENERS.map do |sock|
     Thread.new do
       sleep
+      buf = ""
       begin
         if io = sock.kgio_accept(Rainbows::Client)
           N.incr(0, 1)
-          io.epoll_once
+          io.epoll_once(buf)
         end
         sleep while N[0] >= max
       rescue => e
@@ -41,8 +42,9 @@ module Rainbows::XEpollThreadSpawn::Client
 
   def self.loop
     ACCEPTORS.each { |thr| thr.run }
+    buf = ""
     begin
-      EP.wait(nil, 1000) { |fl, obj| obj.epoll_run }
+      EP.wait(nil, 1000) { |fl, obj| obj.epoll_run(buf) }
       expire
     rescue Errno::EINTR
     rescue => e
@@ -64,10 +66,9 @@ module Rainbows::XEpollThreadSpawn::Client
     @@last_expire = now
   end
 
-  def epoll_once
+  def epoll_once(buf)
     @hp = Rainbows::HttpParser.new
-    @buf2 = ""
-    epoll_run
+    epoll_run(buf)
   end
 
   def timeout!(defer)
@@ -86,13 +87,13 @@ module Rainbows::XEpollThreadSpawn::Client
       closed? or close
   end
 
-  def epoll_run
-    case kgio_tryread(0x4000, @buf2)
+  def epoll_run(buf)
+    case kgio_tryread(0x1000, buf)
     when :wait_readable
       return kato_set
     when String
       kato_delete
-      @hp.buf << @buf2
+      @hp.buf << buf
       env = @hp.parse and return spawn(env, @hp)
     else
       return close
@@ -107,12 +108,12 @@ module Rainbows::XEpollThreadSpawn::Client
 
   def pipeline_ready(hp)
     env = hp.parse and return env
-    case kgio_tryread(0x4000, @buf2)
+    case buf = kgio_tryread(0x1000)
     when :wait_readable
       kato_set
       return false
     when String
-      hp.buf << @buf2
+      hp.buf << buf
       env = hp.parse and return env
       # continue loop
     else
