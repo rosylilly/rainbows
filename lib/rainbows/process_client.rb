@@ -10,7 +10,7 @@ module Rainbows::ProcessClient
 
   def process_loop
     @hp = hp = Rainbows::HttpParser.new
-    kgio_read!(16384, buf = hp.buf) or return
+    kgio_read!(0x1000, buf = hp.buf) or return
 
     begin # loop
       until env = hp.parse

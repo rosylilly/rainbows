@@ -16,7 +16,7 @@ class Rainbows::Client < Kgio::Socket
   def timed_read(buf)
     expire = nil
     begin
-      case rv = kgio_tryread(16384, buf)
+      case rv = kgio_tryread(0x1000, buf)
       when :wait_readable
         return if expire && expire < Time.now
         expire ||= read_expire
