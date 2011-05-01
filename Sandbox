@@ -1,0 +1,25 @@
+= Tips for using \Rainbows! with Sandbox installation tools
+
+Most {tips for Unicorn}[http://unicorn.bogomips.org/Sandbox.html]
+for Bundler and Isolate apply to \Rainbows! as well.
+
+== TLDR (Bundler)
+
+You need to add "rainbows" to your Gemfile for Bundler and start
+\Rainbows! with:
+
+	bundle exec rainbows ...
+
+== TLDR (Isolate)
+
+Isolate "rainbows" and execute the "rainbows" launcher in your isolated
+GEM_PATH:
+
+	$APP_ROOT/tmp/ruby-1.9/bin/rainbows ...
+
+== Explanation
+
+Due to the variety of potential dependencies, \Rainbows! lazy loads many
+of its internals, often after the application itself is loaded.  This
+results in more potential to interact badly with sandbox tools that
+modify the gem environment.
