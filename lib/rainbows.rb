@@ -107,36 +107,29 @@ module Rainbows
     false
   end
 
-  # maps models to default worker counts, default worker count numbers are
-  # pretty arbitrary and tuning them to your application and hardware is
-  # highly recommended
-  MODEL_WORKER_CONNECTIONS = {
-    :Base => 1, # this one can't change
-    :WriterThreadPool => 50,
-    :WriterThreadSpawn => 50,
-    :Revactor => 50,
-    :ThreadSpawn => 50,
-    :ThreadPool => 50,
-    :Rev => 50,
-    :RevThreadSpawn => 50,
-    :RevThreadPool => 50,
-    :RevFiberSpawn => 50,
-    :Coolio => 50,
-    :CoolioThreadSpawn => 50,
-    :CoolioThreadPool => 50,
-    :CoolioFiberSpawn => 50,
-    :Epoll => 50,
-    :XEpoll => 50,
-    :EventMachine => 50,
-    :FiberSpawn => 50,
-    :FiberPool => 50,
-    :ActorSpawn => 50,
-    :NeverBlock => 50,
-    :XEpollThreadSpawn => 50,
-  }.each do |model, _|
-    u = model.to_s.gsub(/([a-z0-9])([A-Z0-9])/) { "#{$1}_#{$2.downcase!}" }
-    autoload model, "rainbows/#{u.downcase!}"
-  end
+  autoload :Base, "rainbows/base"
+  autoload :WriterThreadPool, "rainbows/writer_thread_pool"
+  autoload :WriterThreadSpawn, "rainbows/writer_thread_spawn"
+  autoload :Revactor, "rainbows/revactor"
+  autoload :ThreadSpawn, "rainbows/thread_spawn"
+  autoload :ThreadPool, "rainbows/thread_pool"
+  autoload :Rev, "rainbows/rev"
+  autoload :RevThreadSpawn, "rainbows/rev_thread_spawn"
+  autoload :RevThreadPool, "rainbows/rev_thread_pool"
+  autoload :RevFiberSpawn, "rainbows/rev_fiber_spawn"
+  autoload :Coolio, "rainbows/coolio"
+  autoload :CoolioThreadSpawn, "rainbows/coolio_thread_spawn"
+  autoload :CoolioThreadPool, "rainbows/coolio_thread_pool"
+  autoload :CoolioFiberSpawn, "rainbows/coolio_fiber_spawn"
+  autoload :Epoll, "rainbows/epoll"
+  autoload :XEpoll, "rainbows/xepoll"
+  autoload :EventMachine, "rainbows/event_machine"
+  autoload :FiberSpawn, "rainbows/fiber_spawn"
+  autoload :FiberPool, "rainbows/fiber_pool"
+  autoload :ActorSpawn, "rainbows/actor_spawn"
+  autoload :NeverBlock, "rainbows/never_block"
+  autoload :XEpollThreadSpawn, "rainbows/xepoll_thread_spawn"
+
   # :startdoc:
   autoload :Fiber, 'rainbows/fiber' # core class
   autoload :StreamFile, 'rainbows/stream_file'
