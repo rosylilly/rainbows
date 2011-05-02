@@ -11,7 +11,7 @@ class Rainbows::HttpServer < Unicorn::HttpServer
     @logger = Unicorn::Configurator::DEFAULTS[:logger]
     super(app, options)
     defined?(@use) or use(:Base)
-    @worker_connections ||= Rainbows::MODEL_WORKER_CONNECTIONS[@use]
+    @worker_connections ||= @use == :Base ? 1 : 50
   end
 
   def reopen_worker_logs(worker_nr)
@@ -38,7 +38,7 @@ class Rainbows::HttpServer < Unicorn::HttpServer
     Rainbows.max_bytes = 1024 * 1024
     @worker_connections = nil
     super
-    @worker_connections ||= Rainbows::MODEL_WORKER_CONNECTIONS[@use]
+    @worker_connections ||= @use == :Base ? 1 : 50
   end
 
   def worker_loop(worker)
