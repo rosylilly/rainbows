@@ -133,7 +133,7 @@ module Rainbows::EvCore
   end
 
   def mkinput
-    max = Rainbows.max_bytes
+    max = Rainbows.client_max_body_size
     len = @hp.content_length
     if len
       if max && (len > max)

@@ -25,7 +25,7 @@ class Rainbows::MaxBody
   #   # in config.ru:
   #   use Rainbows::MaxBody, 4096
   #   run YourApplication.new
-  def initialize(app, limit = Rainbows.max_bytes)
+  def initialize(app, limit = Rainbows.client_max_body_size)
     Integer === limit or raise ArgumentError, "limit not an Integer"
     @app, @limit = app, limit
   end
@@ -51,7 +51,7 @@ class Rainbows::MaxBody
   # this is called after forking, so it won't ever affect the master
   # if it's reconfigured
   def self.setup # :nodoc:
-    Rainbows.max_bytes or return
+    Rainbows.client_max_body_size or return
     case Rainbows.server.use
     when :Rev, :Coolio, :EventMachine, :NeverBlock,
          :RevThreadSpawn, :RevThreadPool,

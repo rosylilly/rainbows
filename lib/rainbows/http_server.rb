@@ -35,7 +35,7 @@ class Rainbows::HttpServer < Unicorn::HttpServer
   def load_config!
     use :Base
     Rainbows.keepalive_timeout = 5
-    Rainbows.max_bytes = 1024 * 1024
+    Rainbows.client_max_body_size = 1024 * 1024
     @worker_connections = nil
     super
     @worker_connections ||= @use == :Base ? 1 : 50
@@ -139,7 +139,7 @@ class Rainbows::HttpServer < Unicorn::HttpServer
     else
       raise ArgumentError, err
     end
-    Rainbows.max_bytes = nr
+    Rainbows.client_max_body_size = nr
   end
 
   def client_header_buffer_size(bytes)

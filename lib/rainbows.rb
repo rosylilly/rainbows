@@ -68,7 +68,8 @@ module Rainbows
   # :stopdoc:
   class << self
     attr_accessor :client_header_buffer_size
-    attr_accessor :max_bytes, :keepalive_timeout
+    attr_accessor :client_max_body_size
+    attr_accessor :keepalive_timeout
     attr_accessor :server
     attr_accessor :cur # may not always be used
     attr_reader :alive
@@ -77,7 +78,7 @@ module Rainbows
   # :startdoc:
 
   # the default max body size is 1 megabyte (1024 * 1024 bytes)
-  @max_bytes = 1024 * 1024
+  @client_max_body_size = 1024 * 1024
 
   # the default keepalive_timeout is 5 seconds
   @keepalive_timeout = 5
