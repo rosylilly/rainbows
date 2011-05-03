@@ -4,6 +4,7 @@ require "sleepy_penguin"
 require "raindrops"
 
 module Rainbows::XEpollThreadSpawn::Client
+  HBUFSIZ = Rainbows.client_header_buffer_size
   N = Raindrops.new(1)
   max = Rainbows.server.worker_connections
   ACCEPTORS = Rainbows::HttpServer::LISTENERS.map do |sock|
@@ -88,7 +89,7 @@ module Rainbows::XEpollThreadSpawn::Client
   end
 
   def epoll_run(buf)
-    case kgio_tryread(0x1000, buf)
+    case kgio_tryread(HBUFSIZ, buf)
     when :wait_readable
       return kato_set
     when String
@@ -108,7 +109,7 @@ module Rainbows::XEpollThreadSpawn::Client
 
   def pipeline_ready(hp)
     env = hp.parse and return env
-    case buf = kgio_tryread(0x1000)
+    case buf = kgio_tryread(HBUFSIZ)
     when :wait_readable
       kato_set
       return false

@@ -141,4 +141,10 @@ class Rainbows::HttpServer < Unicorn::HttpServer
     end
     Rainbows.max_bytes = nr
   end
+
+  def client_header_buffer_size(bytes)
+    Integer === bytes && bytes > 0 or raise ArgumentError,
+            "client_header_buffer_size must be a positive Integer"
+    Rainbows.client_header_buffer_size = bytes
+  end
 end

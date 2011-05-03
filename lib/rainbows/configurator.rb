@@ -14,6 +14,7 @@ module Rainbows::Configurator
   #     keepalive_timeout 0 # zero disables keepalives entirely
   #     client_max_body_size 5*1024*1024 # 5 megabytes
   #     keepalive_requests 666 # default:100
+  #     client_header_buffer_size 16 * 1024 # 16 kilobytes
   #   end
   #
   #   # the rest of the Unicorn configuration

@@ -33,7 +33,7 @@ module Rainbows::Epoll::Client
   end
 
   def on_readable
-    case rv = kgio_tryread(16384, RBUF)
+    case rv = kgio_tryread(HBUFSIZ, RBUF)
     when String
       on_read(rv)
       return if @wr_queue[0] || closed?

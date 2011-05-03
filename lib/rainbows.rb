@@ -67,6 +67,7 @@ module Rainbows
 
   # :stopdoc:
   class << self
+    attr_accessor :client_header_buffer_size
     attr_accessor :max_bytes, :keepalive_timeout
     attr_accessor :server
     attr_accessor :cur # may not always be used
@@ -80,6 +81,10 @@ module Rainbows
 
   # the default keepalive_timeout is 5 seconds
   @keepalive_timeout = 5
+
+  # 1024 bytes matches nginx, though Rails session cookies will typically
+  # need >= 1500...
+  @client_header_buffer_size = 1024
 
   # :stopdoc:
   @alive = true

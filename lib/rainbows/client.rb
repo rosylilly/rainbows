@@ -4,6 +4,8 @@ require "io/wait"
 
 # this class is used for most synchronous concurrency models
 class Rainbows::Client < Kgio::Socket
+  include Rainbows::ProcessClient
+
   def read_expire
     Time.now + Rainbows.keepalive_timeout
   end
@@ -16,7 +18,7 @@ class Rainbows::Client < Kgio::Socket
   def timed_read(buf)
     expire = nil
     begin
-      case rv = kgio_tryread(0x1000, buf)
+      case rv = kgio_tryread(HBUFSIZ, buf)
       when :wait_readable
         return if expire && expire < Time.now
         expire ||= read_expire
@@ -26,6 +28,4 @@ class Rainbows::Client < Kgio::Socket
       end
     end while true
   end
-
-  include Rainbows::ProcessClient
 end

@@ -9,6 +9,7 @@ module Rainbows::EvCore
   autoload :CapInput, 'rainbows/ev_core/cap_input'
   RBUF = ""
   Z = "".freeze
+  HBUFSIZ = Rainbows.client_header_buffer_size
 
   # Apps may return this Rack response: AsyncResponse = [ -1, {}, [] ]
   ASYNC_CALLBACK = "async.callback".freeze
