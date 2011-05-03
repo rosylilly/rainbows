@@ -77,15 +77,19 @@ module Rainbows
   end
   # :startdoc:
 
-  # the default max body size is 1 megabyte (1024 * 1024 bytes)
-  @client_max_body_size = 1024 * 1024
+  def self.defaults!
+    # the default max body size is 1 megabyte (1024 * 1024 bytes)
+    @client_max_body_size = 1024 * 1024
 
-  # the default keepalive_timeout is 5 seconds
-  @keepalive_timeout = 5
+    # the default keepalive_timeout is 5 seconds
+    @keepalive_timeout = 5
 
-  # 1024 bytes matches nginx, though Rails session cookies will typically
-  # need >= 1500...
-  @client_header_buffer_size = 1024
+    # 1024 bytes matches nginx, though Rails session cookies will typically
+    # need >= 1500...
+    @client_header_buffer_size = 1024
+  end
+
+  defaults!
 
   # :stopdoc:
   @alive = true
