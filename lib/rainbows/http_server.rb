@@ -55,7 +55,7 @@ class Rainbows::HttpServer < Unicorn::HttpServer
     case @use
     when :ThreadSpawn, :ThreadPool, :ActorSpawn,
          :CoolioThreadSpawn, :RevThreadSpawn,
-         :WriterThreadPool, :WriterThreadSpawn
+         :XEpollThreadSpawn, :WriterThreadPool, :WriterThreadSpawn
       trysetrlimit(:RLIMIT_NPROC, @worker_connections + LISTENERS.size + 1)
     end
     super
