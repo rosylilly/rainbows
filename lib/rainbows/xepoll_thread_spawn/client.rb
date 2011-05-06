@@ -104,14 +104,14 @@ module Rainbows::XEpollThreadSpawn::Client
   end
 
   def pipeline_ready(hp)
-    env = hp.parse and return env
+    hp.parse and return true
     case buf = kgio_tryread(HBUFSIZ)
     when :wait_readable
       kato_set
       return false
     when String
       hp.buf << buf
-      env = hp.parse and return env
+      hp.parse and return true
       # continue loop
     else
       return close

@@ -59,7 +59,7 @@ module Rainbows::ProcessClient
         status, headers, body = APP.call(env)
       end
       write_response(status, headers, body, alive = hp.next?)
-    end while alive && env = pipeline_ready(hp)
+    end while alive && pipeline_ready(hp)
     alive or close
     rescue => e
       handle_error(e)
