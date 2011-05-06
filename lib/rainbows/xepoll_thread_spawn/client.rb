@@ -1,8 +1,4 @@
 # -*- encoding: binary -*-
-require "thread"
-require "sleepy_penguin"
-require "raindrops"
-
 module Rainbows::XEpollThreadSpawn::Client
   HBUFSIZ = Rainbows.client_header_buffer_size
   N = Raindrops.new(1)

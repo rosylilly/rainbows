@@ -1,4 +1,7 @@
 # -*- encoding: binary -*-
+require "thread"
+require "sleepy_penguin"
+require "raindrops"
 
 module Rainbows::XEpollThreadSpawn
   include Rainbows::Base
