@@ -56,7 +56,7 @@ module Rainbows::XEpollThreadSpawn::Client
       ot = now - ot
       defer = []
       LOCK.synchronize do
-        KATO.delete_if { |client, time| time < ot and client.timeout!(defer) }
+        KATO.delete_if { |client, time| time < ot and defer << client }
       end
       defer.each { |io| io.closed? or io.close }
     end
@@ -66,10 +66,6 @@ module Rainbows::XEpollThreadSpawn::Client
   def epoll_once(buf)
     @hp = Rainbows::HttpParser.new
     epoll_run(buf)
-  end
-
-  def timeout!(defer)
-    defer << self
   end
 
   def close
