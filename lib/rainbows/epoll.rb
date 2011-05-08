@@ -32,7 +32,7 @@ module Rainbows::Epoll
 
   def self.loop
     begin
-      EP.wait(nil, 1000) { |flags, obj| obj.epoll_run }
+      EP.wait(nil, 1000) { |_, obj| obj.epoll_run }
       while obj = ReRun.shift
         obj.epoll_run
       end

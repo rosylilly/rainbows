@@ -43,7 +43,7 @@ module Rainbows::XEpollThreadSpawn::Client
   def self.loop
     buf = ""
     begin
-      EP.wait(nil, 1000) { |fl, obj| obj.epoll_run(buf) }
+      EP.wait(nil, 1000) { |_, obj| obj.epoll_run(buf) }
       expire
     rescue Errno::EINTR
     rescue => e
