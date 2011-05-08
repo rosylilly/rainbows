@@ -2,7 +2,7 @@
 # :enddoc:
 #
 class Rainbows::Epoll::ResponseChunkPipe < Rainbows::Epoll::ResponsePipe
-  def tryread(buf)
+  def tryread
     @io or return
 
     case rv = super
