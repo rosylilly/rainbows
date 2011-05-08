@@ -72,6 +72,7 @@ module Rainbows::XEpollThreadSpawn::Client
     super
     kato_delete
     N.decr(0, 1) == THRESH and ACCEPTORS.each { |t| t.run }
+    nil
   end
 
   def handle_error(e)
