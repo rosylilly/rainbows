@@ -66,6 +66,6 @@ module Rainbows::ProcessClient
   end
 
   # override this in subclass/module
-  def pipeline_ready
+  def pipeline_ready(hp)
   end
 end
