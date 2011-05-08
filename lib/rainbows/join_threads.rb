@@ -10,7 +10,7 @@ module Rainbows::JoinThreads
       Rainbows.tick
       begin
         # blocking accept() may not wake up properly
-        thr.raise(Errno::EINTR) if Time.now > expire && "sleep" == thr.status
+        thr.raise(Errno::EINTR) if Time.now > expire && thr.stop?
 
         thr.run
         thr.join(0.01)
