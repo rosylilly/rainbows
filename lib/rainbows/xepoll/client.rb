@@ -5,28 +5,30 @@ module Rainbows::XEpoll::Client
   N = Raindrops.new(1)
   Rainbows::Epoll.nr_clients = lambda { N[0] }
   include Rainbows::Epoll::Client
-  MAX = Rainbows.server.worker_connections
-  THRESH = MAX - 1
   EP = Rainbows::Epoll::EP
-  THREADS = Rainbows::HttpServer::LISTENERS.map do |sock|
-    Thread.new do
-      sleep
-      begin
-        if io = sock.kgio_accept
-          N.incr(0, 1)
-          io.epoll_once
-        end
-        sleep while N[0] >= MAX
-      rescue => e
-        Rainbows::Error.listen_loop(e)
-      end while Rainbows.alive
+  ACCEPTORS = Rainbows::HttpServer::LISTENERS.dup
+  extend Rainbows::WorkerYield
+
+  def self.included(klass)
+    max = Rainbows.server.worker_connections
+    ACCEPTORS.map! do |sock|
+      Thread.new do
+        begin
+          if io = sock.kgio_accept(klass)
+            N.incr(0, 1)
+            io.epoll_once
+          end
+          worker_yield while N[0] >= max
+        rescue => e
+          Rainbows::Error.listen_loop(e)
+        end while Rainbows.alive
+      end
     end
   end
 
   def self.run
-    THREADS.each { |t| t.run }
     Rainbows::Epoll.loop
-    Rainbows::JoinThreads.acceptors(THREADS)
+    Rainbows::JoinThreads.acceptors(ACCEPTORS)
   end
 
   # only call this once
@@ -40,6 +42,6 @@ module Rainbows::XEpoll::Client
 
   def on_close
     KATO.delete(self)
-    N.decr(0, 1) == THRESH and THREADS.each { |t| t.run }
+    N.decr(0, 1)
   end
 end
