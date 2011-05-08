@@ -2,27 +2,30 @@
 module Rainbows::XEpollThreadSpawn::Client
   HBUFSIZ = Rainbows.client_header_buffer_size
   N = Raindrops.new(1)
-  max = Rainbows.server.worker_connections
-  ACCEPTORS = Rainbows::HttpServer::LISTENERS.map do |sock|
-    Thread.new do
-      sleep
-      buf = ""
-      begin
-        if io = sock.kgio_accept(Rainbows::Client)
-          N.incr(0, 1)
-          io.epoll_once(buf)
-        end
-        sleep while N[0] >= max
-      rescue => e
-        Rainbows::Error.listen_loop(e)
-      end while Rainbows.alive
+  ACCEPTORS = Rainbows::HttpServer::LISTENERS.dup
+  extend Rainbows::WorkerYield
+
+  def self.included(klass) # included in Rainbows::Client
+    max = Rainbows.server.worker_connections
+    ACCEPTORS.map! do |sock|
+      Thread.new do
+        buf = ""
+        begin
+          if io = sock.kgio_accept(klass)
+            N.incr(0, 1)
+            io.epoll_once(buf)
+          end
+          worker_yield while N[0] >= max
+        rescue => e
+          Rainbows::Error.listen_loop(e)
+        end while Rainbows.alive
+      end
     end
   end
 
   ep = SleepyPenguin::Epoll
   EP = ep.new
   IN = ep::IN | ep::ET | ep::ONESHOT
-  THRESH = max - 1
   KATO = {}
   KATO.compare_by_identity if KATO.respond_to?(:compare_by_identity)
   LOCK = Mutex.new
@@ -38,7 +41,6 @@ module Rainbows::XEpollThreadSpawn::Client
   end
 
   def self.loop
-    ACCEPTORS.each { |thr| thr.run }
     buf = ""
     begin
       EP.wait(nil, 1000) { |fl, obj| obj.epoll_run(buf) }
@@ -71,7 +73,7 @@ module Rainbows::XEpollThreadSpawn::Client
   def close
     super
     kato_delete
-    N.decr(0, 1) == THRESH and ACCEPTORS.each { |t| t.run }
+    N.decr(0, 1)
     nil
   end
 
