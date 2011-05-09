@@ -1,4 +1,5 @@
 # -*- encoding: binary -*-
+# :stopdoc:
 module Rainbows::XEpollThreadSpawn::Client
   HBUFSIZ = Rainbows.client_header_buffer_size
   N = Raindrops.new(1)
