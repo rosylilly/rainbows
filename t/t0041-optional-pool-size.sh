@@ -4,7 +4,7 @@
 case $model in
 NeverBlock|CoolioThreadPool) ;;
 *)
-	t_info "skipping $T since it doesn't support :pool_size"
+	t_info "skipping $model.$T since it doesn't support :pool_size"
 	exit
 	;;
 esac
