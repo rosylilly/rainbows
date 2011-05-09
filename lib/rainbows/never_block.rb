@@ -15,20 +15,14 @@
 #   end
 #
 module Rainbows::NeverBlock
-
   # :stopdoc:
-  DEFAULTS = {
-    :pool_size => 20, # same default size used by NB
-    :backend => :EventMachine, # NeverBlock doesn't support Rev yet
-  }
+  extend Rainbows::PoolSize
 
   # same pool size NB core itself uses
   def self.setup # :nodoc:
-    o = Rainbows::O
-    DEFAULTS.each { |k,v| o[k] ||= v }
-    Integer === o[:pool_size] && o[:pool_size] > 0 or
-      raise ArgumentError, "pool_size must a be an Integer > 0"
-    Rainbows.const_get(o[:backend])
+    super
+    Rainbows::O[:backend] ||= :EventMachine # no Cool.io support, yet
+    Rainbows.const_get(Rainbows::O[:backend])
     require "never_block" # require EM first since we need a higher version
   end
 

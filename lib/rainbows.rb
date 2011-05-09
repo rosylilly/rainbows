@@ -151,6 +151,7 @@ module Rainbows
   autoload :SyncClose, 'rainbows/sync_close'
   autoload :ReverseProxy, 'rainbows/reverse_proxy'
   autoload :JoinThreads, 'rainbows/join_threads'
+  autoload :PoolSize, 'rainbows/pool_size'
 end
 
 require 'rainbows/error'

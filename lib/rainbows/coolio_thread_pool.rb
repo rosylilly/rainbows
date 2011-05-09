@@ -17,17 +17,8 @@
 module Rainbows::CoolioThreadPool
   # :stopdoc:
   autoload :Client, 'rainbows/coolio_thread_pool/client'
-  DEFAULTS = {
-    :pool_size => 20, # same default size as ThreadPool (w/o Coolio)
-  }
+  extend Rainbows::PoolSize
   #:startdoc:
-
-  def self.setup # :nodoc:
-    o = Rainbows::O
-    DEFAULTS.each { |k,v| o[k] ||= v }
-    Integer === o[:pool_size] && o[:pool_size] > 0 or
-      raise ArgumentError, "pool_size must a be an Integer > 0"
-  end
   include Rainbows::Coolio::Core
 
   def init_worker_threads(master, queue) # :nodoc:
