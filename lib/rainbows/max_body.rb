@@ -6,7 +6,7 @@
 # automatically be configured for you based on the client_max_body_size
 # setting.
 #
-# For more fine-grained conrol, you may also define it per-endpoint in
+# For more fine-grained control, you may also define it per-endpoint in
 # your Rack config.ru like this:
 #
 #        map "/limit_1M" do
@@ -20,11 +20,7 @@
 
 class Rainbows::MaxBody
 
-
-  # :call-seq:
-  #   # in config.ru:
-  #   use Rainbows::MaxBody, 4096
-  #   run YourApplication.new
+  # This is automatically called when used with Rack::Builder#use
   def initialize(app, limit = Rainbows.client_max_body_size)
     Integer === limit or raise ArgumentError, "limit not an Integer"
     @app, @limit = app, limit
