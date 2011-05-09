@@ -140,6 +140,7 @@ module Rainbows
   autoload :ActorSpawn, "rainbows/actor_spawn"
   autoload :NeverBlock, "rainbows/never_block"
   autoload :XEpollThreadSpawn, "rainbows/xepoll_thread_spawn"
+  autoload :XEpollThreadPool, "rainbows/xepoll_thread_pool"
 
   # :startdoc:
   autoload :Fiber, 'rainbows/fiber' # core class

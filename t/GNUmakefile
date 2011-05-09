@@ -22,6 +22,7 @@ export RUBY_VERSION RUBY_ENGINE
 ifeq (Linux,$(shell uname -s))
   models += XEpoll
   models += XEpollThreadSpawn
+  models += XEpollThreadPool
   models += Epoll
 endif
 models += WriterThreadPool
