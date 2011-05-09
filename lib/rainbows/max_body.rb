@@ -21,8 +21,12 @@
 class Rainbows::MaxBody
 
   # This is automatically called when used with Rack::Builder#use
-  def initialize(app, limit = Rainbows.client_max_body_size)
-    Integer === limit or raise ArgumentError, "limit not an Integer"
+  def initialize(app, limit = nil)
+    case limit
+    when Integer, nil
+    else
+      raise ArgumentError, "limit not an Integer"
+    end
     @app, @limit = app, limit
   end
 
@@ -33,6 +37,7 @@ class Rainbows::MaxBody
 
   # our main Rack middleware endpoint
   def call(env)
+    @limit = Rainbows.server.client_max_body_size if nil == @limit
     catch(:rainbows_EFBIG) do
       len = env[CONTENT_LENGTH]
       if len && len.to_i > @limit
@@ -47,7 +52,7 @@ class Rainbows::MaxBody
   # this is called after forking, so it won't ever affect the master
   # if it's reconfigured
   def self.setup # :nodoc:
-    Rainbows.client_max_body_size or return
+    Rainbows.server.client_max_body_size or return
     case Rainbows.server.use
     when :Rev, :Coolio, :EventMachine, :NeverBlock,
          :RevThreadSpawn, :RevThreadPool,

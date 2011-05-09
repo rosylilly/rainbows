@@ -25,6 +25,7 @@ module Rainbows::CoolioFiberSpawn
     Server.const_set(:APP, Rainbows.server.app)
     Heartbeat.new(1, true).attach(Coolio::Loop.default)
     LISTENERS.map! { |s| Server.new(s).attach(Coolio::Loop.default) }
+    Rainbows::Client.__send__ :include, Rainbows::Fiber::Coolio::Methods
     Coolio::Loop.default.run
   end
 end

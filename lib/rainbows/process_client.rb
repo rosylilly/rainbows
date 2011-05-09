@@ -7,11 +7,11 @@ module Rainbows::ProcessClient
   NULL_IO = Unicorn::HttpRequest::NULL_IO
   RACK_INPUT = Unicorn::HttpRequest::RACK_INPUT
   IC = Unicorn::HttpRequest.input_class
-  HBUFSIZ = Rainbows.client_header_buffer_size
+  Rainbows.config!(self, :client_header_buffer_size)
 
   def process_loop
     @hp = hp = Rainbows::HttpParser.new
-    kgio_read!(HBUFSIZ, buf = hp.buf) or return
+    kgio_read!(CLIENT_HEADER_BUFFER_SIZE, buf = hp.buf) or return
 
     begin # loop
       until env = hp.parse

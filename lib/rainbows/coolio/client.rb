@@ -45,7 +45,7 @@ class Rainbows::Coolio::Client < Coolio::IO
   end
 
   def on_readable
-    buf = @_io.kgio_tryread(HBUFSIZ, RBUF)
+    buf = @_io.kgio_tryread(CLIENT_HEADER_BUFFER_SIZE, RBUF)
     case buf
     when :wait_readable
     when nil # eof
@@ -134,7 +134,7 @@ class Rainbows::Coolio::Client < Coolio::IO
       close if @_write_buffer.empty?
     when :headers
       if @buf.empty?
-        buf = @_io.kgio_tryread(HBUFSIZ, RBUF) or return close
+        buf = @_io.kgio_tryread(CLIENT_HEADER_BUFFER_SIZE, RBUF) or return close
         String === buf and return on_read(buf)
         # buf == :wait_readable
         unless enabled?

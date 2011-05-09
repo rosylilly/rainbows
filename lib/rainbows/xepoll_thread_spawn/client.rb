@@ -1,7 +1,7 @@
 # -*- encoding: binary -*-
 # :stopdoc:
 module Rainbows::XEpollThreadSpawn::Client
-  HBUFSIZ = Rainbows.client_header_buffer_size
+  Rainbows.config!(self, :keepalive_timeout, :client_header_buffer_size)
   N = Raindrops.new(1)
   ACCEPTORS = Rainbows::HttpServer::LISTENERS.dup
   extend Rainbows::WorkerYield
@@ -55,7 +55,7 @@ module Rainbows::XEpollThreadSpawn::Client
 
   def self.expire
     return if ((now = Time.now) - @@last_expire) < 1.0
-    if (ot = Rainbows.keepalive_timeout) >= 0
+    if (ot = KEEPALIVE_TIMEOUT) >= 0
       ot = now - ot
       defer = []
       LOCK.synchronize do
@@ -85,7 +85,7 @@ module Rainbows::XEpollThreadSpawn::Client
   end
 
   def epoll_run(buf)
-    case kgio_tryread(HBUFSIZ, buf)
+    case kgio_tryread(CLIENT_HEADER_BUFFER_SIZE, buf)
     when :wait_readable
       return kato_set
     when String
@@ -105,7 +105,7 @@ module Rainbows::XEpollThreadSpawn::Client
 
   def pipeline_ready(hp)
     hp.parse and return true
-    case buf = kgio_tryread(HBUFSIZ)
+    case buf = kgio_tryread(CLIENT_HEADER_BUFFER_SIZE)
     when :wait_readable
       kato_set
       return false

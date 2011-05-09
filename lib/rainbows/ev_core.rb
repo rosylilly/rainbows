@@ -9,7 +9,7 @@ module Rainbows::EvCore
   autoload :CapInput, 'rainbows/ev_core/cap_input'
   RBUF = ""
   Z = "".freeze
-  HBUFSIZ = Rainbows.client_header_buffer_size
+  Rainbows.config!(self, :client_header_buffer_size)
 
   # Apps may return this Rack response: AsyncResponse = [ -1, {}, [] ]
   ASYNC_CALLBACK = "async.callback".freeze
@@ -133,7 +133,7 @@ module Rainbows::EvCore
   end
 
   def mkinput
-    max = Rainbows.client_max_body_size
+    max = Rainbows.server.client_max_body_size
     len = @hp.content_length
     if len
       if max && (len > max)

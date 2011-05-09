@@ -3,7 +3,7 @@
 # FIXME: lots of duplication from xepolll_thread_spawn/client
 
 module Rainbows::XEpollThreadPool::Client
-  HBUFSIZ = Rainbows.client_header_buffer_size
+  Rainbows.config!(self, :keepalive_timeout, :client_header_buffer_size)
   N = Raindrops.new(1)
   ACCEPTORS = Rainbows::HttpServer::LISTENERS.dup
   extend Rainbows::WorkerYield
@@ -66,7 +66,7 @@ module Rainbows::XEpollThreadPool::Client
 
   def self.expire
     return if ((now = Time.now) - @@last_expire) < 1.0
-    if (ot = Rainbows.keepalive_timeout) >= 0
+    if (ot = KEEPALIVE_TIMEOUT) >= 0
       ot = now - ot
       defer = []
       LOCK.synchronize do
@@ -101,7 +101,7 @@ module Rainbows::XEpollThreadPool::Client
   end
 
   def epoll_run(buf)
-    case kgio_tryread(HBUFSIZ, buf)
+    case kgio_tryread(CLIENT_HEADER_BUFFER_SIZE, buf)
     when :wait_readable
       return kato_set
     when String

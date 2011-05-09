@@ -38,7 +38,6 @@ end
 
 [
   Rainbows::Fiber::IO,
-  Rainbows::Client,
   # the next two trigger autoload, ugh, oh well...
   Rainbows::Fiber::IO::Socket,
   Rainbows::Fiber::IO::Pipe

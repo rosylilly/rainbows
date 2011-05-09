@@ -2,6 +2,7 @@
 # :enddoc:
 class Rainbows::EventMachine::Client < EM::Connection
   include Rainbows::EvCore
+  Rainbows.config!(self, :keepalive_timeout)
 
   def initialize(io)
     @_io = io
@@ -87,7 +88,7 @@ class Rainbows::EventMachine::Client < EM::Connection
     if alive
       if @deferred.nil?
         if @buf.empty?
-          set_comm_inactivity_timeout(Rainbows.keepalive_timeout)
+          set_comm_inactivity_timeout(KEEPALIVE_TIMEOUT)
         else
           EM.next_tick { receive_data(nil) }
         end

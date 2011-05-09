@@ -64,6 +64,7 @@ module Rainbows::Fiber::Base
   end
 
   def self.setup(klass, app)
+    Rainbows::Client.__send__(:include, Rainbows::Fiber::IO::Methods)
     require 'rainbows/fiber/body'
     Rainbows::Client.__send__(:include, Rainbows::Fiber::Body)
     self.const_set(:APP, app)

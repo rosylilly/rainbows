@@ -68,29 +68,19 @@ module Rainbows
 
   # :stopdoc:
   class << self
-    attr_accessor :client_header_buffer_size
-    attr_accessor :client_max_body_size
-    attr_accessor :keepalive_timeout
     attr_accessor :server
     attr_accessor :cur # may not always be used
     attr_reader :alive
     attr_writer :tick_io
-  end
-  # :startdoc:
-
-  def self.defaults!
-    # the default max body size is 1 megabyte (1024 * 1024 bytes)
-    @client_max_body_size = 1024 * 1024
-
-    # the default keepalive_timeout is 5 seconds
-    @keepalive_timeout = 5
-
-    # 1024 bytes matches nginx, though Rails session cookies will typically
-    # need >= 1500...
-    @client_header_buffer_size = 1024
+    attr_writer :forked
   end
 
-  defaults!
+  def self.config!(mod, *opts)
+    @forked or abort "#{mod} should only be loaded in a worker process"
+    opts.each do |opt|
+      mod.const_set(opt.to_s.upcase, Rainbows.server.__send__(opt))
+    end
+  end
 
   # :stopdoc:
   @alive = true

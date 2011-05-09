@@ -3,6 +3,14 @@
 # This module adds \Rainbows! to the
 # {Unicorn::Configurator}[http://unicorn.bogomips.org/Unicorn/Configurator.html]
 module Rainbows::Configurator
+  Unicorn::Configurator::DEFAULTS.merge!({
+    :use => Rainbows::Base,
+    :worker_connections => 50,
+    :keepalive_timeout => 5,
+    :keepalive_requests => 100,
+    :client_max_body_size => 1024 * 1024,
+    :client_header_buffer_size => 1024,
+  })
 
   # configures \Rainbows! with a given concurrency model to +use+ and
   # a +worker_connections+ upper-bound.  This method may be called
@@ -45,7 +53,76 @@ module Rainbows::Configurator
   # denial-of-service attacks that use HTTP pipelining.
   def Rainbows!(&block)
     block_given? or raise ArgumentError, "Rainbows! requires a block"
-    Rainbows::HttpServer.setup(block)
+    @block = true
+    instance_eval(&block)
+    ensure
+      @block = false
+  end
+
+  def check! # :nodoc:
+    @block or abort "must be inside a Rainbows! block"
+  end
+
+  def worker_connections(nr)
+    check!
+    set_int(:worker_connections, nr, 1)
+  end
+
+  def use(model, *options)
+    check!
+    mod = begin
+      Rainbows.const_get(model)
+    rescue NameError => e
+      warn "error loading #{model.inspect}: #{e}"
+      e.backtrace.each { |l| warn l }
+      abort "concurrency model #{model.inspect} not supported"
+    end
+    Module === mod or abort "concurrency model #{model.inspect} not supported"
+    options.each do |opt|
+      case opt
+      when Hash
+        Rainbows::O.merge!(opt)
+      when Symbol
+        Rainbows::O[opt] = true
+      else
+        abort "cannot handle option: #{opt.inspect} in #{options.inspect}"
+      end
+    end
+    mod.setup if mod.respond_to?(:setup)
+    set[:use] = mod
+  end
+
+  def keepalive_timeout(seconds)
+    check!
+    set_int(:keepalive_timeout, seconds, 0)
+  end
+
+  def keepalive_requests(count)
+    check!
+    case count
+    when nil, Integer
+      set[:keepalive_requests] = count
+    else
+      abort "not an integer or nil: keepalive_requests=#{count.inspect}"
+    end
+  end
+
+  def client_max_body_size(bytes)
+    check!
+    err = "client_max_body_size must be nil or a non-negative Integer"
+    case bytes
+    when nil
+    when Integer
+      bytes >= 0 or abort err
+    else
+      abort err
+    end
+    set[:client_max_body_size] = bytes
+  end
+
+  def client_header_buffer_size(bytes)
+    check!
+    set_int(:client_header_buffer_size, bytes, 1)
   end
 end
 

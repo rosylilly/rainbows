@@ -10,7 +10,7 @@ module Rainbows::Epoll::Client
   OUT = SleepyPenguin::Epoll::OUT | SleepyPenguin::Epoll::ET
   KATO = {}
   KATO.compare_by_identity if KATO.respond_to?(:compare_by_identity)
-  KEEPALIVE_TIMEOUT = Rainbows.keepalive_timeout
+  Rainbows.config!(self, :keepalive_timeout)
   EP = Rainbows::Epoll::EP
   @@last_expire = Time.now
 
@@ -33,7 +33,7 @@ module Rainbows::Epoll::Client
   end
 
   def on_readable
-    case rv = kgio_tryread(HBUFSIZ, RBUF)
+    case rv = kgio_tryread(CLIENT_HEADER_BUFFER_SIZE, RBUF)
     when String
       on_read(rv)
       return if @wr_queue[0] || closed?

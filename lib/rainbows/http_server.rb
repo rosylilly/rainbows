@@ -2,6 +2,12 @@
 # :enddoc:
 
 class Rainbows::HttpServer < Unicorn::HttpServer
+  attr_accessor :worker_connections
+  attr_accessor :keepalive_timeout
+  attr_accessor :client_header_buffer_size
+  attr_accessor :client_max_body_size
+  attr_reader :use
+
   def self.setup(block)
     Rainbows.server.instance_eval(&block)
   end
@@ -10,7 +16,7 @@ class Rainbows::HttpServer < Unicorn::HttpServer
     Rainbows.server = self
     @logger = Unicorn::Configurator::DEFAULTS[:logger]
     super(app, options)
-    defined?(@use) or use(:Base)
+    defined?(@use) or self.use = Rainbows::Base
     @worker_connections ||= @use == :Base ? 1 : 50
   end
 
@@ -33,14 +39,12 @@ class Rainbows::HttpServer < Unicorn::HttpServer
   end
 
   def load_config!
-    use :Base
-    Rainbows.defaults!
-    @worker_connections = nil
     super
-    @worker_connections ||= @use == :Base ? 1 : 50
+    @worker_connections = 1 if @use == :Base
   end
 
   def worker_loop(worker)
+    Rainbows.forked = true
     orig = method(:worker_loop)
     extend(Rainbows.const_get(@use))
     m = method(:worker_loop)
@@ -80,70 +84,22 @@ class Rainbows::HttpServer < Unicorn::HttpServer
     File.basename($0)
   end
 
-  def use(*args)
-    model = args.shift or return @use
-    mod = begin
-      Rainbows.const_get(model)
-    rescue NameError => e
-      logger.error "error loading #{model.inspect}: #{e}"
-      e.backtrace.each { |l| logger.error l }
-      raise ArgumentError, "concurrency model #{model.inspect} not supported"
-    end
-
-    Module === mod or
-      raise ArgumentError, "concurrency model #{model.inspect} not supported"
-    args.each do |opt|
-      case opt
-      when Hash; Rainbows::O.update(opt)
-      when Symbol; Rainbows::O[opt] = true
-      else; raise ArgumentError, "can't handle option: #{opt.inspect}"
-      end
-    end
-    mod.setup if mod.respond_to?(:setup)
+  def use=(mod)
+    @use = mod.to_s.split(/::/)[-1].to_sym
     new_defaults = {
-      'rainbows.model' => (@use = model.to_sym),
-      'rack.multithread' => !!(model.to_s =~ /Thread/),
+      'rainbows.model' => @use,
+      'rack.multithread' => !!(mod.to_s =~ /Thread/),
       'rainbows.autochunk' => [:Coolio,:Rev,:Epoll,:XEpoll,
                                :EventMachine,:NeverBlock].include?(@use),
     }
     Rainbows::Const::RACK_DEFAULTS.update(new_defaults)
   end
 
-  def worker_connections(*args)
-    return @worker_connections if args.empty?
-    nr = args[0]
-    (Integer === nr && nr > 0) or
-      raise ArgumentError, "worker_connections must be a positive Integer"
-    @worker_connections = nr
-  end
-
-  def keepalive_timeout(nr)
-    (Integer === nr && nr >= 0) or
-      raise ArgumentError, "keepalive_timeout must be a non-negative Integer"
-    Rainbows.keepalive_timeout = nr
-  end
-
-  def keepalive_requests(nr)
-    Integer === nr or
-      raise ArgumentError, "keepalive_requests must be a non-negative Integer"
+  def keepalive_requests=(nr)
     Unicorn::HttpRequest.keepalive_requests = nr
   end
 
-  def client_max_body_size(nr)
-    err = "client_max_body_size must be nil or a non-negative Integer"
-    case nr
-    when nil
-    when Integer
-      nr >= 0 or raise ArgumentError, err
-    else
-      raise ArgumentError, err
-    end
-    Rainbows.client_max_body_size = nr
-  end
-
-  def client_header_buffer_size(bytes)
-    Integer === bytes && bytes > 0 or raise ArgumentError,
-            "client_header_buffer_size must be a positive Integer"
-    Rainbows.client_header_buffer_size = bytes
+  def keepalive_requests
+    Unicorn::HttpRequest.keepalive_requests
   end
 end

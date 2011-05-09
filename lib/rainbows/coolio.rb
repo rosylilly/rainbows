@@ -39,10 +39,10 @@ module Rainbows::Coolio
   autoload :ThreadClient, 'rainbows/coolio/thread_client'
   autoload :ResponsePipe, 'rainbows/coolio/response_pipe'
   autoload :ResponseChunkPipe, 'rainbows/coolio/response_chunk_pipe'
+  autoload :Heartbeat, 'rainbows/coolio/heartbeat'
   # :startdoc:
 end
 # :enddoc:
-require 'rainbows/coolio/heartbeat'
 require 'rainbows/coolio/server'
 require 'rainbows/coolio/core'
 Rainbows::Coolio.__send__ :include, Rainbows::Coolio::Core

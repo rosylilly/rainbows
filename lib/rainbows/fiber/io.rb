@@ -101,7 +101,6 @@ end
 # :stopdoc:
 require 'rainbows/fiber/io/methods'
 require 'rainbows/fiber/io/compat'
-Rainbows::Client.__send__(:include, Rainbows::Fiber::IO::Methods)
 class Rainbows::Fiber::IO
   include Rainbows::Fiber::IO::Compat
   include Rainbows::Fiber::IO::Methods
