@@ -33,7 +33,7 @@ module Rainbows::XEpollThreadPool::Client
   end
 
   QUEUE = Queue.new
-  APP_POOL = (1..20).each { Thread.new { app_run(QUEUE) } }
+  Rainbows::O[:pool_size].times { Thread.new { app_run(QUEUE) } }
 
   ep = SleepyPenguin::Epoll
   EP = ep.new

@@ -5,6 +5,7 @@ require "raindrops"
 
 module Rainbows::XEpollThreadPool
   include Rainbows::Base
+  extend Rainbows::PoolSize
 
   def init_worker_process(worker)
     super
