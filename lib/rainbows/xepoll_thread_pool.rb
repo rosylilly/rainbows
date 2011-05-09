@@ -39,9 +39,24 @@ require "raindrops"
 # exactly the same for an equivalent number of active connections
 # (but independently tunable).
 #
-# Since +:pool_size+ and +worker_connections+ is independently tunable,
+# === :pool_size vs worker_connections
+#
+# Since +:pool_size+ and +worker_connections+ are independently tunable,
 # it is possible to get into situations where active connections need
 # to wait for an idle thread in the thread pool before being processed
+#
+# In your Rainbows! config block, you may specify a Thread pool size
+# to limit your application concurrency independently of
+# worker_connections.
+#
+#   Rainbows! do
+#     use :XEpollThreadPool, :pool_size => 50
+#     worker_connections 100
+#   end
+#
+# In extremely rare cases, this may be combined with Rainbows::AppPool
+# if you have different concurrency capabilities for different parts of
+# your Rack application.
 
 module Rainbows::XEpollThreadPool
   extend Rainbows::PoolSize

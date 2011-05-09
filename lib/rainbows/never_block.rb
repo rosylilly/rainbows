@@ -6,8 +6,11 @@
 # a streaming "rack.input" but is compatible with everything else
 # EventMachine supports.
 #
+# === :pool_size vs worker_connections
+#
 # In your Rainbows! config block, you may specify a Fiber pool size
 # to limit your application concurrency (without using Rainbows::AppPool)
+# independently of worker_connections.
 #
 #   Rainbows! do
 #     use :NeverBlock, :pool_size => 50

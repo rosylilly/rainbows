@@ -14,6 +14,21 @@
 #
 # This concurrency model is designed for Ruby 1.9, and Ruby 1.8
 # users are NOT advised to use this due to high CPU usage.
+#
+# === :pool_size vs worker_connections
+#
+# In your Rainbows! config block, you may specify a Thread pool size
+# to limit your application concurrency independently of
+# worker_connections.
+#
+#   Rainbows! do
+#     use :CoolioThreadPool, :pool_size => 50
+#     worker_connections 100
+#   end
+#
+# In extremely rare cases, this may be combined with Rainbows::AppPool
+# if you have different concurrency capabilities for different parts of
+# your Rack application.
 module Rainbows::CoolioThreadPool
   # :stopdoc:
   autoload :Client, 'rainbows/coolio_thread_pool/client'
