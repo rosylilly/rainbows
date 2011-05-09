@@ -132,6 +132,20 @@
     %td.r19 Yes
     %td.rbx Yes
     %td.slow Yes
+  %tr.comp_row
+    %td.mod XEpollThreadSpawn
+    %td.tee Yes
+    %td.r18 Yes
+    %td.r19 Yes
+    %td.rbx Yes
+    %td.slow Yes
+  %tr.comp_row
+    %td.mod XEpollThreadPool
+    %td.tee Yes
+    %td.r18 Yes
+    %td.r19 Yes
+    %td.rbx Yes
+    %td.slow Yes
 %ul
   %li
     Cool.io should also work with Rubinius (though we haven't had time to test).
@@ -256,6 +270,16 @@
     %td.slowio No
     %td.thr No
     %td.reent No
+  %tr.comp_base
+    %td.mod XEpollThreadSpawn
+    %td.slowio thread-safe Ruby
+    %td.thr Yes
+    %td.reent No
+  %tr.comp_base
+    %td.mod XEpollThreadPool
+    %td.slowio thread-safe Ruby
+    %td.thr Yes
+    %td.reent No
 %ul
   %li
     Requirements for single thread reentrancy are loose in that there is
@@ -288,91 +312,78 @@
     %th.lock
       %a(href="http://rack.rubyforge.org/doc/Rack/Lock.html") Rack::Lock
     %th.async async
-    %th.ws Web Sockets
   %tr.comp_row
     %td.mod Unicorn/Base
     %td.devfd no-op
     %td.app_pool no-op
     %td.lock no-op
     %td.async lots of RAM :P
-    %td.ws no
   %tr.comp_row
     %td.mod Revactor
     %td.devfd no-op
     %td.app_pool Yes
     %td.lock No!
     %td.async Revactor itself
-    %td.ws no
   %tr.comp_row
     %td.mod ThreadPool
     %td.devfd Yes
     %td.app_pool Yes
     %td.lock Yes
-    %td.async standard Ruby
-    %td.ws no
+    %td.async thread-safe Ruby
   %tr.comp_row
     %td.mod Coolio
     %td.devfd Yes
     %td.app_pool no-op
     %td.lock no-op
     %td.async DevFdResponse
-    %td.ws no
   %tr.comp_row
     %td.mod ThreadSpawn
     %td.devfd Yes
     %td.app_pool Yes
     %td.lock Yes
-    %td.async standard Ruby
-    %td.ws no
+    %td.async thread-safe Ruby
   %tr.comp_row
     %td.mod EventMachine
     %td.devfd Yes
     %td.app_pool no-op
     %td.lock no-op
     %td.async async_sinatra, Cramp, rack-fiber_pool
-    %td.ws no
   %tr.comp_row
     %td.mod CoolioThreadSpawn
     %td.devfd Yes
     %td.app_pool Yes
     %td.lock Dumb
-    %td.async standard Ruby
-    %td.ws no
+    %td.async thread-safe Ruby
   %tr.comp_row
     %td.mod FiberSpawn
     %td.devfd Yes
     %td.app_pool Yes
     %td.lock No!
     %td.async Rainbows::Fiber::IO, Rainbows.sleep
-    %td.ws no
   %tr.comp_row
     %td.mod FiberPool
     %td.devfd Yes
     %td.app_pool Yes
     %td.lock No!
     %td.async Rainbows::Fiber::IO, Rainbows.sleep
-    %td.ws no
   %tr.comp_row
     %td.mod ActorSpawn
     %td.devfd no-op
     %td.app_pool Yes
     %td.lock Yes
-    %td.async standard Ruby
-    %td.ws no
+    %td.async thread-safe Ruby
   %tr.comp_row
     %td.mod NeverBlock
     %td.devfd Yes
     %td.app_pool Yes*
     %td.lock Yes*
     %td.async NeverBlock, async_sinatra
-    %td.ws no
   %tr.comp_row
     %td.mod CoolioThreadPool
     %td.devfd Yes
     %td.app_pool Yes
     %td.lock Dumb
-    %td.async Coolio, standard Ruby
-    %td.ws no
+    %td.async Coolio, thread-safe Ruby
   %tr.comp_row
     %td.mod CoolioFiberSpawn
     %td.devfd Yes
@@ -384,29 +395,37 @@
     %td.devfd Yes
     %td.app_pool no-op
     %td.lock no-op
-    %td.async Standard Ruby in response body only
-    %td.ws response body only
+    %td.async thread-safe Ruby in response body only
   %tr.comp_row
     %td.mod WriterThreadSpawn
     %td.devfd Yes
     %td.app_pool no-op
     %td.lock no-op
-    %td.async Standard Ruby in response body only
-    %td.ws response body only
+    %td.async thread-safe Ruby in response body only
   %tr.comp_row
     %td.mod Epoll
     %td.devfd Yes
     %td.app_pool no-op
     %td.lock no-op
     %td.async DevFdResponse
-    %td.ws no
   %tr.comp_row
     %td.mod XEpoll
     %td.devfd Yes
     %td.app_pool no-op
     %td.lock no-op
     %td.async DevFdResponse
-    %td.ws no
+  %tr.comp_row
+    %td.mod XEpollThreadPool
+    %td.devfd Yes
+    %td.app_pool Yes
+    %td.lock Yes
+    %td.async thread-safe Ruby
+  %tr.comp_row
+    %td.mod XEpollThreadSpawn
+    %td.devfd Yes
+    %td.app_pool Yes
+    %td.lock Yes
+    %td.async thread-safe Ruby
 %ul
   %li
     "No!" means it's fundamentally incompatible, use an
