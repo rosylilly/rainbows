@@ -17,7 +17,25 @@
 #          use Rainbows::MaxBody, 1024*1024*10
 #          run MyApp
 #        end
-
+#
+# This is only compatible with concurrency models that expose a streaming
+# "rack.input" to the Rack application.  Thus it is NOT compatible with
+# any of the following as they fully buffer the request body before
+# the application dispatch:
+#
+# * :Coolio
+# * :CoolioThreadPool
+# * :CoolioThreadSpawn
+# * :Epoll
+# * :EventMachine
+# * :NeverBlock
+# * :Rev
+# * :RevThreadPool
+# * :RevThreadSpawn
+# * :XEpoll
+#
+# However, the global Rainbows::Configurator#client_max_body_size is compatible
+# with all concurrency models \Rainbows! supports.
 class Rainbows::MaxBody
 
   # This is automatically called when used with Rack::Builder#use
