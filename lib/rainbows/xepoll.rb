@@ -14,6 +14,7 @@ module Rainbows::XEpoll
   def init_worker_process(worker)
     super
     Rainbows::Epoll.const_set :EP, SleepyPenguin::Epoll.new
+    Rainbows.at_quit { Rainbows::Epoll::EP.close }
     Rainbows::Client.__send__ :include, Client
   end
 

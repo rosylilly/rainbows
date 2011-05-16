@@ -37,6 +37,7 @@ module Rainbows::XEpollThreadPool::Client
 
   ep = SleepyPenguin::Epoll
   EP = ep.new
+  Rainbows.at_quit { EP.close }
   IN = ep::IN | ep::ET | ep::ONESHOT
   KATO = {}
   KATO.compare_by_identity if KATO.respond_to?(:compare_by_identity)

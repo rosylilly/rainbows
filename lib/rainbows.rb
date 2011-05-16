@@ -87,6 +87,11 @@ module Rainbows
   @cur = 0
   @tick_mod = 0
   @expire = nil
+  @at_quit = []
+
+  def self.at_quit(&block)
+    @at_quit << block
+  end
 
   def self.tick
     @tick_io.chmod(@tick_mod = 0 == @tick_mod ? 1 : 0)
@@ -104,6 +109,7 @@ module Rainbows
       Rainbows::HttpParser.quit
       @expire = Time.now + (@server.timeout * 2.0)
       Unicorn::HttpServer::LISTENERS.each { |s| s.close rescue nil }.clear
+      @at_quit.each { |task| task.call }
     end
     false
   end
