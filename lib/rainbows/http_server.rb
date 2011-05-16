@@ -2,6 +2,7 @@
 # :enddoc:
 
 class Rainbows::HttpServer < Unicorn::HttpServer
+  attr_accessor :copy_stream
   attr_accessor :worker_connections
   attr_accessor :keepalive_timeout
   attr_accessor :client_header_buffer_size

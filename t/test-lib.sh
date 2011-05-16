@@ -198,6 +198,33 @@ req_curl_chunked_upload_err_check () {
 	fi
 }
 
+check_splice () {
+	case $(uname -s) in
+	Linux) ;;
+	*)
+		t_info "skipping $T since it's not Linux"
+		exit 0
+		;;
+	esac
+
+	# we only allow splice on 2.6.32+
+	min=32 uname_r=$(uname -r)
+	case $uname_r in
+	2.6.*)
+		sub=$(expr "$uname_r" : '2\.6\.\(.*\)$')
+		if test $sub -lt $min
+		then
+			t_info "skipping $T (Linux $(uname_r < 2.6.$min)"
+			exit 0
+		fi
+		;;
+	*)
+		t_info "skipping $T (Linux $uname_r < 2.6.$min)"
+		exit 0
+		;;
+	esac
+}
+
 case $model in
 Rev) require_check rev Rev::VERSION ;;
 Coolio) require_check coolio Coolio::VERSION ;;

@@ -27,6 +27,7 @@ module Rainbows::Configurator
     :keepalive_requests => 100,
     :client_max_body_size => 1024 * 1024,
     :client_header_buffer_size => 1024,
+    :copy_stream => IO.respond_to?(:copy_stream) ? IO : false,
   })
 
   # Configures \Rainbows! with a given concurrency model to +use+ and
@@ -160,6 +161,44 @@ module Rainbows::Configurator
   def client_header_buffer_size(bytes)
     check!
     set_int(:client_header_buffer_size, bytes, 1)
+  end
+
+  # Allows overriding the +klass+ where the +copy_stream+ method is
+  # used to do efficient copying of regular files, pipes, and sockets.
+  #
+  # This is only used with multi-threaded concurrency models:
+  #
+  # * ThreadSpawn
+  # * ThreadPool
+  # * WriterThreadSpawn
+  # * WriterThreadPool
+  # * XEpollThreadSpawn
+  # * XEpollThreadPool
+  #
+  # Due to existing {bugs}[http://redmine.ruby-lang.org/search?q=copy_stream]
+  # in the Ruby IO.copy_stream implementation, \Rainbows! uses the
+  # "sendfile" RubyGem that instead of copy_stream to transfer regular files
+  # to clients.  The "sendfile" RubyGem also supports more operating systems,
+  # and works with more concurrency models.
+  #
+  # Recent Linux 2.6 users may override this with "IO::Splice" from the
+  # "io_splice" RubyGem:
+  #
+  #   require "io/splice"
+  #   Rainbows! do
+  #     copy_stream IO::Splice
+  #   end
+  #
+  # Keep in mind that splice(2) itself is a relatively new system call
+  # and has been buggy in many older Linux kernels.
+  #
+  # Default: IO on Ruby 1.9+, false otherwise
+  def copy_stream(klass)
+    check!
+    if klass && ! klass.respond_to?(:copy_stream)
+      abort "#{klass} must respond to `copy_stream' or be `false'"
+    end
+    set[:copy_stream] = klass
   end
 end
 
