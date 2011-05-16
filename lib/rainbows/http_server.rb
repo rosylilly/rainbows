@@ -62,6 +62,8 @@ class Rainbows::HttpServer < Unicorn::HttpServer
          :CoolioThreadSpawn, :RevThreadSpawn,
          :XEpollThreadSpawn, :WriterThreadPool, :WriterThreadSpawn
       trysetrlimit(:RLIMIT_NPROC, @worker_connections + LISTENERS.size + 1)
+    when :XEpollThreadPool, :CoolioThreadPool
+      trysetrlimit(:RLIMIT_NPROC, Rainbows::O[:pool_size] + LISTENERS.size + 1)
     end
     super
   end
