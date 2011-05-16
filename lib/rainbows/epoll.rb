@@ -18,6 +18,13 @@ require 'sendfile'
 # if you're not serving static files, or if your working set is
 # small enough to aways be in your kernel page cache.  This concurrency
 # model may starve clients if you have slow disks and large static files.
+#
+# === RubyGem Requirements
+#
+# * raindrops 0.6.0 or later
+# * sleepy_penguin 2.0.0 or later
+# * sendfile 1.1.0 or later
+#
 module Rainbows::Epoll
   # :stopdoc:
   include Rainbows::Base

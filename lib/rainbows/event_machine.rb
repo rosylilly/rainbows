@@ -40,6 +40,10 @@ EM::VERSION >= '0.12.10' or abort 'eventmachine 0.12.10 is required'
 # the Rack application to process data as it arrives.  This means
 # "rack.input" will be fully buffered in memory or to a temporary file
 # before the application is entered.
+#
+# === RubyGem Requirements
+#
+# * event_machine 0.12.10
 module Rainbows::EventMachine
   autoload :ResponsePipe, 'rainbows/event_machine/response_pipe'
   autoload :ResponseChunkPipe, 'rainbows/event_machine/response_chunk_pipe'

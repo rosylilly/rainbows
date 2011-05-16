@@ -57,7 +57,11 @@ require "raindrops"
 # In extremely rare cases, this may be combined with Rainbows::AppPool
 # if you have different concurrency capabilities for different parts of
 # your Rack application.
-
+#
+# === RubyGem Requirements
+#
+# * raindrops 0.6.0 or later
+# * sleepy_penguin 2.0.0 or later
 module Rainbows::XEpollThreadPool
   extend Rainbows::PoolSize
 

@@ -29,6 +29,9 @@
 # In extremely rare cases, this may be combined with Rainbows::AppPool
 # if you have different concurrency capabilities for different parts of
 # your Rack application.
+#
+# === RubyGem Requirements
+# * cool.io 1.0.0 or later
 module Rainbows::CoolioThreadPool
   # :stopdoc:
   autoload :Client, 'rainbows/coolio_thread_pool/client'

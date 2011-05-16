@@ -13,6 +13,9 @@
 #
 # This concurrency model is designed for Ruby 1.9, and Ruby 1.8
 # users are NOT advised to use this due to high CPU usage.
+#
+# === RubyGem Requirements
+# * cool.io 1.0.0 or later
 module Rainbows::CoolioThreadSpawn
   include Rainbows::Coolio::Core
   autoload :Client, 'rainbows/coolio_thread_spawn/client'

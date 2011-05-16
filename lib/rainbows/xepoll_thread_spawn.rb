@@ -35,7 +35,11 @@ require "raindrops"
 # This can maintain idle connections without the memory overhead of an
 # idle Thread.  The cost of handling/dispatching active connections is
 # exactly the same for an equivalent number of active connections.
-
+#
+# === RubyGem Requirements
+#
+# * raindrops 0.6.0 or later
+# * sleepy_penguin 2.0.0 or later
 module Rainbows::XEpollThreadSpawn
   # :stopdoc:
   include Rainbows::Base

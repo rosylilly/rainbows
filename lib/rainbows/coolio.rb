@@ -21,6 +21,9 @@ require 'rainbows/coolio_support'
 #
 # This model is mostly compatible with users of "async.callback" in
 # the Rack environment as long as they do not depend on EventMachine.
+#
+# === RubyGem Requirements
+# * cool.io 1.0.0 or later
 module Rainbows::Coolio
   # :stopdoc:
   # keep-alive timeout scoreboard

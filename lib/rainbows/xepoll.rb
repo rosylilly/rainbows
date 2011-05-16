@@ -6,6 +6,12 @@ require 'rainbows/epoll'
 # (hopefully) native thread.  This is just like Epoll, but recommended
 # for Ruby 1.9 users as it can avoid accept()-scalability issues on
 # multicore machines with many worker processes.
+#
+# === RubyGem Requirements
+#
+# * raindrops 0.6.0 or later
+# * sleepy_penguin 2.0.0 or later
+# * sendfile 1.1.0 or later
 module Rainbows::XEpoll
   # :stopdoc:
   include Rainbows::Base

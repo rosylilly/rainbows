@@ -22,6 +22,9 @@ Revactor::VERSION >= '0.1.5' or abort 'revactor 0.1.5 is required'
 # in the application using this model should be implemented using the
 # \Revactor library as well, to take advantage of the networking
 # concurrency features this model provides.
+#
+# === RubyGem Requirements
+# * revactor 0.1.5 or later
 module Rainbows::Revactor
   autoload :Client, 'rainbows/revactor/client'
   autoload :Proxy, 'rainbows/revactor/proxy'
