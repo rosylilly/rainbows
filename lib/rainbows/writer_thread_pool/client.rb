@@ -18,7 +18,7 @@ class Rainbows::WriterThreadPool::Client < Struct.new(:to_io, :q)
       }
     end
 
-    if Rainbows::Response::COPY_STREAM
+    if Rainbows::Response::COPY_STREAM || IO.method_defined?(:trysendfile)
       def write_response(status, headers, body, alive)
         if body.respond_to?(:close)
           write_response_close(status, headers, body, alive)
