@@ -16,16 +16,15 @@ Unicorn::SocketHelper::DEFAULTS.merge!({
   :tcp_nopush => false,
 })
 
+# See http://rainbows.rubyforge.org/ for documentation
 module Rainbows
-
-  O = {} # :nodoc:
+  # :stopdoc:
+  O = {}
 
   # map of numeric file descriptors to IO objects to avoid using IO.new
   # and potentially causing race conditions when using /dev/fd/
   FD_MAP = {}
   FD_MAP.compare_by_identity if FD_MAP.respond_to?(:compare_by_identity)
-
-  # :startdoc:
 
   require 'rainbows/const'
   require 'rainbows/http_parser'
@@ -42,23 +41,25 @@ module Rainbows
   autoload :EvCore, 'rainbows/ev_core'
   autoload :SocketProxy, 'rainbows/socket_proxy'
 
+  # :startdoc:
   # Sleeps the current application dispatch.  This will pick the
   # optimal method to sleep depending on the concurrency model chosen
   # (which may still suck and block the entire process).  Using this
   # with the basic :Coolio or :EventMachine models is not recommended.
   # This should be used within your Rack application.
-  def self.sleep(nr)
+  def self.sleep(seconds)
     case Rainbows.server.use
     when :FiberPool, :FiberSpawn
-      Rainbows::Fiber.sleep(nr)
+      Rainbows::Fiber.sleep(seconds)
     when :RevFiberSpawn, :CoolioFiberSpawn
-      Rainbows::Fiber::Coolio::Sleeper.new(nr)
+      Rainbows::Fiber::Coolio::Sleeper.new(seconds)
     when :Revactor
-      Actor.sleep(nr)
+      Actor.sleep(seconds)
     else
-      Kernel.sleep(nr)
+      Kernel.sleep(seconds)
     end
   end
+  # :stopdoc:
 
   # runs the Rainbows! HttpServer with +app+ and +options+ and does
   # not return until the server has exited.
@@ -66,7 +67,6 @@ module Rainbows
     HttpServer.new(app, options).start.join
   end
 
-  # :stopdoc:
   class << self
     attr_accessor :server
     attr_accessor :cur # may not always be used
@@ -82,7 +82,6 @@ module Rainbows
     end
   end
 
-  # :stopdoc:
   @alive = true
   @cur = 0
   @tick_mod = 0
@@ -138,7 +137,6 @@ module Rainbows
   autoload :XEpollThreadSpawn, "rainbows/xepoll_thread_spawn"
   autoload :XEpollThreadPool, "rainbows/xepoll_thread_pool"
 
-  # :startdoc:
   autoload :Fiber, 'rainbows/fiber' # core class
   autoload :StreamFile, 'rainbows/stream_file'
   autoload :HttpResponse, 'rainbows/http_response' # deprecated
