@@ -1,22 +1,7 @@
 #!/bin/sh
 . ./test-lib.sh
 test -r random_blob || die "random_blob required, run with 'make $0'"
-case $RUBY_VERSION in
-1.9.*) ;;
-*)
-	t_info "skipping $T since it can't IO.copy_stream"
-	exit 0
-	;;
-esac
-
-case $model in
-ThreadSpawn|WriterThreadSpawn|ThreadPool|WriterThreadPool|Base) ;;
-XEpollThreadSpawn) ;;
-*)
-	t_info "skipping $T since it doesn't use IO.copy_stream"
-	exit 0
-	;;
-esac
+check_copy_stream
 
 t_plan 13 "IO.copy_stream byte range response for $model"
 

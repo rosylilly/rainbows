@@ -225,6 +225,37 @@ check_splice () {
 	esac
 }
 
+check_threaded_app_dispatch () {
+	case $model in
+	ThreadSpawn|ThreadPool) ;;
+	RevThreadSpawn|RevThreadPool) ;;
+	CoolioThreadSpawn|CoolioThreadPool) ;;
+	XEpollThreadSpawn|XEpollThreadPool) ;;
+	*)
+		t_info "$0 is only compatible with threaded app dispatch"
+		exit 0 ;;
+	esac
+}
+
+check_copy_stream () {
+	case $RUBY_VERSION in
+	1.9.*) ;;
+	*)
+		t_info "skipping $T since it can't IO.copy_stream"
+		exit 0
+		;;
+	esac
+
+	case $model in
+	ThreadSpawn|WriterThreadSpawn|ThreadPool|WriterThreadPool|Base) ;;
+	XEpollThreadSpawn|XEpollThreadPool) ;;
+	*)
+		t_info "skipping $T since it doesn't use copy_stream"
+		exit 0
+		;;
+	esac
+}
+
 case $model in
 Rev) require_check rev Rev::VERSION ;;
 Coolio) require_check coolio Coolio::VERSION ;;

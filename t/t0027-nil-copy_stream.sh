@@ -1,15 +1,7 @@
 #!/bin/sh
 . ./test-lib.sh
 test -r random_blob || die "random_blob required, run with 'make $0'"
-
-case $model in
-ThreadSpawn|WriterThreadSpawn|ThreadPool|WriterThreadPool|Base) ;;
-XEpollThreadSpawn) ;;
-*)
-	t_info "skipping $T since it doesn't use copy_stream"
-	exit 0
-	;;
-esac
+check_copy_stream
 
 t_plan 7 "large file 'copy_stream nil' test for $model"
 

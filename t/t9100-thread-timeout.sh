@@ -1,12 +1,6 @@
 #!/bin/sh
 . ./test-lib.sh
-case $model in
-ThreadSpawn|ThreadPool) ;;
-RevThreadSpawn|RevThreadPool) ;;
-CoolioThreadSpawn|CoolioThreadPool) ;;
-XEpollThreadSpawn) ;;
-*) t_info "$0 is only compatible with Thread*"; exit 0 ;;
-esac
+check_threaded_app_dispatch
 
 t_plan 6 "ThreadTimeout Rack middleware test for $model"
 
