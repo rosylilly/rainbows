@@ -41,7 +41,7 @@ Isolate.now!(opts) do
     gem 'sleepy_penguin', '2.0.0'
 
     # is 2.6.32 new enough?
-    gem 'io_splice', '4.1.0' if `uname -r`.strip > '2.6.32'
+    gem 'io_splice', '4.1.1' if `uname -r`.strip > '2.6.32'
   end
 end
 

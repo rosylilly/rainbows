@@ -190,7 +190,9 @@ module Rainbows::Configurator
   #   end
   #
   # Keep in mind that splice(2) itself is a relatively new system call
-  # and has been buggy in many older Linux kernels.
+  # and has been buggy in many older Linux kernels.  If you're proxying
+  # the output of sockets to the client, be sure to use "io_splice"
+  # 4.1.1 or later to avoid stalling responses.
   #
   # Default: IO on Ruby 1.9+, false otherwise
   def copy_stream(klass)
