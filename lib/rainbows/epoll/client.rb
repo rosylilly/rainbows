@@ -11,7 +11,8 @@ module Rainbows::Epoll::Client
   KATO = {}
   KATO.compare_by_identity if KATO.respond_to?(:compare_by_identity)
   Rainbows.config!(self, :keepalive_timeout)
-  EP = Rainbows::Epoll::EP
+  EP = Rainbows::EP
+  ReRun = []
   @@last_expire = Time.now
 
   def self.expire
@@ -21,6 +22,19 @@ module Rainbows::Epoll::Client
       KATO.delete_if { |client, time| time < ot and client.timeout! }
     end
     @@last_expire = now
+  end
+
+  def self.loop
+    begin
+      EP.wait(nil, 1000) { |_, obj| obj.epoll_run }
+      while obj = ReRun.shift
+        obj.epoll_run
+      end
+      expire
+    rescue Errno::EINTR
+    rescue => e
+      Rainbows::Error.listen_loop(e)
+    end while Rainbows.tick || Server.nr > 0
   end
 
   # only call this once
@@ -100,7 +114,7 @@ module Rainbows::Epoll::Client
   end
 
   def want_more
-    Rainbows::Epoll::ReRun << self
+    ReRun << self
   end
 
   def on_deferred_write_complete

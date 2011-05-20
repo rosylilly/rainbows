@@ -28,38 +28,22 @@ require 'sendfile'
 module Rainbows::Epoll
   # :stopdoc:
   include Rainbows::Base
-  ReRun = []
   autoload :Server, 'rainbows/epoll/server'
   autoload :Client, 'rainbows/epoll/client'
   autoload :ResponsePipe, 'rainbows/epoll/response_pipe'
   autoload :ResponseChunkPipe, 'rainbows/epoll/response_chunk_pipe'
-  class << self
-    attr_writer :nr_clients
-  end
-
-  def self.loop
-    begin
-      EP.wait(nil, 1000) { |_, obj| obj.epoll_run }
-      while obj = ReRun.shift
-        obj.epoll_run
-      end
-      Rainbows::Epoll::Client.expire
-    rescue Errno::EINTR
-    rescue => e
-      Rainbows::Error.listen_loop(e)
-    end while Rainbows.tick || @nr_clients.call > 0
-  end
 
   def init_worker_process(worker)
     super
-    Rainbows::Epoll.const_set :EP, SleepyPenguin::Epoll.new
-    Rainbows.at_quit { Rainbows::Epoll::EP.close }
+    Rainbows.const_set(:EP, SleepyPenguin::Epoll.new)
+    Rainbows.at_quit { Rainbows::EP.close }
     Rainbows::Client.__send__ :include, Client
+    LISTENERS.each { |io| io.extend(Server) }
   end
 
   def worker_loop(worker) # :nodoc:
     init_worker_process(worker)
-    Server.run
+    Client.loop
   end
   # :startdoc:
 end

@@ -19,14 +19,14 @@ module Rainbows::XEpoll
 
   def init_worker_process(worker)
     super
-    Rainbows::Epoll.const_set :EP, SleepyPenguin::Epoll.new
-    Rainbows.at_quit { Rainbows::Epoll::EP.close }
+    Rainbows.const_set(:EP, SleepyPenguin::Epoll.new)
+    Rainbows.at_quit { Rainbows::EP.close }
     Rainbows::Client.__send__ :include, Client
   end
 
   def worker_loop(worker) # :nodoc:
     init_worker_process(worker)
-    Client.run
+    Client.loop
   end
   # :startdoc:
 end

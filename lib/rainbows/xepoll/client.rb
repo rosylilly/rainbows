@@ -3,9 +3,7 @@
 
 module Rainbows::XEpoll::Client
   N = Raindrops.new(1)
-  Rainbows::Epoll.nr_clients = lambda { N[0] }
   include Rainbows::Epoll::Client
-  EP = Rainbows::Epoll::EP
   ACCEPTORS = Rainbows::HttpServer::LISTENERS.dup
   extend Rainbows::WorkerYield
 
@@ -26,8 +24,17 @@ module Rainbows::XEpoll::Client
     end
   end
 
-  def self.run
-    Rainbows::Epoll.loop
+  def self.loop
+    begin
+      EP.wait(nil, 1000) { |_, obj| obj.epoll_run }
+      while obj = ReRun.shift
+        obj.epoll_run
+      end
+      Rainbows::Epoll::Client.expire
+    rescue Errno::EINTR
+    rescue => e
+      Rainbows::Error.listen_loop(e)
+    end while Rainbows.tick || N[0] > 0
     Rainbows::JoinThreads.acceptors(ACCEPTORS)
   end
 

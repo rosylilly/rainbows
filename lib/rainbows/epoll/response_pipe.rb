@@ -5,7 +5,7 @@ class Rainbows::Epoll::ResponsePipe
   attr_reader :io
   alias to_io io
   RBUF = Rainbows::EvCore::RBUF
-  EP = Rainbows::Epoll::EP
+  EP = Rainbows::EP
 
   def initialize(io, client, body)
     @io, @client, @body = io, client, body
