@@ -29,4 +29,6 @@ class Rainbows::Client < Kgio::Socket
       end
     end while true
   end
+
+  alias write kgio_write
 end
