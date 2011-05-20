@@ -74,11 +74,11 @@ module Rainbows::EventMachine
       conns = EM.instance_variable_get(:@conns) or
         raise RuntimeError, "EM @conns instance variable not accessible!"
       Rainbows::EventMachine::Server.const_set(:CUR, conns)
+      Rainbows.at_quit do
+        EM.next_tick { conns.each_value { |c| client_class === c and c.quit } }
+      end
       EM.add_periodic_timer(1) do
-        unless Rainbows.tick
-          conns.each_value { |c| client_class === c and c.quit }
-          EM.stop if conns.empty? && EM.reactor_running?
-        end
+        EM.stop if ! Rainbows.tick && conns.empty? && EM.reactor_running?
       end
       LISTENERS.map! do |s|
         EM.watch(s, Rainbows::EventMachine::Server) do |c|
