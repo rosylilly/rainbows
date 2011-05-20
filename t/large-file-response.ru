@@ -9,6 +9,9 @@ map "/rss" do
     [ 200, {}, [ ($1.to_i * 1024).to_s ] ]
   }
 end
+map "/pid" do
+  run lambda { |env| [ 200, {}, [ "#{Process.pid}\n" ] ] }
+end
 map "/" do
   run Rack::File.new(Dir.pwd)
 end
