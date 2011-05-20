@@ -10,6 +10,7 @@ module Rainbows::Epoll::Client
   OUT = SleepyPenguin::Epoll::OUT | SleepyPenguin::Epoll::ET
   KATO = {}
   KATO.compare_by_identity if KATO.respond_to?(:compare_by_identity)
+  Rainbows.at_quit { KATO.each_key { |k| k.timeout! }.clear }
   Rainbows.config!(self, :keepalive_timeout)
   EP = Rainbows::EP
   ReRun = []

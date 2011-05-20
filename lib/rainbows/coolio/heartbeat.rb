@@ -9,6 +9,7 @@ class Rainbows::Coolio::Heartbeat < Coolio::TimerWatcher
   KATO = Rainbows::Coolio::KATO
   CONN = Rainbows::Coolio::CONN
   Rainbows.config!(self, :keepalive_timeout)
+  Rainbows.at_quit { KATO.each_key { |client| client.timeout? }.clear }
 
   def on_timer
     if (ot = KEEPALIVE_TIMEOUT) >= 0

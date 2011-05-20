@@ -36,7 +36,6 @@ module Rainbows::Epoll
   def init_worker_process(worker)
     super
     Rainbows.const_set(:EP, SleepyPenguin::Epoll.new)
-    Rainbows.at_quit { Rainbows::EP.close }
     Rainbows::Client.__send__ :include, Client
     LISTENERS.each { |io| io.extend(Server) }
   end
