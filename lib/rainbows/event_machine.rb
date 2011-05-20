@@ -32,9 +32,7 @@ EM::VERSION >= '0.12.10' or abort 'eventmachine 0.12.10 is required'
 # all request processing is complete.
 #
 # Merb (and other frameworks/apps) supporting +deferred?+ execution as
-# documented at http://brainspl.at/articles/2008/04/18/deferred-requests-with-merb-ebb-and-thin
-# will also get the ability to conditionally defer request processing
-# to a separate thread.
+# documented at Rainbows::EventMachine::TryDefer
 #
 # This model does not implement as streaming "rack.input" which allows
 # the Rack application to process data as it arrives.  This means
