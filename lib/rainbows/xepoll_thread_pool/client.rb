@@ -127,7 +127,7 @@ module Rainbows::XEpollThreadPool::Client
   def pipeline_ready(hp)
     # be fair to other clients, let others run first
     hp.parse and return queue!
-    kato_set
+    epoll_run("")
     false
   end
 end
