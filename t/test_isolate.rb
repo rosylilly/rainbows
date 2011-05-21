@@ -38,7 +38,7 @@ Isolate.now!(opts) do
   end
 
   if RUBY_PLATFORM =~ /linux/
-    gem 'sleepy_penguin', '2.0.0'
+    gem 'sleepy_penguin', '3.0.0'
 
     # is 2.6.32 new enough?
     gem 'io_splice', '4.1.1' if `uname -r`.strip > '2.6.32'
