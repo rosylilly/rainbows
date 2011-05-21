@@ -25,8 +25,35 @@ esac
 
 t_plan 13 "Kgio autopush tests"
 
+start_strace () {
+	# dbgcat strace_out
+	> $strace_out
+	sleep 1
+	strace -p $worker_pid -e '!futex' -f -o $strace_out &
+	strace_pid=$!
+	while ! test -s $strace_out; do sleep 1; done
+}
+
+check_TCP_CORK () {
+	nr=0
+	while test 2 -gt $(grep TCP_CORK $strace_out | wc -l)
+	do
+		nr=$(( $nr + 1 ))
+		if test $nr -gt 30
+		then
+			dbgcat strace_out
+			die "waited too long ($nr seconds) for TCP_CORK"
+		fi
+		sleep 1
+	done
+
+	test 2 -eq $(grep TCP_CORK $strace_out | wc -l)
+	fgrep 'SOL_TCP, TCP_CORK, [0], 4) = 0' $strace_out
+	fgrep 'SOL_TCP, TCP_CORK, [1], 4) = 0' $strace_out
+}
+
 t_begin "setup and start" && {
-	rainbows_setup $model 1
+	rainbows_setup $model 1 1
 	rtmpfiles strace_out
 	ed -s $unicorn_config <<EOF
 ,s/^listen.*/listen "$listen", :tcp_nodelay => true, :tcp_nopush => true/
@@ -41,42 +68,25 @@ t_begin "read worker pid" && {
 	kill -0 $worker_pid
 }
 
-t_begin "start strace on worker" && {
-	strace -p $worker_pid -e '!futex' -f -o $strace_out &
-	strace_pid=$!
-	sleep 1
-}
+t_begin "start strace on worker" && start_strace
 
 t_begin "reading RSS uncorks" && {
 	curl -sSf http://$listen/rss >/dev/null
-	sleep 2
-	grep TCP_CORK $strace_out || :
-	test 2 -eq $(grep TCP_CORK $strace_out |wc -l)
-	fgrep 'SOL_TCP, TCP_CORK, [0], 4) = 0' $strace_out
-	fgrep 'SOL_TCP, TCP_CORK, [1], 4) = 0' $strace_out
 }
 
 t_begin "restart strace on worker" && {
-	kill -9 $strace_pid
+	kill $strace_pid
 	wait
-
-	# dbgcat strace_out
-	> $strace_out
-	strace -p $worker_pid -e '!futex' -f -o $strace_out &
-	strace_pid=$!
-	sleep 1
+	start_strace
 }
 
 t_begin "reading static file uncorks" && {
 	curl -sSf http://$listen/random_blob >/dev/null
-	sleep 2
-	test 2 -eq $(grep TCP_CORK $strace_out |wc -l)
-	fgrep 'SOL_TCP, TCP_CORK, [0], 4) = 0' $strace_out
-	fgrep 'SOL_TCP, TCP_CORK, [1], 4) = 0' $strace_out
+	check_TCP_CORK
 }
 
 t_begin "stop strace on worker" && {
-	kill -9 $strace_pid
+	kill $strace_pid
 	wait
 }
 
@@ -91,24 +101,15 @@ t_begin "reread worker pid" && {
 	kill -0 $worker_pid
 }
 
-t_begin "restart strace on the worker" && {
-	# dbgcat strace_out
-	> $strace_out
-	strace -p $worker_pid -e '!futex' -f -o $strace_out &
-	strace_pid=$!
-	sleep 1
-}
+t_begin "restart strace on the worker" && start_strace
 
 t_begin "HTTP/1.x GET on static file with sendfile uncorks" && {
 	curl -sSf http://$listen/random_blob >/dev/null
-	sleep 1
-	test 2 -eq $(grep TCP_CORK $strace_out |wc -l)
-	fgrep 'SOL_TCP, TCP_CORK, [0], 4) = 0' $strace_out
-	fgrep 'SOL_TCP, TCP_CORK, [1], 4) = 0' $strace_out
+	check_TCP_CORK
 }
 
 t_begin "killing succeeds" && {
-	kill -9 $strace_pid
+	kill $strace_pid
 	wait
 	# dbgcat strace_out
 	kill $rainbows_pid
