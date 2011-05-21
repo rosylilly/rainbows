@@ -39,7 +39,7 @@ require "raindrops"
 # === RubyGem Requirements
 #
 # * raindrops 0.6.0 or later
-# * sleepy_penguin 3.0.0 or later
+# * sleepy_penguin 3.0.1 or later
 module Rainbows::XEpollThreadSpawn
   # :stopdoc:
   include Rainbows::Base

@@ -10,7 +10,7 @@ require 'rainbows/epoll'
 # === RubyGem Requirements
 #
 # * raindrops 0.6.0 or later
-# * sleepy_penguin 3.0.0 or later
+# * sleepy_penguin 3.0.1 or later
 # * sendfile 1.1.0 or later
 module Rainbows::XEpoll
   # :stopdoc:
