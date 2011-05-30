@@ -218,6 +218,9 @@ check_splice () {
 			exit 0
 		fi
 		;;
+	[3-9].*)
+		# OK
+		;;
 	*)
 		t_info "skipping $T (Linux $uname_r < 2.6.$min)"
 		exit 0
