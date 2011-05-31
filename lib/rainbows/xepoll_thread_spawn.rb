@@ -14,7 +14,7 @@ require "raindrops"
 #
 # === Disadvantages
 #
-# This is only supported under Linux 2.6 kernels.
+# This is only supported under Linux 2.6 and later kernels.
 #
 # === Compared to CoolioThreadSpawn
 #
