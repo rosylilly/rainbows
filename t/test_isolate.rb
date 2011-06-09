@@ -16,9 +16,9 @@ $stdout.reopen($stderr)
 lock = File.open(__FILE__, "rb")
 lock.flock(File::LOCK_EX)
 Isolate.now!(opts) do
-  gem 'kgio', '2.4.0'
-  gem 'unicorn', '3.6.2'
-  gem 'kcar', '0.2.0'
+  gem 'kgio', '2.4.1'
+  gem 'unicorn', '3.7.0'
+  gem 'kcar', '0.3.0'
   gem 'raindrops', '0.6.1'
 
   if engine == "ruby"
