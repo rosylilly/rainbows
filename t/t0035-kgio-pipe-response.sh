@@ -1,5 +1,6 @@
 #!/bin/sh
 . ./test-lib.sh
+skip_models StreamResponseEpoll
 test -r random_blob || die "random_blob required, run with 'make $0'"
 
 t_plan 10 "fast Kgio pipe response for $model"

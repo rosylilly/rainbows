@@ -1,6 +1,7 @@
 #!/bin/sh
 nr=${nr-"5"}
 . ./test-lib.sh
+skip_models StreamResponseEpoll
 
 t_plan 7 "ensure close-on-exec flag is set for $model"
 

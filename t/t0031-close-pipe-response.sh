@@ -1,5 +1,6 @@
 #!/bin/sh
 . ./test-lib.sh
+skip_models StreamResponseEpoll
 
 t_plan 16 "close pipe response for $model"
 

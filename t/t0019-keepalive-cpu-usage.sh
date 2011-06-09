@@ -5,6 +5,8 @@ then
 fi
 . ./test-lib.sh
 skip_models WriterThreadSpawn WriterThreadPool Base
+skip_models StreamResponseEpoll
+
 t_plan 6 "keepalive_timeout CPU usage tests for $model"
 
 t_begin "setup and start" && {

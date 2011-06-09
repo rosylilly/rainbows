@@ -1,5 +1,6 @@
 #!/bin/sh
 . ./test-lib.sh
+skip_models StreamResponseEpoll
 t_plan 25 "simple HTTP connection keepalive/pipelining tests for $model"
 
 t_begin "checking for config.ru for $model" && {

@@ -1,5 +1,6 @@
 #!/bin/sh
 . ./test-lib.sh
+skip_models StreamResponseEpoll
 t_plan 6 "keepalive_requests limit tests for $model"
 
 t_begin "setup and start" && {

@@ -136,6 +136,7 @@ module Rainbows
   autoload :NeverBlock, "rainbows/never_block"
   autoload :XEpollThreadSpawn, "rainbows/xepoll_thread_spawn"
   autoload :XEpollThreadPool, "rainbows/xepoll_thread_pool"
+  autoload :StreamResponseEpoll, "rainbows/stream_response_epoll"
 
   autoload :Fiber, 'rainbows/fiber' # core class
   autoload :StreamFile, 'rainbows/stream_file'

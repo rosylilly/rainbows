@@ -1,5 +1,6 @@
 #!/bin/sh
 . ./test-lib.sh
+skip_models StreamResponseEpoll
 test -r random_blob || die "random_blob required, run with 'make $0'"
 req_curl_chunked_upload_err_check
 

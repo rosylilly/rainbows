@@ -3,6 +3,7 @@ CONFIG_RU=${CONFIG_RU-'async-response.ru'}
 . ./test-lib.sh
 
 skip_models Base WriterThreadPool WriterThreadSpawn
+skip_models StreamResponseEpoll
 
 t_plan 6 "async HTTP/1.0 response for $model"
 

@@ -1,5 +1,6 @@
 #!/bin/sh
 . ./test-lib.sh
+skip_models StreamResponseEpoll
 req_curl_chunked_upload_err_check
 
 t_plan 6 "rack.input client_max_body_size zero"

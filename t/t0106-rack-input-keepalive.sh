@@ -1,5 +1,6 @@
 #!/bin/sh
 . ./test-lib.sh
+skip_models StreamResponseEpoll
 t_plan 11 "rack.input pipelining test"
 
 t_begin "setup and startup" && {

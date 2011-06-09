@@ -32,6 +32,7 @@ models += ThreadSpawn
 models += Coolio
 models += EventMachine
 models += NeverBlock
+models += StreamResponseEpoll
 
 ifeq ($(RUBY_ENGINE),ruby)
   rp := )

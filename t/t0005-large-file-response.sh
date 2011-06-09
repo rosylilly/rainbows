@@ -1,5 +1,6 @@
 #!/bin/sh
 . ./test-lib.sh
+skip_models StreamResponseEpoll
 test -r random_blob || die "random_blob required, run with 'make $0'"
 
 if ! grep -v ^VmRSS: /proc/self/status >/dev/null 2>&1

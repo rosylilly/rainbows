@@ -1,5 +1,6 @@
 #!/bin/sh
 . ./test-lib.sh
+skip_models StreamResponseEpoll
 if ! test -d /dev/fd
 then
 	t_info "skipping $T since /dev/fd is required"

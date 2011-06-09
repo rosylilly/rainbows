@@ -15,6 +15,7 @@ fi
 # these buffer internally in external libraries, so we can't detect when
 # to use TCP_CORK
 skip_models EventMachine NeverBlock
+skip_models StreamResponseEpoll
 skip_models Coolio CoolioThreadPool CoolioThreadSpawn
 skip_models Revactor Rev RevThreadPool RevThreadSpawn
 

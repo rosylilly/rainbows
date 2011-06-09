@@ -1,5 +1,6 @@
 #!/bin/sh
 . ./test-lib.sh
+skip_models StreamResponseEpoll
 
 t_plan 29 "keepalive does not clear Rack env prematurely for $model"
 

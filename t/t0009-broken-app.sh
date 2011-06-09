@@ -1,5 +1,6 @@
 #!/bin/sh
 . ./test-lib.sh
+skip_models StreamResponseEpoll
 
 t_plan 9 "graceful handling of broken apps for $model"
 

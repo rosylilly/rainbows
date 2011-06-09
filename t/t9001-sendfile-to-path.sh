@@ -1,5 +1,6 @@
 #!/bin/sh
 . ./test-lib.sh
+skip_models StreamResponseEpoll
 
 t_plan 7 "Sendfile middleware test for $model"
 
