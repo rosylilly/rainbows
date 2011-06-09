@@ -119,7 +119,15 @@ module Rainbows::Response
     # This does not support multipart responses (does anybody actually
     # use those?)
     def sendfile_range(status, headers)
-      200 == status.to_i &&
+      status = status.to_i
+      if 206 == status
+        if %r{\Abytes (\d+)-(\d+)/\d+\z} =~ headers[Content_Range]
+          a, b = $1.to_i, $2.to_i
+          return 206, headers, [ a,  b - a + 1 ]
+        end
+        return # wtf...
+      end
+      200 == status &&
       /\Abytes=(\d+-\d*|\d*-\d+)\z/ =~ @hp.env[HTTP_RANGE] or
         return
       a, b = $1.split(/-/)
