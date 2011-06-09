@@ -29,7 +29,7 @@ t_begin "staggered trailer upload" && {
 }
 
 t_begin "HTTP response is OK" && {
-	fgrep 'HTTP/1.1 200 OK' $tmp
+	grep 'HTTP/1\.[01] 200 OK' $tmp
 }
 
 t_begin "upload small blob" && {
@@ -42,7 +42,7 @@ t_begin "upload small blob" && {
 	test xok = x"$(cat $ok)"
 }
 
-t_begin "HTTP response is OK" && fgrep 'HTTP/1.1 200 OK' $tmp
+t_begin "HTTP response is OK" && grep 'HTTP/1\.[01] 200 OK' $tmp
 t_begin "no errors in stderr log" && check_stderr
 
 t_begin "big blob request" && {
@@ -55,7 +55,7 @@ t_begin "big blob request" && {
 	test xok = x"$(cat $ok)"
 }
 
-t_begin "HTTP response is OK" && fgrep 'HTTP/1.1 200 OK' $tmp
+t_begin "HTTP response is OK" && grep 'HTTP/1\.[01] 200 OK' $tmp
 t_begin "no errors in stderr log" && check_stderr
 
 t_begin "staggered blob upload" && {
@@ -76,9 +76,7 @@ t_begin "staggered blob upload" && {
 	test xok = x"$(cat $ok)"
 }
 
-t_begin "HTTP response is OK" && {
-	fgrep 'HTTP/1.1 200 OK' $tmp
-}
+t_begin "HTTP response is OK" && grep 'HTTP/1\.[01] 200 OK' $tmp
 
 t_begin "no errors in stderr log" && check_stderr
 
