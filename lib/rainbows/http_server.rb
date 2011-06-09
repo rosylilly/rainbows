@@ -21,14 +21,6 @@ class Rainbows::HttpServer < Unicorn::HttpServer
     @worker_connections ||= @use == :Base ? 1 : 50
   end
 
-  def reopen_worker_logs(worker_nr)
-    logger.info "worker=#{worker_nr} reopening logs..."
-    Unicorn::Util.reopen_logs
-    logger.info "worker=#{worker_nr} done reopening logs"
-    rescue
-      Rainbows.quit! # let the master reopen and refork us
-  end
-
   # Add one second to the timeout since our fchmod heartbeat is less
   # precise (and must be more conservative) than Unicorn does.  We
   # handle many clients per process and can't chmod on every

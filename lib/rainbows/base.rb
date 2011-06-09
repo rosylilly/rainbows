@@ -36,5 +36,12 @@ module Rainbows::Base
     klass.const_set :LISTENERS, Rainbows::HttpServer::LISTENERS
   end
 
+  def reopen_worker_logs(worker_nr)
+    logger.info "worker=#{worker_nr} reopening logs..."
+    Unicorn::Util.reopen_logs
+    logger.info "worker=#{worker_nr} done reopening logs"
+    rescue
+      Rainbows.quit! # let the master reopen and refork us
+  end
   # :startdoc:
 end
