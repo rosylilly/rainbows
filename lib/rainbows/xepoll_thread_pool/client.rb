@@ -111,8 +111,7 @@ module Rainbows::XEpollThreadPool::Client
       return kato_set
     when String
       kato_delete
-      @hp.buf << buf
-      @hp.parse and return queue!
+      @hp.add_parse(buf) and return queue!
     else
       return close
     end while true

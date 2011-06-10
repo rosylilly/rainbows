@@ -95,8 +95,7 @@ module Rainbows::XEpollThreadSpawn::Client
       return kato_set
     when String
       kato_delete
-      @hp.buf << buf
-      env = @hp.parse and return spawn(env, @hp)
+      env = @hp.add_parse(buf) and return spawn(env, @hp)
     else
       return close
     end while true
@@ -115,8 +114,7 @@ module Rainbows::XEpollThreadSpawn::Client
       kato_set
       return false
     when String
-      hp.buf << buf
-      hp.parse and return true
+      hp.add_parse(buf) and return true
       # continue loop
     else
       return close

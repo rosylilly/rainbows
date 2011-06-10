@@ -80,8 +80,7 @@ module Rainbows::EvCore
   def on_read(data)
     case @state
     when :headers
-      @buf << data
-      @hp.parse or return want_more
+      @hp.add_parse(data) or return want_more
       @state = :body
       if 0 == @hp.content_length
         app_call NULL_IO # common case
