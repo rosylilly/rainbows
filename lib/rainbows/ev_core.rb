@@ -10,6 +10,7 @@ module Rainbows::EvCore
   RBUF = ""
   Z = "".freeze
   Rainbows.config!(self, :client_header_buffer_size)
+  HTTP_VERSION = "HTTP_VERSION"
 
   # Apps may return this Rack response: AsyncResponse = [ -1, {}, [] ]
   ASYNC_CALLBACK = "async.callback".freeze
@@ -54,13 +55,23 @@ module Rainbows::EvCore
   def stream_response_headers(status, headers, alive)
     headers = Rack::Utils::HeaderHash.new(headers) unless Hash === headers
     if headers.include?(Content_Length)
-      rv = false
+      write_headers(status, headers, alive)
+      return false
+    end
+
+    case @env[HTTP_VERSION]
+    when "HTTP/1.0" # disable HTTP/1.0 keepalive to stream
+      write_headers(status, headers, false)
+      @hp.clear
+      false
+    when nil # "HTTP/0.9"
+      false
     else
       rv = !!(headers[Transfer_Encoding] =~ %r{\Achunked\z}i)
       rv = false unless @env["rainbows.autochunk"]
+      write_headers(status, headers, alive)
+      rv
     end
-    write_headers(status, headers, alive)
-    rv
   end
 
   def prepare_request_body

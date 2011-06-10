@@ -19,7 +19,6 @@ class Rainbows::DevFdResponse < Struct.new(:app)
   Transfer_Encoding = "Transfer-Encoding".freeze
   Rainbows_autochunk = "rainbows.autochunk".freeze
   Rainbows_model = "rainbows.model"
-  HTTP_1_0 = "HTTP/1.0"
   HTTP_VERSION = "HTTP_VERSION"
   Chunked = "chunked"
 
@@ -55,8 +54,12 @@ class Rainbows::DevFdResponse < Struct.new(:app)
       headers.delete(Transfer_Encoding)
     elsif st.pipe? || st.socket? # epoll-able things
       unless headers.include?(Content_Length)
-        if env[Rainbows_autochunk] && HTTP_1_0 != env[HTTP_VERSION]
-          headers[Transfer_Encoding] = Chunked
+        if env[Rainbows_autochunk]
+          case env[HTTP_VERSION]
+          when "HTTP/1.0", nil
+          else
+            headers[Transfer_Encoding] = Chunked
+          end
         else
           env[Rainbows_autochunk] = false
         end
