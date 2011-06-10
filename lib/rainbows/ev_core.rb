@@ -104,7 +104,7 @@ module Rainbows::EvCore
         want_more
       end
     when :trailers
-      if @hp.trailers(@env, @buf << data)
+      if @hp.add_parse(data)
         @input.rewind
         app_call @input
       else
