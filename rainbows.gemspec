@@ -53,5 +53,6 @@ Gem::Specification.new do |s|
   # NeverBlock, currently only available on http://gems.github.com/
   # s.add_dependency(%q<espace-neverblock>, ["~> 0.1.6.1"])
 
-  # s.licenses = %w(GPLv2 Ruby) # accessor not compatible with older RubyGems
+  # accessor not compatible with older RubyGems
+  # s.licenses = %w(GPLv3 GPLv2 Ruby)
 end
