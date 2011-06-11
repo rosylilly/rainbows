@@ -2,12 +2,13 @@
 require "sleepy_penguin"
 require "raindrops"
 
-# Like \Unicorn itself, this concurrency model is only intended for use
-# behind nginx and completely unsupported otherwise.
+# Like Unicorn itself, this concurrency model is only intended for use
+# behind nginx and completely unsupported otherwise.  Even further from
+# Unicorn, this isn't even a good idea with normal LAN clients, only nginx!
 #
 # It does NOT require a thread-safe Rack application at any point, but
-# allows streaming data asynchronously via nginx (using the the
-# "X-Accel-Buffering: no" header).
+# allows streaming data asynchronously via nginx (using the
+# "X-Accel-Buffering: no" header to disable buffering).
 #
 # Unlike Rainbows::Base, this does NOT support persistent
 # connections or pipelining.  All \Rainbows! specific configuration
@@ -28,6 +29,8 @@ module Rainbows::StreamResponseEpoll
     ep_client = false
 
     if headers
+      # don't set extra headers here, this is only intended for
+      # consuming by nginx.
       buf = "HTTP/1.0 #{status}\r\nStatus: #{status}\r\n"
       headers.each do |key, value|
         if value =~ /\n/
