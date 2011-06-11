@@ -61,12 +61,6 @@ module Rainbows
   end
   # :stopdoc:
 
-  # runs the Rainbows! HttpServer with +app+ and +options+ and does
-  # not return until the server has exited.
-  def self.run(app, options = {}) # :nodoc:
-    HttpServer.new(app, options).start.join
-  end
-
   class << self
     attr_accessor :server
     attr_accessor :cur # may not always be used
