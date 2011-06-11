@@ -1,5 +1,4 @@
 # -*- encoding: binary -*-
-#
 # :enddoc:
 
 # this is used to augment Kgio::Socket and Kgio::Pipe-enhanced classes

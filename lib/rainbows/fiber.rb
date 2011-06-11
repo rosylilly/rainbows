@@ -1,11 +1,10 @@
 # -*- encoding: binary -*-
-# :stopdoc:
+# :enddoc:
 begin
   require 'fiber'
 rescue LoadError
   defined?(NeverBlock) or raise
 end
-# :startdoc:
 
 # core namespace for all things that use Fibers in \Rainbows!
 #
@@ -15,7 +14,6 @@ end
 # supporting these in the future.
 module Rainbows::Fiber
 
-  # :stopdoc:
   # blocked readers (key: fileno, value: Rainbows::Fiber::IO object)
   RD = []
 
@@ -24,7 +22,6 @@ module Rainbows::Fiber
 
   # sleeping fibers go here (key: Fiber object, value: wakeup time)
   ZZ = {}
-  # :startdoc:
 
   # puts the current Fiber into uninterruptible sleep for at least
   # +seconds+.  Unlike Kernel#sleep, this it is not possible to sleep
