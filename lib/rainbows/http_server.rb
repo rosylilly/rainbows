@@ -97,4 +97,8 @@ class Rainbows::HttpServer < Unicorn::HttpServer
   def keepalive_requests
     Unicorn::HttpRequest.keepalive_requests
   end
+
+  def client_max_header_size=(bytes)
+    Unicorn::HttpParser.max_header_len = bytes
+  end
 end

@@ -27,6 +27,7 @@ module Rainbows::Configurator
     :keepalive_requests => 100,
     :client_max_body_size => 1024 * 1024,
     :client_header_buffer_size => 1024,
+    :client_max_header_size => 112 * 1024,
     :copy_stream => IO.respond_to?(:copy_stream) ? IO : false,
   })
 
@@ -145,6 +146,18 @@ module Rainbows::Configurator
       abort err
     end
     set[:client_max_body_size] = bytes
+  end
+
+  # Limits the maximum size of a request header for all requests.
+  #
+  # Default: 112 kilobytes (114688 bytes)
+  #
+  # Lowering this will lower worst-case memory usage and mitigate some
+  # denial-of-service attacks.  This should be larger than
+  # client_header_buffer_size.
+  def client_max_header_size(bytes)
+    check!
+    set_int(:client_max_header_size, bytes, 8)
   end
 
   # This governs the amount of memory allocated for an individual read(2) or
