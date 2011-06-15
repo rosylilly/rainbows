@@ -15,9 +15,6 @@ module Rainbows::Base
     Rainbows::MaxBody.setup
     Rainbows.tick_io = worker.tmp
 
-    listeners = Rainbows::HttpServer::LISTENERS
-    Rainbows::HttpServer::IO_PURGATORY.concat(listeners)
-
     # we're don't use the self-pipe mechanism in the Rainbows! worker
     # since we don't defer reopening logs
     Rainbows::HttpServer::SELF_PIPE.each { |x| x.close }.clear
