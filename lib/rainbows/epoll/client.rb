@@ -96,12 +96,12 @@ module Rainbows::Epoll::Client
   end
 
   def ev_write_response(status, headers, body, alive)
+    @state = alive ? :headers : :close
     if body.respond_to?(:to_path)
       write_response_path(status, headers, body, alive)
     else
       write_response(status, headers, body, alive)
     end
-    @state = alive ? :headers : :close
     on_read(Z) if alive && 0 == @wr_queue.size && 0 != @buf.size
   end
 
