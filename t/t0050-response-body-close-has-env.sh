@@ -16,6 +16,7 @@ req_pipelined () {
 	pfx=$1
 	t_begin "make pipelined requests to trigger $pfx response body" && {
 		> $r_out
+		rm -f $ok
 		(
 			cat $fifo > $tmp &
 			printf 'GET /%s/1 HTTP/1.1\r\n' $pfx
@@ -35,7 +36,8 @@ req_pipelined () {
 reload () {
 	t_begin 'reloading Rainbows! to ensure writeout' && {
 		# ensure worker is loaded before HUP
-		curl -s http://$listen/ >/dev/null
+		rm -f $curl_err $curl_out
+		curl -vs http://$listen/ >$curl_out 2> $curl_err
 		# reload to ensure everything is flushed
 		kill -HUP $rainbows_pid
 		test xSTART = x"$(cat $fifo)"
