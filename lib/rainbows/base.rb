@@ -13,7 +13,7 @@ module Rainbows::Base
     super(worker)
     Rainbows::Response.setup(self.class)
     Rainbows::MaxBody.setup
-    Rainbows.tick_io = worker.tmp
+    Rainbows.worker = worker
 
     # we're don't use the self-pipe mechanism in the Rainbows! worker
     # since we don't defer reopening logs

@@ -65,7 +65,7 @@ module Rainbows
     attr_accessor :server
     attr_accessor :cur # may not always be used
     attr_reader :alive
-    attr_writer :tick_io
+    attr_writer :worker
     attr_writer :forked
   end
 
@@ -78,7 +78,6 @@ module Rainbows
 
   @alive = true
   @cur = 0
-  @tick_mod = 0
   @expire = nil
   @at_quit = []
 
@@ -87,7 +86,7 @@ module Rainbows
   end
 
   def self.tick
-    @tick_io.chmod(@tick_mod = 0 == @tick_mod ? 1 : 0)
+    @worker.tick = Time.now.to_i
     exit!(2) if @expire && Time.now >= @expire
     @alive && @server.master_pid == Process.ppid or quit!
   end
