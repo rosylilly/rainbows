@@ -6,10 +6,6 @@
 # objects.  This may be used in conjunction with the #to_path method
 # on servers that support it to pass arbitrary file descriptors into
 # the HTTP response without additional open(2) syscalls
-#
-# This middleware is currently a no-op for Rubinius, as it lacks
-# IO.copy_stream in 1.9 and also due to a bug here:
-#   http://github.com/evanphx/rubinius/issues/379
 
 class Rainbows::DevFdResponse < Struct.new(:app)
 
@@ -21,12 +17,6 @@ class Rainbows::DevFdResponse < Struct.new(:app)
   Rainbows_model = "rainbows.model"
   HTTP_VERSION = "HTTP_VERSION"
   Chunked = "chunked"
-
-  # make this a no-op under Rubinius, it's pointless anyways
-  # since Rubinius doesn't have IO.copy_stream
-  def self.new(app)
-    app
-  end if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'rbx'
   include Rack::Utils
 
   # Rack middleware entry point, we'll just pass through responses
