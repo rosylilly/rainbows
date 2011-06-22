@@ -21,7 +21,7 @@ Isolate.now!(opts) do
   gem 'raindrops', '0.6.1'
 
   if engine == "ruby"
-    gem 'sendfile', '1.1.0' # next Rubinius should support this
+    gem 'sendfile', '1.1.0'
     gem 'cool.io', '1.0.0'
 
     gem 'eventmachine', '0.12.10'
