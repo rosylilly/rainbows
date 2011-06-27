@@ -13,7 +13,7 @@ module Rainbows::Response
   class F < File; end
 
   # called after forking
-  def self.setup(klass)
+  def self.setup
     Kgio.accept_class = Rainbows::Client
     0 == Rainbows.server.keepalive_timeout and
       Rainbows::HttpParser.keepalive_requests = 0

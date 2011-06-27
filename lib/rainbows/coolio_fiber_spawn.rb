@@ -18,7 +18,7 @@ module Rainbows::CoolioFiberSpawn
   include Rainbows::Fiber::Coolio
 
   def worker_loop(worker) # :nodoc:
-    Rainbows::Response.setup(Server)
+    Rainbows::Response.setup
     init_worker_process(worker)
     Server.const_set(:MAX, @worker_connections)
     Rainbows::Fiber::Base.setup(Server, nil)

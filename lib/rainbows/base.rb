@@ -11,7 +11,7 @@ module Rainbows::Base
   # this method is called by all current concurrency models
   def init_worker_process(worker) # :nodoc:
     super(worker)
-    Rainbows::Response.setup(self.class)
+    Rainbows::Response.setup
     Rainbows::MaxBody.setup
     Rainbows.worker = worker
 
