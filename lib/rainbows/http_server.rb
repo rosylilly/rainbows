@@ -27,8 +27,9 @@ class Rainbows::HttpServer < Unicorn::HttpServer
   # connection we accept without wasting cycles.  That added to the
   # fact that we let clients keep idle connections open for long
   # periods of time means we have to chmod at a fixed interval.
-  def timeout=(nr)
-    @timeout = nr + 1
+  def timeout=(seconds)
+    max = 0x7fffffff
+    @timeout = seconds >= max ? max : seconds + 1
   end
 
   def load_config!
