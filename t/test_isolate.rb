@@ -16,9 +16,10 @@ $stdout.reopen($stderr)
 lock = File.open(__FILE__, "rb")
 lock.flock(File::LOCK_EX)
 Isolate.now!(opts) do
-  gem 'kgio', '2.4.1'
+  gem 'kgio', '2.5.0'
   gem 'kcar', '0.3.0'
-  gem 'raindrops', '0.6.1'
+  gem 'raindrops', '0.7.0'
+  gem 'unicorn', '4.0.0'
 
   if engine == "ruby"
     gem 'sendfile', '1.1.0'
