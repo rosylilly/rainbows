@@ -7,7 +7,26 @@ module Rainbows::ProcessClient
   NULL_IO = Unicorn::HttpRequest::NULL_IO
   RACK_INPUT = Unicorn::HttpRequest::RACK_INPUT
   IC = Unicorn::HttpRequest.input_class
-  Rainbows.config!(self, :client_header_buffer_size)
+  Rainbows.config!(self, :client_header_buffer_size, :keepalive_timeout)
+
+  def read_expire
+    Time.now + KEEPALIVE_TIMEOUT
+  end
+
+  # used for reading headers (respecting keepalive_timeout)
+  def timed_read(buf)
+    expire = nil
+    begin
+      case rv = kgio_tryread(CLIENT_HEADER_BUFFER_SIZE, buf)
+      when :wait_readable
+        return if expire && expire < Time.now
+        expire ||= read_expire
+        kgio_wait_readable(KEEPALIVE_TIMEOUT)
+      else
+        return rv
+      end
+    end while true
+  end
 
   def process_loop
     @hp = hp = Rainbows::HttpParser.new

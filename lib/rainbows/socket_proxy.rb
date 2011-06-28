@@ -18,6 +18,14 @@ module Rainbows::SocketProxy
     to_io.kgio_trywrite(buf)
   end
 
+  def kgio_tryread(size, buf = "")
+    to_io.kgio_tryread(size, buf)
+  end
+
+  def kgio_wait_readable(timeout = nil)
+    to_io.kgio_wait_readable(timeout)
+  end
+
   def timed_read(buf)
     to_io.timed_read(buf)
   end
