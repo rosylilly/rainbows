@@ -49,8 +49,8 @@ check_TCP_CORK () {
 	done
 
 	test 2 -eq $(grep TCP_CORK $strace_out | wc -l)
-	fgrep 'SOL_TCP, TCP_CORK, [0], 4) = 0' $strace_out
-	fgrep 'SOL_TCP, TCP_CORK, [1], 4) = 0' $strace_out
+	fgrep 'SOL_TCP, TCP_CORK, [0],' $strace_out
+	fgrep 'SOL_TCP, TCP_CORK, [1],' $strace_out
 }
 
 t_begin "setup and start" && {
