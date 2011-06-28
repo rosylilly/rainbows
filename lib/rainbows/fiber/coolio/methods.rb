@@ -28,7 +28,7 @@ module Rainbows::Fiber::Coolio::Methods
     @w.disable
   end
 
-  def kgio_wait_readable
+  def kgio_wait_readable(timeout = nil)
     @r = Watcher.new(self, :r) unless defined?(@r)
     @r.enable unless @r.enabled?
     Fiber.yield

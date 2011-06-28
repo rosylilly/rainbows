@@ -24,8 +24,8 @@ Gem::Specification.new do |s|
   # we want a newer Rack for a valid HeaderHash#each
   s.add_dependency(%q<rack>, ['~> 1.1'])
 
-  # kgio has some fixes for MRI 1.9.3dev that affect us
-  s.add_dependency(%q<kgio>, ['~> 2.4'])
+  # kgio 2.5 has kgio_wait_* methods that take optional timeout args
+  s.add_dependency(%q<kgio>, ['~> 2.5'])
 
   # we need Unicorn for the HTTP parser and process management
   s.add_dependency(%q<unicorn>, ["~> 4.0"])

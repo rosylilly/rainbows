@@ -1,6 +1,5 @@
 # -*- encoding: binary -*-
 # :enddoc:
-require "io/wait"
 
 # this class is used for most synchronous concurrency models
 class Rainbows::Client < Kgio::Socket
@@ -11,10 +10,6 @@ class Rainbows::Client < Kgio::Socket
     Time.now + KEEPALIVE_TIMEOUT
   end
 
-  def kgio_wait_readable
-    wait KEEPALIVE_TIMEOUT
-  end
-
   # used for reading headers (respecting keepalive_timeout)
   def timed_read(buf)
     expire = nil
@@ -23,7 +18,7 @@ class Rainbows::Client < Kgio::Socket
       when :wait_readable
         return if expire && expire < Time.now
         expire ||= read_expire
-        kgio_wait_readable
+        kgio_wait_readable(KEEPALIVE_TIMEOUT)
       else
         return rv
       end

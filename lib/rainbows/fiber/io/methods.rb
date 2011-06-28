@@ -29,7 +29,7 @@ module Rainbows::Fiber::IO::Methods
     super
   end
 
-  def kgio_wait_readable
+  def kgio_wait_readable(timeout = nil)
     fd = fileno
     @f = Fiber.current
     RD[fd] = self
