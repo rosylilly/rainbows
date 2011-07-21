@@ -1,19 +1,8 @@
 # -*- encoding: binary -*-
 require 'kgio'
 require 'unicorn'
-Unicorn::SocketHelper::DEFAULTS.merge!({
-  # the value passed to TCP_DEFER_ACCEPT actually matters in Linux 2.6.32+
-  :tcp_defer_accept => 60,
-
-  # keep-alive performance sucks without this due to
-  # write(headers)-write(body)-read
-  # because we always write headers and bodies with two calls
-  :tcp_nodelay => true,
-
-  # we always want to send our headers out ASAP since Rainbows!
-  # is designed for apps that could trickle out the body slowly
-  :tcp_nopush => false,
-})
+# the value passed to TCP_DEFER_ACCEPT actually matters in Linux 2.6.32+
+Unicorn::SocketHelper::DEFAULTS[:tcp_defer_accept] = 60
 
 # See http://rainbows.rubyforge.org/ for documentation
 module Rainbows
