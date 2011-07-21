@@ -1,7 +1,6 @@
 # -*- encoding: binary -*-
 require 'kgio'
 require 'unicorn'
-require 'io/wait'
 Unicorn::SocketHelper::DEFAULTS.merge!({
   # the value passed to TCP_DEFER_ACCEPT actually matters in Linux 2.6.32+
   :tcp_defer_accept => 60,
