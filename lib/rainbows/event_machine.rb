@@ -82,7 +82,7 @@ module Rainbows::EventMachine
     max = worker_connections + LISTENERS.size
     Rainbows::EventMachine::Server.const_set(:MAX, max)
     Rainbows::EventMachine::Server.const_set(:CL, client_class)
-    client_class.const_set(:APP, Rainbows.server.app)
+    Rainbows::EventMachine::Client.const_set(:APP, Rainbows.server.app)
     EM.run {
       conns = EM.instance_variable_get(:@conns) or
         raise RuntimeError, "EM @conns instance variable not accessible!"
