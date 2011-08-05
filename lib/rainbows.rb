@@ -121,7 +121,6 @@ module Rainbows
 
   autoload :Fiber, 'rainbows/fiber' # core class
   autoload :StreamFile, 'rainbows/stream_file'
-  autoload :HttpResponse, 'rainbows/http_response' # deprecated
   autoload :ThreadTimeout, 'rainbows/thread_timeout'
   autoload :WorkerYield, 'rainbows/worker_yield'
   autoload :SyncClose, 'rainbows/sync_close'
