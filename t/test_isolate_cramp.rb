@@ -17,7 +17,7 @@ lock = File.open(__FILE__, "rb")
 lock.flock(File::LOCK_EX)
 Isolate.now!(opts) do
   if engine == "ruby"
-    gem 'cramp', '0.12'
+    gem 'cramp', '0.13'
   end
 end
 
