@@ -23,7 +23,7 @@ Isolate.now!(opts) do
 
   if engine == "ruby"
     gem 'sendfile', '1.1.0'
-    gem 'cool.io', '1.0.0'
+    gem 'cool.io', '1.1.0'
 
     gem 'eventmachine', '0.12.10'
     gem 'sinatra', '1.2.0'
