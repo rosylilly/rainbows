@@ -12,15 +12,13 @@ module Rainbows::Error
   end
 
   def self.app(e)
-    Rainbows.server.logger.error "app error: #{e.inspect}"
-    Rainbows.server.logger.error e.backtrace.join("\n")
+    Unicorn.log_error(Rainbows.server.logger, "app error", e)
     rescue
   end
 
   def self.listen_loop(e)
     Rainbows.alive or return
-    Rainbows.server.logger.error "listen loop error: #{e.inspect}."
-    Rainbows.server.logger.error e.backtrace.join("\n")
+    Unicorn.log_error(Rainbows.server.logger, "listen loop error", e)
     rescue
   end
 

@@ -43,9 +43,7 @@ module Rainbows::ReverseProxy::Coolio
           return close
         when SystemCallError
         else
-          logger = @env["rack.logger"]
-          logger.error "#{e} #{e.message}"
-          e.backtrace.each { |m| logger.error m }
+          Unicorn.log_error(@env["rack.logger"], "on_readable", e)
         end
         @env[AsyncCallback].call(Rainbows::ReverseProxy::E502)
         close

@@ -164,7 +164,8 @@ class Rainbows::Coolio::Client < Coolio::IO
       begin
         @deferred.close if @deferred.respond_to?(:close)
       rescue => e
-        Rainbows.server.logger.error("closing #@deferred: #{e}")
+        Unicorn.log_error(Rainbows.server.logger,
+                          "closing deferred=#{@deferred.inspect}", e)
       end
       @deferred = nil
     end
