@@ -8,7 +8,7 @@ EM::VERSION >= '0.12.10' or abort 'eventmachine 0.12.10 is required'
 # a single-threaded app dispatch.  It is suited for slow clients,
 # and can work with slow applications via asynchronous libraries such as
 # {async_sinatra}[http://github.com/raggi/async_sinatra],
-# {Cramp}[http://m.onkey.org/2010/1/7/introducing-cramp],
+# {Cramp}[http://cramp.in/],
 # and {rack-fiber_pool}[http://github.com/mperham/rack-fiber_pool].
 #
 # It does not require your Rack application to be thread-safe,
@@ -23,7 +23,7 @@ EM::VERSION >= '0.12.10' or abort 'eventmachine 0.12.10 is required'
 # {async_sinatra}[http://github.com/raggi/async_sinatra].
 #
 # For a complete asynchronous framework,
-# {Cramp}[http://m.onkey.org/2010/1/7/introducing-cramp] is fully
+# {Cramp}[http://cramp.in/] is fully
 # supported when using this concurrency model.
 #
 # This model is fully-compatible with
