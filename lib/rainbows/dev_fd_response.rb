@@ -69,7 +69,7 @@ class Rainbows::DevFdResponse < Struct.new(:app)
     [ status, headers, Body.new(io, "/dev/fd/#{fileno}", body) ]
   end
 
-  class Body < Struct.new(:to_io, :to_path, :orig_body)
+  class Body < Struct.new(:to_io, :to_path, :orig_body) # :nodoc:
     # called by the webserver or other middlewares if they can't
     # handle #to_path
     def each
