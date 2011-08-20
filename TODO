@@ -7,9 +7,6 @@ care about.
 
 * documentation improvements
 
-* allow _OPTIONAL_ splice(2) with DevFdResponse under Linux
-  (splice is very broken under some older kernels)
-
 * Improve test suite coverage.  We won't waste cycles with puny
   unit tests, only integration tests that exercise externally
   visible parts.
