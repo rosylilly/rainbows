@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   s.add_dependency(%q<kgio>, ['~> 2.5'])
 
   # we need Unicorn for the HTTP parser and process management
-  s.add_dependency(%q<unicorn>, ["~> 4.0"])
+  s.add_dependency(%q<unicorn>, ["~> 4.1"])
   s.add_development_dependency(%q<isolate>, "~> 3.1")
   s.add_development_dependency(%q<wrongdoc>, "~> 1.6")
 
