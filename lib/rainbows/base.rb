@@ -18,8 +18,11 @@ module Rainbows::Base
     # we're don't use the self-pipe mechanism in the Rainbows! worker
     # since we don't defer reopening logs
     Rainbows::HttpServer::SELF_PIPE.each { |x| x.close }.clear
-    trap(:USR1) { reopen_worker_logs(worker.nr) }
-    trap(:QUIT) { Rainbows.quit! }
+
+    # spawn Threads since Logger takes a mutex by default and
+    # we can't safely lock a mutex in a signal handler
+    trap(:USR1) { Thread.new { reopen_worker_logs(worker.nr) } }
+    trap(:QUIT) { Thread.new { Rainbows.quit! } }
     [:TERM, :INT].each { |sig| trap(sig) { exit!(0) } } # instant shutdown
     Rainbows::ProcessClient.const_set(:APP, Rainbows.server.app)
     logger.info "Rainbows! #@use worker_connections=#@worker_connections"
