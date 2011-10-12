@@ -18,7 +18,8 @@ class Rainbows::HttpServer < Unicorn::HttpServer
     @logger = Unicorn::Configurator::DEFAULTS[:logger]
     super(app, options)
     defined?(@use) or self.use = Rainbows::Base
-    @worker_connections ||= @use == :Base ? 1 : 50
+    @worker_connections ||= 50
+    @worker_connections = 1 if @use == :Base
   end
 
   # Add one second to the timeout since our fchmod heartbeat is less
