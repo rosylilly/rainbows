@@ -16,7 +16,7 @@ require 'sendfile'
 # When serving static files, this is extremely unfair and optimized
 # for throughput at the expense of fairness.  This is not an issue
 # if you're not serving static files, or if your working set is
-# small enough to aways be in your kernel page cache.  This concurrency
+# small enough to always be in your kernel page cache.  This concurrency
 # model may starve clients if you have slow disks and large static files.
 #
 # === RubyGem Requirements

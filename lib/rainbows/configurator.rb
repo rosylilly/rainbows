@@ -3,7 +3,7 @@
 # This module adds \Rainbows! to the
 # {Unicorn::Configurator}[http://unicorn.bogomips.org/Unicorn/Configurator.html]
 # \Rainbows!-specific configuration options must be inside a the Rainbows!
-# block, otherwise Unicorn::Configurator directives may be used anwwhere
+# block, otherwise Unicorn::Configurator directives may be used anywhere
 # in the file.
 #
 #   Rainbows! do
