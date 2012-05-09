@@ -30,7 +30,7 @@ module Rainbows::FiberPool
 
     begin
       schedule do |l|
-        fib = pool.shift or break # let another worker process take it
+        fib = pool.pop or break # let another worker process take it
         if io = l.kgio_tryaccept
           fib.resume(io)
         else
