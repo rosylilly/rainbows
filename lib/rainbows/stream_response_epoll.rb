@@ -67,9 +67,31 @@ module Rainbows::StreamResponseEpoll
         end while true
       end
     end
-    ep_client.close if ep_client
     ensure
       body.respond_to?(:close) and body.close
+      if ep_client
+        ep_client.close
+      else
+        socket.shutdown
+        socket.close
+      end
   end
+
+  # once a client is accepted, it is processed in its entirety here
+  # in 3 easy steps: read request, call app, write app response
+  def process_client(client)
+    status, headers, body = @app.call(env = @request.read(client))
+
+    if 100 == status.to_i
+      client.write(Unicorn::Const::EXPECT_100_RESPONSE)
+      env.delete(Unicorn::Const::HTTP_EXPECT)
+      status, headers, body = @app.call(env)
+    end
+    @request.headers? or headers = nil
+    http_response_write(client, status, headers, body)
+  rescue => e
+    handle_error(client, e)
+  end
+
   # :startdoc:
 end

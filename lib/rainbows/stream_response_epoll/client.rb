@@ -19,7 +19,7 @@ class Rainbows::StreamResponseEpoll::Client
 
   def initialize(io, unwritten)
     @closed = false
-    @to_io = io.dup
+    @to_io = io
     @wr_queue = [ unwritten.dup ]
     EP.set(self, OUT)
   end
@@ -50,6 +50,7 @@ class Rainbows::StreamResponseEpoll::Client
 
   def on_write_complete
     if @closed
+      @to_io.shutdown
       @to_io.close
       N.decr(0, 1)
     end
