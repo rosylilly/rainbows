@@ -181,7 +181,7 @@ module Rainbows::Epoll::Client
   end
 
   def timeout!
-    close
+    shutdown
     true
   end
 
