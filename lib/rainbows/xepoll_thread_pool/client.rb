@@ -77,7 +77,7 @@ module Rainbows::XEpollThreadPool::Client
       LOCK.synchronize do
         KATO.delete_if { |client, time| time < ot and defer << client }
       end
-      defer.each { |io| io.closed? or io.close }
+      defer.each { |io| io.closed? or io.shutdown }
     end
     @@last_expire = now
   end

@@ -33,7 +33,7 @@ module Rainbows::XEpollThreadSpawn::Client
   Rainbows.at_quit do
     clients = nil
     LOCK.synchronize { clients = KATO.keys; KATO.clear }
-    clients.each { |io| io.closed? or io.close }
+    clients.each { |io| io.closed? or io.shutdown }
   end
   @@last_expire = Time.now
 

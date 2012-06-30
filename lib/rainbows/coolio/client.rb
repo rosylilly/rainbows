@@ -69,7 +69,12 @@ class Rainbows::Coolio::Client < Coolio::IO
   end
 
   def timeout?
-    nil == @deferred && @_write_buffer.empty? and close.nil?
+    if nil == @deferred && @_write_buffer.empty?
+      @_io.shutdown
+      true
+    else
+      false
+    end
   end
 
   # used for streaming sockets and pipes
