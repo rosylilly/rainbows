@@ -18,7 +18,7 @@ lock.flock(File::LOCK_EX)
 Isolate.now!(opts) do
   gem 'kgio', '2.7.4'
   gem 'kcar', '0.3.0'
-  gem 'raindrops', '0.8.0'
+  gem 'raindrops', '0.10.0'
   gem 'unicorn', '4.3.1'
 
   if engine == "ruby"
