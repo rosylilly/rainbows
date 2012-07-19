@@ -44,6 +44,15 @@ require 'thread'
 # does not expose a monotonic clock for users, so don't change
 # the system time while this is running.  All servers should be
 # running ntpd anyways.
+#
+# "ensure" clauses may not fire properly or be interrupted during
+# execution, so do not mix this module with code which relies on "ensure".
+# (This is also true for the "Timeout" module in the Ruby standard library)
+#
+# "recursive locking" ThreadError exceptions may occur if
+# ThreadTimeout fires while a Mutex is locked (because "ensure"
+# clauses may not fire properly).
+
 class Rainbows::ThreadTimeout
 
   # :stopdoc:
