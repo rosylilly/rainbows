@@ -51,8 +51,16 @@ module Rainbows::Fiber::Base
       end
     }
     fibs.each { |fib| fib.resume }
-    now = Time.now
-    max.nil? || max > (now + 1) ? 1 : max - now
+
+    max_sleep = 1.0 # wake up semi-frequently to prevent SIGKILL from master
+    if max
+      max -= Time.now
+      return 0 if max < 0.0
+      return max_sleep if max > max_sleep
+      max
+    else
+      max_sleep
+    end
   end
 
   def process(client)
