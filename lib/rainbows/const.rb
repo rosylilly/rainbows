@@ -2,7 +2,7 @@
 # :enddoc:
 module Rainbows::Const
 
-  RAINBOWS_VERSION = '4.4.0'
+  RAINBOWS_VERSION = '4.4.1'
 
   include Unicorn::Const
 
