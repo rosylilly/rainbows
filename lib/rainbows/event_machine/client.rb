@@ -64,8 +64,11 @@ class Rainbows::EventMachine::Client < EM::Connection
     @state = :headers if alive
     if body.respond_to?(:errback) && body.respond_to?(:callback)
       @deferred = body
+      write_headers(status, headers, alive)
+      write_body_each(body)
       deferred_errback(body)
       deferred_callback(body, alive)
+      return
     elsif body.respond_to?(:to_path)
       st = File.stat(path = body.to_path)
 
